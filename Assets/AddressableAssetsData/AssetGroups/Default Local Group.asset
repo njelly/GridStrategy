@@ -17,6 +17,10 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4123bf7043da5904abae82375ef8f533
   m_SerializeEntries:
+  - m_GUID: 06aeb9d5deedd084797294aa602b45f5
+    m_Address: Assets/_GridStrategy/Prefabs/FX/GroundFog/GroundFog.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 249925a26ff066247b9c5755cb47894e
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Bold SDF.asset
     m_ReadOnly: 0

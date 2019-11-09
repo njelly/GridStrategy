@@ -28,5 +28,13 @@ namespace Tofunaut.GridStrategy
         {
             public const string Default = "Assets/_GridStrategy/DataAssets/PlayerData/DefaultPlayerData.asset";
         }
+
+        public static class Prefabs
+        {
+            public static class FX
+            {
+                public const string GroundFog = "Assets/_GridStrategy/Prefabs/FX/GroundFog/GroundFog.prefab";
+            }
+        }
     }
 }
