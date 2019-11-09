@@ -67,9 +67,9 @@ Material:
     - _OutlineWidth: 0
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
-    - _ScaleRatioA: 1
-    - _ScaleRatioB: 1
-    - _ScaleRatioC: 1
+    - _ScaleRatioA: 0.8333333
+    - _ScaleRatioB: 0.6770833
+    - _ScaleRatioC: 0.6770833
     - _ScaleX: 1
     - _ScaleY: 1
     - _ShaderFlags: 0
@@ -153,9 +153,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: Gravity-UltraLight SDF
   m_EditorClassIdentifier: 
-  hashCode: 0
+  hashCode: 1329106938
   material: {fileID: -5681331499295341198}
-  materialHashCode: 0
+  materialHashCode: -1206255311
   m_Version: 1.1.0
   m_SourceFontFileGUID: 3ce214ad2524ea14a92dfa946885c8c1
   m_SourceFontFile_EditorRef: {fileID: 0}

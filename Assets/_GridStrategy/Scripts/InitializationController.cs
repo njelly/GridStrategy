@@ -73,7 +73,7 @@ namespace Tofunaut.GridStrategy
         private void LoadEssentials_Enter()
         {
             // create the main canvas
-            MainCanvas.Create();
+            UIMainCanvas.Create();
 
             // need to count frames so the canvas has enough time to size itself
             _canvasFrameCounter = 0;

@@ -48,7 +48,7 @@ namespace Tofunaut.GridStrategy
 
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Initializing, Initializing_Enter, null, Initializing_Exit);
-            _stateMachine.Register(State.StartMenu, null, null, null);
+            _stateMachine.Register(State.StartMenu, StartMenu_Enter, null, StartMenu_Exit);
             _stateMachine.Register(State.InGame, null, null, null);
             _stateMachine.ChangeState(State.Initializing);
 
@@ -85,16 +85,34 @@ namespace Tofunaut.GridStrategy
             InitializationController initializationController = gameObject.RequireComponent<InitializationController>();
             initializationController.Completed -= InitializationController_Completed;
             initializationController.enabled = false;
-
-            Debug.Log($"Hello {LocalPlayerManager.LocalPlayerData.playerName}");
         }
 
+        // --------------------------------------------------------------------------------------------
+        private void StartMenu_Enter()
+        {
+            StartMenuController startMenuController = gameObject.RequireComponent<StartMenuController>();
+            startMenuController.Completed += StartMenuController_Completed;
+            startMenuController.enabled = true;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void StartMenu_Exit()
+        {
+            StartMenuController startMenuController = gameObject.RequireComponent<StartMenuController>();
+            startMenuController.Completed -= StartMenuController_Completed;
+            startMenuController.enabled = false;
+        }
         #endregion State Machine
 
         // --------------------------------------------------------------------------------------------
         private void InitializationController_Completed(object sender, ControllerCompletedEventArgs e)
         {
             _stateMachine.ChangeState(State.StartMenu);
+        }
+
+        private void StartMenuController_Completed(object sender, ControllerCompletedEventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
 
         // --------------------------------------------------------------------------------------------

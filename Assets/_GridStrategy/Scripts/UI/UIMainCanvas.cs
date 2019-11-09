@@ -13,14 +13,14 @@ using UnityEngine.UI;
 namespace Tofunaut.GridStrategy.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class MainCanvas : SharpCanvas
+    public class UIMainCanvas : SharpCanvas
     {
-        public static MainCanvas Instance { get; private set; }
+        public static UIMainCanvas Instance { get; private set; }
 
         public static Vector2 ReferenceResolution { get { return new Vector2(1920, 1080); } }
 
         // --------------------------------------------------------------------------------------------
-        private MainCanvas() : base("Main Canvas") { }
+        private UIMainCanvas() : base("Main Canvas") { }
 
         // --------------------------------------------------------------------------------------------
         public static void Create()
@@ -30,7 +30,7 @@ namespace Tofunaut.GridStrategy.UI
                 return;
             }
 
-            Instance = new MainCanvas();
+            Instance = new UIMainCanvas();
             Instance.Render(AppManager.Transform);
 
             Instance._unityCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
