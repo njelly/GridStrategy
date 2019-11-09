@@ -1,0 +1,6 @@
+[submodule "Submodules/TofuCore"]
+	path = Submodules/TofuCore
+	url = git@github.com:njelly/TofuCore.git
+[submodule "Submodules/TofuUnity"]
+	path = Submodules/TofuUnity
+	url = git@github.com:njelly/TofuUnity.git
