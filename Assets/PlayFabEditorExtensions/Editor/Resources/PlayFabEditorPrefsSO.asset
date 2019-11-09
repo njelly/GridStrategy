@@ -15,9 +15,9 @@ MonoBehaviour:
   DevAccountEmail: tofunaut@gmail.com
   DevAccountToken: f59ncnhpf6mtudtgpno3wxwsxxcjtncc4xksw8suz737ed6eixdfs37n8hgdx9zdbdyi153r6wgjnmzahcu639hiiichhp5p365uzxq1s35cseqdjaapwf3r4373je6pp4pysqi1yzqho45b5f1q1ro8ihb3oi1sw6o36s7wiwr73wnpxkoicpt9w67ftprpd9xfp4np
   SelectedStudio: Tofunaut
-  SdkPath: Assets/PlayFabSdk
+  SdkPath: Assets/Plugins/PlayFabSdk
   EdExPath: 
   LocalCloudScriptPath: 
   PanelIsShown: 0
-  curMainMenuIdx: 1
+  curMainMenuIdx: 2
   curSubMenuIdx: 0
