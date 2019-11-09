@@ -1,17 +1,28 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+//  LoginManager (c) 2019 Tofunaut
+//
+//  Created by Nathaniel Ellingson for GridStrategy on 11/09/2019
+//
+////////////////////////////////////////////////////////////////////////////////
+
 using Tofunaut.SharpUnity.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Tofunaut.GridStrategy.UI
 {
+    // --------------------------------------------------------------------------------------------
     public class MainCanvas : SharpCanvas
     {
         public static MainCanvas Instance { get; private set; }
 
         public static Vector2 ReferenceResolution { get { return new Vector2(1920, 1080); } }
 
+        // --------------------------------------------------------------------------------------------
         private MainCanvas() : base("Main Canvas") { }
 
+        // --------------------------------------------------------------------------------------------
         public static void Create()
         {
             if(Instance != null)

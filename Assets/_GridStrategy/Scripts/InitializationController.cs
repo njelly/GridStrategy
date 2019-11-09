@@ -97,9 +97,6 @@ namespace Tofunaut.GridStrategy
 
             if(_canvasFrameCounter > 2 && AppManager.AssetManager.Ready)
             {
-                SharpCamera mainCamera = SharpCamera.Main();
-                mainCamera.Render(AppManager.Transform);
-
                 Complete(new ControllerCompletedEventArgs(true));
             }
         }
