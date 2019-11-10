@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy
@@ -6,5 +7,11 @@ namespace Tofunaut.GridStrategy
     public class PlayerDataAsset : ScriptableObject
     {
         public PlayerData data;
+    }
+
+    [Serializable]
+    public struct PlayerData
+    {
+        public string playerName;
     }
 }
