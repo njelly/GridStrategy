@@ -14,8 +14,10 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy
 {
     // --------------------------------------------------------------------------------------------
-    public class StartMenuController : ControllerBehaviour
+    public class StartMenuController : ControllerBehaviour, UIStartMenuView.IUIStartMenuViewListener
     {
+
+        // --------------------------------------------------------------------------------------------
         private static class State
         {
             public const string Loading = "loading";
@@ -26,6 +28,8 @@ namespace Tofunaut.GridStrategy
         private StartMenuBackgroundView _backgroundView;
         private UIStartMenuView _uiStartMenuView;
 
+
+        // --------------------------------------------------------------------------------------------
         private void Awake()
         {
             _stateMachine = new TofuStateMachine();
@@ -33,19 +37,25 @@ namespace Tofunaut.GridStrategy
             _stateMachine.Register(State.Root, null, null, null);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         private void OnEnable()
         {
             _backgroundView = new StartMenuBackgroundView();
-            _uiStartMenuView = new UIStartMenuView();
+            _uiStartMenuView = new UIStartMenuView(this);
 
             _stateMachine.ChangeState(State.Loading);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         private void Update()
         {
             _stateMachine.Update(Time.deltaTime);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         private void Loading_Enter()
         {
             _backgroundView = new StartMenuBackgroundView();
@@ -61,10 +71,27 @@ namespace Tofunaut.GridStrategy
             });
         }
 
+
+        // --------------------------------------------------------------------------------------------
         private void Loading_Exit()
         {
             _uiStartMenuView.Show();
             _backgroundView.Show();
+        }
+
+        public void OnPlayClicked()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OnLoadoutClicked()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OnSettingsClicked()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

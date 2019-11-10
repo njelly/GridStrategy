@@ -25,6 +25,8 @@ namespace Tofunaut.GridStrategy
         private PlayFabAccountAuthenticationManager _authenticationManager;
         private PlayFabAccountData _accountData;
 
+
+        // --------------------------------------------------------------------------------------------
         protected override void Awake()
         {
             base.Awake();
@@ -32,6 +34,7 @@ namespace Tofunaut.GridStrategy
             name = "AccountManager";
             transform.SetParent(AppManager.Transform);
         }
+
 
         // --------------------------------------------------------------------------------------------
         /// <summary>
@@ -55,12 +58,16 @@ namespace Tofunaut.GridStrategy
             }, onFailure);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public void WritePlayerData(PlayerData playerData, System.Action onSuccess, AccountAuthenticationManager.AuthenticationFailureDelegate onFailure)
         {
             // TODO: This is where the player can save their local data to the cloud
             onSuccess();
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public class AuthenticatedSuccessfullyEventArgs : System.EventArgs
         {
             public readonly PlayFabAccountData accountData;

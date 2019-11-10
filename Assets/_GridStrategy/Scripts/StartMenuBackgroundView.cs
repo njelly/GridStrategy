@@ -12,6 +12,8 @@ using UnityEngine;
 
 namespace Tofunaut.GridStrategy
 {
+
+    // --------------------------------------------------------------------------------------------
     public class StartMenuBackgroundView : AsyncAssetView
     {
         private SharpCamera _camera;
@@ -19,12 +21,16 @@ namespace Tofunaut.GridStrategy
         private GameObject _fogPrefab;
         private GameObject _instantiatedFog;
 
+
+        // --------------------------------------------------------------------------------------------
         public StartMenuBackgroundView() : base (AppManager.AssetManager)
         {
             _camera = new StartMenuBackgroundCamera();
             _light = SharpLight.Sun();
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public override void Load(LoadProgressCallback progressCallback)
         {
             int numCompleted = 0;
@@ -49,6 +55,8 @@ namespace Tofunaut.GridStrategy
             progressCallback((float)numCompleted / numToLoad);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public override void Show()
         {
             _instantiatedFog = Object.Instantiate(_fogPrefab);
@@ -58,6 +66,8 @@ namespace Tofunaut.GridStrategy
             _light.Render(null);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public override void Destroy()
         {
             _camera.Destroy();
@@ -67,18 +77,26 @@ namespace Tofunaut.GridStrategy
             _instantiatedFog = null;
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public override void Release()
         {
             _assetManager.Release<ParticleSystem>(AssetPaths.Prefabs.FX.GroundFog);
         }
 
+
+        // --------------------------------------------------------------------------------------------
         private class StartMenuBackgroundCamera : SharpCamera
         {
+
+            // --------------------------------------------------------------------------------------------
             public StartMenuBackgroundCamera() : base("StartMenuBackgroundCamera") 
             {
                 LocalPosition = new Vector3(0, 1.5f, -10f);
             }
 
+
+            // --------------------------------------------------------------------------------------------
             protected override void Build()
             {
                 base.Build();

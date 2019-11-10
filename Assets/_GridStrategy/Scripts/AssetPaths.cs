@@ -8,8 +8,12 @@
 
 namespace Tofunaut.GridStrategy
 {
+
+    // --------------------------------------------------------------------------------------------
     public static class AssetPaths
     {
+
+        // --------------------------------------------------------------------------------------------
         public static class Fonts
         {
             public const string GravityBold = "Assets/_GridStrategy/Art/Fonts/Gravity-Bold SDF.asset";
@@ -24,11 +28,15 @@ namespace Tofunaut.GridStrategy
             public const string GravityUltraLightItalic = "Assets/_GridStrategy/Art/Fonts/Gravity-UltraLightItalic SDF.asset";
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public static class PlayerData
         {
             public const string Default = "Assets/_GridStrategy/DataAssets/PlayerData/DefaultPlayerData.asset";
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public static class Prefabs
         {
             public static class FX
