@@ -79,19 +79,25 @@ namespace Tofunaut.GridStrategy
             _backgroundView.Show();
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public void OnPlayClicked()
         {
-            throw new System.NotImplementedException();
+            _uiStartMenuView.AnimatePlayButtonSelected(() => { });
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public void OnLoadoutClicked()
         {
-            throw new System.NotImplementedException();
+            _uiStartMenuView.AnimateLoadoutButtonSelected(() => { });
         }
 
+
+        // --------------------------------------------------------------------------------------------
         public void OnSettingsClicked()
         {
-            throw new System.NotImplementedException();
+            _uiStartMenuView.AnimateSettingsButtonSelected(() => { });
         }
     }
 }
