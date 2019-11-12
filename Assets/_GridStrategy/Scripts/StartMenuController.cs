@@ -14,7 +14,7 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy
 {
     // --------------------------------------------------------------------------------------------
-    public class StartMenuController : ControllerBehaviour, UIStartMenuView.IUIStartMenuViewListener
+    public class StartMenuController : ControllerBehaviour, UIStartMenuRootView.IUIStartMenuRootViewListener
     {
 
         // --------------------------------------------------------------------------------------------
@@ -22,11 +22,12 @@ namespace Tofunaut.GridStrategy
         {
             public const string Loading = "loading";
             public const string Root = "root";
+            public const string Disabled = "disabled";
         }
 
         private TofuStateMachine _stateMachine;
         private StartMenuBackgroundView _backgroundView;
-        private UIStartMenuView _uiStartMenuView;
+        private UIStartMenuRootView _uiStartMenuRootView;
 
 
         // --------------------------------------------------------------------------------------------
@@ -34,7 +35,8 @@ namespace Tofunaut.GridStrategy
         {
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Loading, Loading_Enter, null, Loading_Exit);
-            _stateMachine.Register(State.Root, null, null, null);
+            _stateMachine.Register(State.Root, Root_Enter, null, Root_Exit);
+            _stateMachine.Register(State.Disabled, null, null, null);
         }
 
 
@@ -42,9 +44,21 @@ namespace Tofunaut.GridStrategy
         private void OnEnable()
         {
             _backgroundView = new StartMenuBackgroundView();
-            _uiStartMenuView = new UIStartMenuView(this);
+            _uiStartMenuRootView = new UIStartMenuRootView(this);
 
             _stateMachine.ChangeState(State.Loading);
+        }
+
+
+        // --------------------------------------------------------------------------------------------
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            _backgroundView.Destroy();
+            _uiStartMenuRootView.Hide();
+
+            _stateMachine.ChangeState(State.Disabled);
         }
 
 
@@ -75,29 +89,59 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Loading_Exit()
         {
-            _uiStartMenuView.Show();
             _backgroundView.Show();
         }
 
 
         // --------------------------------------------------------------------------------------------
-        public void OnPlayClicked()
+        private void Root_Enter()
         {
-            _uiStartMenuView.AnimatePlayButtonSelected(() => { });
+            _uiStartMenuRootView.Show();
         }
 
 
         // --------------------------------------------------------------------------------------------
-        public void OnLoadoutClicked()
+        private void Root_Exit()
         {
-            _uiStartMenuView.AnimateLoadoutButtonSelected(() => { });
+            _uiStartMenuRootView.Hide();
         }
 
 
         // --------------------------------------------------------------------------------------------
-        public void OnSettingsClicked()
+        public void OnRootNewGameClicked()
         {
-            _uiStartMenuView.AnimateSettingsButtonSelected(() => { });
+            //_uiStartMenuRootView.AnimatePlayButtonSelected(() => 
+            //{
+            //    Debug.Log("play the game");
+            //});
+        }
+
+
+        // --------------------------------------------------------------------------------------------
+        public void OnRootContinueClicked()
+        {
+            //_uiStartMenuRootView.AnimateLoadoutButtonSelected(() => 
+            //{
+            //    Debug.Log("edit palyer's loadout for multiplayer games");
+            //});
+        }
+
+
+        // --------------------------------------------------------------------------------------------
+        public void OnRootMultiplayerClicked()
+        {
+            //_uiStartMenuRootView.AnimateSettingsButtonSelected(() =>
+            //{
+            //    Debug.Log("change settings");
+            //});
+        }
+        // --------------------------------------------------------------------------------------------
+        public void OnRootOptionsClicked()
+        {
+            //_uiStartMenuRootView.AnimateSettingsButtonSelected(() =>
+            //{
+            //    Debug.Log("change settings");
+            //});
         }
     }
 }

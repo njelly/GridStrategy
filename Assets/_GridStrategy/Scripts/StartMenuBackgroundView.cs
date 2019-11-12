@@ -35,7 +35,7 @@ namespace Tofunaut.GridStrategy
         {
             int numCompleted = 0;
             int numToLoad = 1; // update as more assets become necessary
-            if(!_assetManager.IsLoaded(typeof(ParticleSystem), AssetPaths.Prefabs.FX.GroundFog))
+            if(!_assetManager.IsLoaded(typeof(GameObject), AssetPaths.Prefabs.FX.GroundFog))
             {
                 _assetManager.Load(AssetPaths.Prefabs.FX.GroundFog, (bool succesful, GameObject payload) =>
                 {
@@ -49,6 +49,7 @@ namespace Tofunaut.GridStrategy
             }
             else
             {
+                _fogPrefab = _assetManager.Get<GameObject>(AssetPaths.Prefabs.FX.GroundFog);
                 numCompleted += 1;
             }
 

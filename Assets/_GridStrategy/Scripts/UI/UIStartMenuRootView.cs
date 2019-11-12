@@ -16,13 +16,14 @@ namespace Tofunaut.GridStrategy.UI
 {
 
     // --------------------------------------------------------------------------------------------
-    public class UIStartMenuView : SharpUIView
+    public class UIStartMenuRootView : SharpUIView
     {
-        public interface IUIStartMenuViewListener
+        public interface IUIStartMenuRootViewListener
         {
-            void OnPlayClicked();
-            void OnLoadoutClicked();
-            void OnSettingsClicked();
+            void OnRootNewGameClicked();
+            void OnRootContinueClicked();
+            void OnRootMultiplayerClicked();
+            void OnRootOptionsClicked();
         }
 
         private const float BackgroundFadeInTime = 6f;
@@ -32,17 +33,18 @@ namespace Tofunaut.GridStrategy.UI
         private const float CanvasGroupFadeInDelay = 1f;
         private const float CanvasGroupFadeInTime = 3f;
 
-        private IUIStartMenuViewListener _listener;
+        private IUIStartMenuRootViewListener _listener;
         private SharpUIImage _background;
         private SharpUICanvasGroup _canvasGroup;
         private SharpUIBase _buttonLayout;
-        private UIStartMenuButton _playButton;
-        private UIStartMenuButton _loadoutButton;
-        private UIStartMenuButton _settingsButton;
+        private UIStartMenuButton _newGameButton;
+        private UIStartMenuButton _continueButton;
+        private UIStartMenuButton _multiplayerButton;
+        private UIStartMenuButton _optionsButton;
 
 
         // --------------------------------------------------------------------------------------------
-        public UIStartMenuView(IUIStartMenuViewListener listener) : base(UIMainCanvas.Instance)
+        public UIStartMenuRootView(IUIStartMenuRootViewListener listener) : base(UIMainCanvas.Instance)
         {
             _listener = listener;
         }
@@ -91,19 +93,22 @@ namespace Tofunaut.GridStrategy.UI
         {
             SharpUIVerticalLayout toReturn = new SharpUIVerticalLayout("ButtonLayout");
             toReturn.alignment = EAlignment.BottomCenter;
-            toReturn.margin = new RectOffset(0, 0, 0, 300);
+            toReturn.margin = new RectOffset(0, 0, 0, 200);
             toReturn.childAlignment = EAlignment.MiddleCenter;
             toReturn.spacing = 50;
             toReturn.SetFitSize();
 
-            _playButton = new UIStartMenuButton("Play", _listener.OnPlayClicked);
-            toReturn.AddChild(_playButton);
+            _newGameButton = new UIStartMenuButton("New Game", () => { AnimateNewGameButtonSelected(_listener.OnRootNewGameClicked); });
+            toReturn.AddChild(_newGameButton);
 
-            _loadoutButton = new UIStartMenuButton("Loadout", _listener.OnLoadoutClicked);
-            toReturn.AddChild(_loadoutButton);
+            _continueButton = new UIStartMenuButton("Continue", () => { AnimateContinueButtonSelected(_listener.OnRootContinueClicked); });
+            toReturn.AddChild(_continueButton);
 
-            _settingsButton = new UIStartMenuButton("Settings", _listener.OnSettingsClicked);
-            toReturn.AddChild(_settingsButton);
+            _multiplayerButton = new UIStartMenuButton("Multiplayer", () => { AnimateMultiplayerButtonSelected(_listener.OnRootMultiplayerClicked); });
+            toReturn.AddChild(_multiplayerButton);
+
+            _optionsButton = new UIStartMenuButton("Options", () => { AnimateOptionsButtonSelected(_listener.OnRootOptionsClicked); });
+            toReturn.AddChild(_optionsButton);
 
             return toReturn;
         }
@@ -140,29 +145,34 @@ namespace Tofunaut.GridStrategy.UI
 
 
         // --------------------------------------------------------------------------------------------
-        public void AnimatePlayButtonSelected(Action onComplete)
+        // TODO: put these into one function somehow
+        private void AnimateNewGameButtonSelected(Action onComplete)
         {
-            _playButton.AnimateSelected(onComplete);
-            _loadoutButton.AnimateAway(0f);
-            _settingsButton.AnimateAway(0.1f);
+            _newGameButton.AnimateSelected(onComplete);
+            _continueButton.AnimateAway(0.3f);
+            _multiplayerButton.AnimateAway(0.2f);
+            _optionsButton.AnimateAway(0.1f);
         }
-
-
-        // --------------------------------------------------------------------------------------------
-        public void AnimateLoadoutButtonSelected(Action onComplete)
+        private void AnimateContinueButtonSelected(Action onComplete)
         {
-            _loadoutButton.AnimateSelected(onComplete);
-            _playButton.AnimateAway(0f);
-            _settingsButton.AnimateAway(0.1f);
+            _newGameButton.AnimateAway(0.3f);
+            _continueButton.AnimateSelected(onComplete);
+            _multiplayerButton.AnimateAway(0.2f);
+            _optionsButton.AnimateAway(0.1f);
         }
-
-
-        // --------------------------------------------------------------------------------------------
-        public void AnimateSettingsButtonSelected(Action onComplete)
+        private void AnimateMultiplayerButtonSelected(Action onComplete)
         {
-            _settingsButton.AnimateSelected(onComplete);
-            _playButton.AnimateAway(0f);
-            _loadoutButton.AnimateAway(0.1f);
+            _newGameButton.AnimateAway(0.3f);
+            _continueButton.AnimateAway(0.2f);
+            _multiplayerButton.AnimateSelected(onComplete);
+            _optionsButton.AnimateAway(0.1f);
+        }
+        private void AnimateOptionsButtonSelected(Action onComplete)
+        {
+            _newGameButton.AnimateAway(0.3f);
+            _continueButton.AnimateAway(0.2f);
+            _multiplayerButton.AnimateAway(0.1f);
+            _optionsButton.AnimateSelected(onComplete);
         }
 
 
@@ -178,11 +188,12 @@ namespace Tofunaut.GridStrategy.UI
             private const float PressedScale = 0.9f;
             private const float PressAnimTime = 0.3f;
             private const float AnimateAwayDistance = -300;
-            private const float AnimateAwayTime = 1f;
+            private const float AnimateAwayTime = 0.5f;
             private const float AnimateSelectedDistance = 50;
             private const float AnimateSelectedTime = 0.5f;
             private const float AnimateSelectedScale = 1.2f;
 
+            private Action _onClicked;
             private SharpUIImage _background;
             private SharpUITextMeshPro _captionLabel;
             private TofuAnimation _pointerEnterAnim;
@@ -195,6 +206,8 @@ namespace Tofunaut.GridStrategy.UI
             {
                 SetFixedSize(Size);
                 alignment = EAlignment.MiddleCenter;
+
+                _onClicked = onClicked;
 
                 _background = new SharpUIImage($"{name}_Background", null);
                 _background.SetFillSize(EAxis.X);
@@ -212,30 +225,46 @@ namespace Tofunaut.GridStrategy.UI
                 _captionLabel.alignment = EAlignment.MiddleCenter;
                 AddChild(_captionLabel);
 
-                SubscribeToEvent(EEventType.PointerEnter, (object sender, EventSystemEventArgs e) =>
-                {
-                    Highlight();
-                });
+                SubscribeToEvent(EEventType.PointerEnter, OnPointerEnter);
+                SubscribeToEvent(EEventType.PointerExit, OnPointerExit);
+                SubscribeToEvent(EEventType.PointerDown, OnPointerDown);
+                SubscribeToEvent(EEventType.PointerUp, OnPointerUp);
+                SubscribeToEvent(EEventType.PointerClick, OnClicked);
+            }
 
-                SubscribeToEvent(EEventType.PointerExit, (object sender, EventSystemEventArgs e) =>
-                {
-                    UnHighlight();
-                });
 
-                SubscribeToEvent(EEventType.PointerDown, (object sender, EventSystemEventArgs e) =>
-                {
-                    Press();
-                });
+            // --------------------------------------------------------------------------------------------
+            private void OnPointerEnter(object sender, EventSystemEventArgs e )
+            {
+                Highlight();
+            }
 
-                SubscribeToEvent(EEventType.PointerUp, (object sender, EventSystemEventArgs e) =>
-                {
-                    UnPress();
-                });
 
-                SubscribeToEvent(EEventType.PointerClick, (object sender, EventSystemEventArgs e) =>
-                {
-                    onClicked?.Invoke();
-                });
+            // --------------------------------------------------------------------------------------------
+            private void OnPointerExit(object sender, EventSystemEventArgs e)
+            {
+                UnHighlight();
+            }
+
+
+            // --------------------------------------------------------------------------------------------
+            private void OnPointerDown(object sender, EventSystemEventArgs e)
+            {
+                Press();
+            }
+
+
+            // --------------------------------------------------------------------------------------------
+            private void OnPointerUp(object sender, EventSystemEventArgs e)
+            {
+                UnPress();
+            }
+
+
+            // --------------------------------------------------------------------------------------------
+            private void OnClicked(object sender, EventSystemEventArgs e)
+            {
+                _onClicked?.Invoke();
             }
 
 
@@ -325,7 +354,11 @@ namespace Tofunaut.GridStrategy.UI
             // --------------------------------------------------------------------------------------------
             public void AnimateAway(float delay)
             {
-                UnHighlight();
+                UnsubscribeToEvent(EEventType.PointerEnter, OnPointerEnter);
+                UnsubscribeToEvent(EEventType.PointerExit, OnPointerExit);
+                UnsubscribeToEvent(EEventType.PointerDown, OnPointerDown);
+                UnsubscribeToEvent(EEventType.PointerUp, OnPointerUp);
+                UnsubscribeToEvent(EEventType.PointerClick, OnClicked);
 
                 Vector2 startPosition = RectTransform.anchoredPosition;
                 Vector2 endPosition = startPosition + Vector2.up * AnimateAwayDistance;
@@ -347,6 +380,12 @@ namespace Tofunaut.GridStrategy.UI
             public void AnimateSelected(Action onComplete)
             {
                 UnHighlight();
+
+                UnsubscribeToEvent(EEventType.PointerEnter, OnPointerEnter);
+                UnsubscribeToEvent(EEventType.PointerExit, OnPointerExit);
+                UnsubscribeToEvent(EEventType.PointerDown, OnPointerDown);
+                UnsubscribeToEvent(EEventType.PointerUp, OnPointerUp);
+                UnsubscribeToEvent(EEventType.PointerClick, OnClicked);
 
                 Vector2 startPosition = RectTransform.anchoredPosition;
                 Vector2 endPosition = startPosition  + Vector2.up * AnimateSelectedTime;
