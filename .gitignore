@@ -34,3 +34,9 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+# Symlinks
+Assets/Plugins/TofuUnity
+Assets/Plugins/TofuUnity.meta
+Assets/Plugins/TofuCore
+Assets/Plugins/TofuCore.meta
