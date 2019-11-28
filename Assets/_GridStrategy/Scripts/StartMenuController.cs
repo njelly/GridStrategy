@@ -110,38 +110,45 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public void OnRootNewGameClicked()
         {
-            //_uiStartMenuRootView.AnimatePlayButtonSelected(() => 
-            //{
-            //    Debug.Log("play the game");
-            //});
+            Complete(new StartMenuControllerCompletedEventArgs(StartMenuControllerCompletedEventArgs.Intention.StartSinglePlayer, true));
         }
 
 
         // --------------------------------------------------------------------------------------------
         public void OnRootContinueClicked()
         {
-            //_uiStartMenuRootView.AnimateLoadoutButtonSelected(() => 
-            //{
-            //    Debug.Log("edit palyer's loadout for multiplayer games");
-            //});
+            Debug.Log("Continue...");
         }
 
 
         // --------------------------------------------------------------------------------------------
         public void OnRootMultiplayerClicked()
         {
-            //_uiStartMenuRootView.AnimateSettingsButtonSelected(() =>
-            //{
-            //    Debug.Log("change settings");
-            //});
+            Debug.Log("Multiplayer...");
         }
+
+
         // --------------------------------------------------------------------------------------------
         public void OnRootOptionsClicked()
         {
-            //_uiStartMenuRootView.AnimateSettingsButtonSelected(() =>
-            //{
-            //    Debug.Log("change settings");
-            //});
+            Debug.Log("Options...");
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------
+    public class StartMenuControllerCompletedEventArgs : ControllerCompletedEventArgs
+    {
+        public enum Intention
+        {
+            QuitApp,
+            StartSinglePlayer,
+        }
+
+        public readonly Intention intention;
+
+        public StartMenuControllerCompletedEventArgs(Intention intention, bool successful) : base(successful)
+        {
+            this.intention = intention;
         }
     }
 }

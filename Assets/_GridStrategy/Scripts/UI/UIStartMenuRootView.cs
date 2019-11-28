@@ -199,7 +199,8 @@ namespace Tofunaut.GridStrategy.UI
             private TofuAnimation _pointerEnterAnim;
             private TofuAnimation _pointerExitAnim;
             private TofuAnimation _pointerDownAnim;
-
+            private TofuAnimation _animateAwayAnim;
+            private TofuAnimation _animateSelectedAnim;
 
             // --------------------------------------------------------------------------------------------
             public UIStartMenuButton(string caption, Action onClicked) : base($"{caption}_Button")
@@ -232,6 +233,16 @@ namespace Tofunaut.GridStrategy.UI
                 SubscribeToEvent(EEventType.PointerClick, OnClicked);
             }
 
+            public override void Destroy()
+            {
+                base.Destroy();
+
+                _pointerEnterAnim?.Stop();
+                _pointerExitAnim?.Stop();
+                _pointerDownAnim?.Stop();
+                _animateAwayAnim?.Stop();
+                _animateSelectedAnim?.Stop();
+            }
 
             // --------------------------------------------------------------------------------------------
             private void OnPointerEnter(object sender, EventSystemEventArgs e )
@@ -364,7 +375,7 @@ namespace Tofunaut.GridStrategy.UI
                 Vector2 endPosition = startPosition + Vector2.up * AnimateAwayDistance;
                 Color startColor = _captionLabel.Color;
                 Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
-                new TofuAnimation()
+                _animateAwayAnim = new TofuAnimation()
                     .Wait(delay)
                     .Then()
                     .Value01(AnimateAwayTime, EEaseType.EaseOutExpo, (float newValue) =>
@@ -393,7 +404,7 @@ namespace Tofunaut.GridStrategy.UI
                 Color endColor = Color.white;
                 Vector3 startScale = Vector3.one;
                 Vector3 endScale = Vector3.one * AnimateSelectedScale;
-                new TofuAnimation()
+                _animateSelectedAnim = new TofuAnimation()
                     .Value01(AnimateAwayTime, EEaseType.EaseOutExpo, (float newValue) =>
                     {
                         RectTransform.anchoredPosition = Vector2.LerpUnclamped(startPosition, endPosition, newValue);

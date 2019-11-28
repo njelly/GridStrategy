@@ -49,7 +49,7 @@ namespace Tofunaut.GridStrategy
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Initializing, Initializing_Enter, null, Initializing_Exit);
             _stateMachine.Register(State.StartMenu, StartMenu_Enter, null, StartMenu_Exit);
-            _stateMachine.Register(State.InGame, null, null, null);
+            _stateMachine.Register(State.InGame, InGame_Enter, null, InGame_Exit);
             _stateMachine.ChangeState(State.Initializing);
 
             _assetManager = new AssetManager();
@@ -102,6 +102,23 @@ namespace Tofunaut.GridStrategy
             startMenuController.Completed -= StartMenuController_Completed;
             startMenuController.enabled = false;
         }
+
+        // --------------------------------------------------------------------------------------------
+        private void InGame_Enter()
+        {
+            InGameController inGameController = gameObject.RequireComponent<InGameController>();
+            inGameController.Completed += InGameController_Completed;
+            inGameController.enabled = true;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void InGame_Exit()
+        {
+            InGameController inGameController = gameObject.RequireComponent<InGameController>();
+            inGameController.Completed -= InGameController_Completed;
+            inGameController.enabled = false;
+        }
+
         #endregion State Machine
 
         // --------------------------------------------------------------------------------------------
@@ -110,9 +127,25 @@ namespace Tofunaut.GridStrategy
             _stateMachine.ChangeState(State.StartMenu);
         }
 
+        // --------------------------------------------------------------------------------------------
         private void StartMenuController_Completed(object sender, ControllerCompletedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            StartMenuControllerCompletedEventArgs startMenuControllerCompletedEventArgs = e as StartMenuControllerCompletedEventArgs;
+            switch (startMenuControllerCompletedEventArgs.intention)
+            {
+                case StartMenuControllerCompletedEventArgs.Intention.QuitApp:
+                    Application.Quit();
+                    Debug.Log("The app has quit");
+                    break;
+                case StartMenuControllerCompletedEventArgs.Intention.StartSinglePlayer:
+                    _stateMachine.ChangeState(State.InGame);
+                    break;
+            }
+        }
+
+        private void InGameController_Completed(object sender, ControllerCompletedEventArgs e)
+        {
+            _stateMachine.ChangeState(State.StartMenu);
         }
 
         // --------------------------------------------------------------------------------------------
