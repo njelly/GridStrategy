@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data:
     playerName: DefaultPlayer
+    currentWorldZonePrefab: {fileID: 8679183932312975568, guid: a46d3d5be6fddcc45a1a75b55499c01c,
+      type: 3}

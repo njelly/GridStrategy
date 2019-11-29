@@ -17,6 +17,10 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 4123bf7043da5904abae82375ef8f533
   m_SerializeEntries:
+  - m_GUID: 03186e1b75cca5e4a9277bc5833af6a6
+    m_Address: Assets/_GridStrategy/Prefabs/GameEntityView.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 06aeb9d5deedd084797294aa602b45f5
     m_Address: Assets/_GridStrategy/Prefabs/FX/GroundFog/GroundFog.prefab
     m_ReadOnly: 0
@@ -47,6 +51,10 @@ MonoBehaviour:
     m_SerializedLabels: []
   - m_GUID: 8ec22ffdcc86496429116afaa55b8bf5
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Book SDF.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a46d3d5be6fddcc45a1a75b55499c01c
+    m_Address: Assets/_GridStrategy/Prefabs/WorldZones/Route1.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: c9da88734fa7c3a428386a19eb26a98e

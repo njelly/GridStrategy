@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using Tofunaut.Core;
+using Tofunaut.GridStrategy.Game;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace Tofunaut.GridStrategy
         }
 
         private TofuStateMachine _stateMachine;
+        private GameManager _gameManager;
 
         // --------------------------------------------------------------------------------------------
         private void Awake()
@@ -53,9 +55,20 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void InGame_Enter()
         {
-            Debug.Log("InGame_Enter");
+            _gameManager = new GameManager();
         }
 
         #endregion State Machine
+
+        protected override void Complete(ControllerCompletedEventArgs e)
+        {
+            base.Complete(e);
+
+            if (_gameManager != null)
+            {
+                _gameManager.CleanUp();
+                _gameManager = null;
+            }
+        }
     }
 }

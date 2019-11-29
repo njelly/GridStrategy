@@ -31,6 +31,8 @@ namespace Tofunaut.GridStrategy
         public static AssetManager AssetManager { get { return _instance._assetManager; } }
         public static Transform Transform { get { return _instance.transform; } }
 
+        public GameObject testObjectsRoot;
+
         private TofuStateMachine _stateMachine;
         private AssetManager _assetManager;
 
@@ -38,6 +40,9 @@ namespace Tofunaut.GridStrategy
         protected override void Awake()
         {
             base.Awake();
+
+            // test objects are for messing around in the scene and should be destroyed immediately
+            Destroy(testObjectsRoot);
 
             DontDestroyOnLoad(gameObject);
 

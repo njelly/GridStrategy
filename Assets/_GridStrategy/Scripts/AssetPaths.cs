@@ -39,9 +39,18 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public static class Prefabs
         {
+            public const string GameEntityView = "Assets/_GridStrategy/Prefabs/GameEntityView.prefab";
+
+            // --------------------------------------------------------------------------------------------
             public static class FX
             {
                 public const string GroundFog = "Assets/_GridStrategy/Prefabs/FX/GroundFog/GroundFog.prefab";
+            }
+
+            // --------------------------------------------------------------------------------------------
+            public static class WorldZones
+            {
+                public const string Route1 = "Assets/_GridStrategy/Prefabs/WorldZones/Route1.prefab";
             }
         }
     }
