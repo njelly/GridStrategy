@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System.Collections.Generic;
 using Tofunaut.SharpUnity;
 
 namespace Tofunaut.GridStrategy.Game
@@ -16,14 +17,25 @@ namespace Tofunaut.GridStrategy.Game
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
 
+        private int _currentPlayerIndex;
+        private List<Player> _players;
+
         // --------------------------------------------------------------------------------------------
-        public GameManager()
+        public GameManager(List<PlayerData> players, int firstPlayerIndex)
         {
             gameCamera = GameCamera.Create();
             gameCamera.Render(AppManager.Transform);
 
             sun = SharpLight.Sun();
             sun.Render(AppManager.Transform);
+
+            _players = new List<Player>();
+            foreach(PlayerData playerData in players)
+            {
+                //_players.Add(new Player())
+            }
+
+            _currentPlayerIndex = firstPlayerIndex;
         }
 
         // --------------------------------------------------------------------------------------------

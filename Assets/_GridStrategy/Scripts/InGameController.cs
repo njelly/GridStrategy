@@ -47,8 +47,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Loading_Enter()
         {
-            // TODO: actually load stuff
-
+            // TODO: Actually load stuff
             _stateMachine.ChangeState(State.InGame);
         }
 

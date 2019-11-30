@@ -30,16 +30,16 @@ namespace Tofunaut.GridStrategy
 
 
         // --------------------------------------------------------------------------------------------
-        public static class PlayerData
+        public static class UserData
         {
-            public const string Default = "Assets/_GridStrategy/DataAssets/PlayerData/DefaultPlayerData.asset";
+            public const string Default = "Assets/_GridStrategy/DataAssets/UserData/DefaultUserData.asset";
         }
 
 
         // --------------------------------------------------------------------------------------------
         public static class Prefabs
         {
-            public const string GameEntityView = "Assets/_GridStrategy/Prefabs/GameEntityView.prefab";
+            public const string BoardTileView = "Assets/_GridStrategy/Prefabs/BoardTileView.prefab";
 
             // --------------------------------------------------------------------------------------------
             public static class FX
@@ -48,9 +48,9 @@ namespace Tofunaut.GridStrategy
             }
 
             // --------------------------------------------------------------------------------------------
-            public static class WorldZones
+            public static class GameEntityViews
             {
-                public const string Route1 = "Assets/_GridStrategy/Prefabs/WorldZones/Route1.prefab";
+                public const string DefaultHero = "Assets/_GridStrategy/Prefabs/GameEntityViews/HeroView.prefab";
             }
         }
     }

@@ -88,7 +88,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void IntializeWithDefaultData(Action onComplete)
         {
-            AppManager.AssetManager.Load(AssetPaths.PlayerData.Default, (bool success, PlayerDataAsset payload) =>
+            AppManager.AssetManager.Load(AssetPaths.UserData.Default, (bool success, UserDataAsset payload) =>
             {
                 if(success)
                 {
