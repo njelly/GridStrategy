@@ -54,7 +54,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void InGame_Enter()
         {
-            _gameManager = new GameManager();
+            //_gameManager = new GameManager();
         }
 
         #endregion State Machine

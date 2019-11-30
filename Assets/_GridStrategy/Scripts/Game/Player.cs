@@ -18,31 +18,32 @@ namespace Tofunaut.GridStrategy.Game
         public IReadOnlyCollection<Card> Hand { get { return _hand.AsReadOnly(); } }
         public IReadOnlyCollection<Card> DiscardPile { get { return _discardPile.AsReadOnly(); } }
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
+        public Unit Hero { get { return _hero; } }
 
         // Cards the player does not have access to until they are drawn.
-        private List<Card> _deck;
+        private readonly List<Card> _deck;
 
         // The cards the player has access to and can potentially play on the player's turn.
-        private List<Card> _hand;
+        private readonly List<Card> _hand;
 
         // Cards that have been discarded from the player's hand.
-        private List<Card> _discardPile;
+        private readonly List<Card> _discardPile;
 
         // The game entities the player controls on the board.
-        private List<Unit> _units;
+        private readonly List<Unit> _units;
 
         // The player's hero is the unit the player starts with. When it is defeated, the player loses.
         private Unit _hero;
 
         // --------------------------------------------------------------------------------------------
-        public Player(UnitData heroData, List<CardData> deckData)
+        public Player(PlayerData playerData)
         {
             // create the player's deck
             _deck = new List<Card>();
-            foreach(CardData cardData in deckData)
-            {
-                _deck.Add(Card.Create(this, cardData));
-            }
+            //foreach(CardDataAsset cardDataAsset in playerData.deckDataAssets)
+            //{
+            //    _deck.Add(Card.Create(this, cardDataAsset.data));
+            //}
 
             // create the player's hand, but it will be empty until the player draws cards
             _hand = new List<Card>();
@@ -52,7 +53,7 @@ namespace Tofunaut.GridStrategy.Game
 
             // create the list of units and the player's hero, and add the hero to the list of units
             _units = new List<Unit>();
-            _hero = Unit.Create(heroData);
+            _hero = Unit.Create(playerData.heroDataAsset.data);
             _units.Add(_hero);
         }
 

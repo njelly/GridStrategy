@@ -49,7 +49,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void InitializeLocalPlayer_Enter()
         {
-            LocalPlayerManager.Instance.Initialize(() =>
+            LocalUserManager.Instance.Initialize(() =>
             {
                 _stateMachine.ChangeState(State.LogIn);
             });

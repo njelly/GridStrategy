@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
 using Tofunaut.GridStrategy.Game;
 using UnityEngine;
 
@@ -26,5 +27,7 @@ namespace Tofunaut.GridStrategy
     public struct UserData
     {
         public string name;
+        public List<CardDataAsset> cardLibrary;
+        public List<DeckDataAsset> decks;
     }
 }

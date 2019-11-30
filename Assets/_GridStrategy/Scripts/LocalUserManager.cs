@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  LocalPlayerManager (c) 2019 Tofunaut
+//  LocalUserDataManager (c) 2019 Tofunaut
 //
 //  Created by Nathaniel Ellingson for GridStrategy on 11/09/2019
 //
@@ -17,18 +17,18 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy
 {
     // --------------------------------------------------------------------------------------------
-    public class LocalPlayerManager : AutomaticSingletonBehaviour<LocalPlayerManager>
+    public class LocalUserManager : AutomaticSingletonBehaviour<LocalUserManager>
     {
-        public static PlayerData LocalPlayerData { get; set; }
+        public static UserData LocalUserData { get; set; }
 
-        private const string SerializedLocalPlayerDataKey = "local_player_data";
+        private const string SerializedLocalPlayerDataKey = "local_user_data";
 
         // --------------------------------------------------------------------------------------------
         protected override void Awake()
         {
             base.Awake();
 
-            name = "LocalPlayerManager";
+            name = "LocalUserManager";
             transform.SetParent(AppManager.Transform);
 
             AccountManager.AuthenticatedSuccessfully += AccountManager_AuthenticatedSuccessfully;
@@ -50,7 +50,7 @@ namespace Tofunaut.GridStrategy
             {
                 try
                 {
-                    LocalPlayerData = JsonUtility.FromJson<PlayerData>(serializedLocalPlayerData);
+                    LocalUserData = JsonUtility.FromJson<UserData>(serializedLocalPlayerData);
                     onComplete();
                 }
                 catch
@@ -68,12 +68,12 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public void Save(Action onComplete)
         {
-            PlayerPrefs.SetString(SerializedLocalPlayerDataKey, JsonUtility.ToJson(LocalPlayerData));
+            PlayerPrefs.SetString(SerializedLocalPlayerDataKey, JsonUtility.ToJson(LocalUserData));
 
-            // if the player is logged in, attempt to write their player data to their account
+            // if the user is logged in, attempt to write their data to their account
             if(AccountManager.LoggedIn)
             {
-                AccountManager.Instance.WritePlayerData(LocalPlayerData, onComplete, (TofuError errorCode, string errorMessage) =>
+                AccountManager.Instance.WriteUserData(LocalUserData, onComplete, (TofuError errorCode, string errorMessage) =>
                 {
                     Debug.LogError($"Failed to write player data remotely, code: {errorCode}, message: {errorMessage}");
                     onComplete();
@@ -94,7 +94,7 @@ namespace Tofunaut.GridStrategy
                 {
                     Debug.Log("initalized with default player data");
 
-                    LocalPlayerData = payload.data;
+                    LocalUserData = payload.data;
                     onComplete();
                 }
                 else
@@ -107,15 +107,15 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void AccountManager_AuthenticatedSuccessfully(object sender, AccountManager.AuthenticatedSuccessfullyEventArgs e)
         {
-            PlayerData copy = LocalPlayerData;
+            UserData copy = LocalUserData;
 
             string displayName = e.accountData.playerProfileModel.DisplayName;
             if(!string.IsNullOrEmpty(displayName))
             {
-                copy.playerName = displayName;
+                copy.name = displayName;
             }
 
-            LocalPlayerData = copy;
+            LocalUserData = copy;
         }
     }
 }

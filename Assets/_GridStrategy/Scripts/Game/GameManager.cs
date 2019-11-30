@@ -8,12 +8,15 @@
 
 using System.Collections.Generic;
 using Tofunaut.SharpUnity;
+using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
     public class GameManager
     {
+        public static GameManager Instance { get; private set; }
+
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
 
@@ -23,6 +26,14 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public GameManager(List<PlayerData> players, int firstPlayerIndex)
         {
+            if(Instance != null)
+            {
+                Debug.LogError("Only one instance of GameManager can exist at a time!");
+                return;
+            }
+
+            Instance = this;
+
             gameCamera = GameCamera.Create();
             gameCamera.Render(AppManager.Transform);
 
@@ -41,6 +52,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void CleanUp()
         {
+            Instance = null;
             gameCamera.Destroy();
             sun.Destroy();
         }

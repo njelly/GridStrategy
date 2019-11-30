@@ -60,7 +60,7 @@ namespace Tofunaut.GridStrategy
 
 
         // --------------------------------------------------------------------------------------------
-        public void WritePlayerData(PlayerData playerData, System.Action onSuccess, AccountAuthenticationManager.AuthenticationFailureDelegate onFailure)
+        public void WriteUserData(UserData userData, System.Action onSuccess, AccountAuthenticationManager.AuthenticationFailureDelegate onFailure)
         {
             // TODO: This is where the player can save their local data to the cloud
             onSuccess();

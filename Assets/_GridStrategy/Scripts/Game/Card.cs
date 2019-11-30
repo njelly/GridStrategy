@@ -18,7 +18,7 @@ namespace Tofunaut.GridStrategy.Game
             Invalid = 0,
             Ally = 1,
             Skill = 2,
-            Equipment = 3,
+            Equip = 3,
         }
 
         // --------------------------------------------------------------------------------------------
@@ -59,8 +59,8 @@ namespace Tofunaut.GridStrategy.Game
                 case Type.Skill:
                     toReturn = SkillCard.Create(data);
                     break;
-                case Type.Equipment:
-                    toReturn = EquipmentCard.Create(data);
+                case Type.Equip:
+                    toReturn = EquipCard.Create(data);
                     break;
                 default:
                     Debug.LogError($"the type {data.type} has not been implemented.");
