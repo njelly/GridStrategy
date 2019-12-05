@@ -17,13 +17,4 @@ namespace Tofunaut.GridStrategy.Game
     {
         public CardData data;
     }
-
-    // --------------------------------------------------------------------------------------------
-    [Serializable]
-    public struct CardData
-    {
-        public string name;
-        public Card.Type type;
-        public int solidarityRequired;
-    }
 }

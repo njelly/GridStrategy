@@ -18,14 +18,4 @@ namespace Tofunaut.GridStrategy.Game
     {
         public UnitData data;
     }
-
-    // --------------------------------------------------------------------------------------------
-    [Serializable]
-    public struct UnitData
-    {
-        public string name;
-        public string prefabPath;
-        public float health;
-        public int moveSpeed;
-    }
 }

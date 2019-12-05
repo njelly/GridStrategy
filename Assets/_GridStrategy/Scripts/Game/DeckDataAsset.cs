@@ -18,19 +18,4 @@ namespace Tofunaut.GridStrategy.Game
     {
         public DeckData data;
     }
-
-    // --------------------------------------------------------------------------------------------
-    [Serializable]
-    public struct DeckData
-    {
-        public List<CardCountPairing> cards;
-    }
-
-    // --------------------------------------------------------------------------------------------
-    [Serializable]
-    public struct CardCountPairing
-    {
-        public CardDataAsset cardDataAsset;
-        public int count;
-    }
 }

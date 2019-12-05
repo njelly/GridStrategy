@@ -30,6 +30,7 @@ namespace Tofunaut.GridStrategy
         public static bool IsClientValid { get; private set; }
         public static AssetManager AssetManager { get { return _instance._assetManager; } }
         public static Transform Transform { get { return _instance.transform; } }
+        public static Config Config { get; private set; }
 
         public GameObject testObjectsRoot;
 
@@ -162,7 +163,19 @@ namespace Tofunaut.GridStrategy
             }
             else
             {
-                throw new System.Exception($"the key [required_version] wasn't found in the title data");
+                throw new System.Exception($"the key required_version wasn't found in the title data");
+            }
+
+            if(e.accountData.titleData.TryGetValue("game_config", out string serializedConfig))
+            {
+                serializedConfig = serializedConfig.Replace(@"\r", "");
+                serializedConfig = serializedConfig.Replace(@"\n", "");
+
+                Config = new Config(serializedConfig);
+            }
+            else
+            {
+                throw new System.Exception("the key game_config wasn't found in the title data");
             }
         }
     }

@@ -34,7 +34,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         protected Card(CardData data)
         {
-            name = data.name;
+            name = data.displayName;
             solidarityRequired = data.solidarityRequired;
         }
 
