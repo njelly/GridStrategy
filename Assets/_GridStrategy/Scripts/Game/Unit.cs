@@ -33,7 +33,7 @@ namespace Tofunaut.GridStrategy.Game
         private TofuStateMachine _stateMachine;
 
         // --------------------------------------------------------------------------------------------
-        protected Unit(UnitData data) : base(data.displayName) 
+        protected Unit(UnitData data) : base(data.id) 
         {
             _data = data;
 
@@ -59,14 +59,14 @@ namespace Tofunaut.GridStrategy.Game
             {
                 if(!succesfull)
                 {
-                    Debug.LogError($"Failed to load the UnitView prefab for {_data.displayName} at the path {_data.prefabPath}");
+                    Debug.LogError($"Failed to load the UnitView prefab for {_data.id} at the path {_data.prefabPath}");
                     return;
                 }
 
                 _unitView = Object.Instantiate(payload, Transform, false).GetComponent<UnitView>();
                 if(_unitView == null)
                 {
-                    Debug.LogError($"Failed to get the UnitView MonoBehaviour on instantiated prefab for {_data.displayName} at the path {_data.prefabPath}");
+                    Debug.LogError($"Failed to get the UnitView MonoBehaviour on instantiated prefab for {_data.id} at the path {_data.prefabPath}");
                     return;
                 }
             });
@@ -114,6 +114,7 @@ namespace Tofunaut.GridStrategy.Game
             return new Unit(data);
         }
 
+        // --------------------------------------------------------------------------------------------
         public void Update(float deltaTime)
         {
             _stateMachine.Update(deltaTime);
