@@ -8,52 +8,56 @@ namespace Tofunaut.GridStrategy
     // --------------------------------------------------------------------------------------------
     public class Config
     {
+        private const string CardsKey = "Cards";
+        private const string DecksKey = "Decks";
+        private const string UnitsKey = "Units";
+        private const string OpponentsKey = "Opponents";
+
+        private delegate bool ParseRawDataDelegate(object[] rawData);
+
         private Dictionary<string, CardData> _idToCardData;
         private Dictionary<string, DeckData> _idToDeckData;
         private Dictionary<string, UnitData> _idToUnitData;
+        private Dictionary<string, OpponentData> _idToOpponentData;
 
         // --------------------------------------------------------------------------------------------
         public Config(string serializedData)
         {
-            Dictionary<string, object[]> sheetToData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object[]>>(serializedData);
+            Dictionary<string, object[]> sheetData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object[]>>(serializedData);
 
-            // Cards
-            if (sheetToData.TryGetValue("Cards", out object[] rawCardDatas))
+            bool parsedWithErrors = false;
+            parsedWithErrors |= !TryParseRawData(CardsKey, sheetData, BuildCardDatas);
+            parsedWithErrors |= !TryParseRawData(DecksKey, sheetData, BuildDeckDatas);
+            parsedWithErrors |= !TryParseRawData(UnitsKey, sheetData, BuildUnitDatas);
+            parsedWithErrors |= !TryParseRawData(OpponentsKey, sheetData, BuildOpponentDatas);
+
+            if (parsedWithErrors)
             {
-                BuildCardDatas(rawCardDatas);
+                Debug.Log("parsed config with errors, please review logs above");
             }
             else
             {
-                throw new Exception("the string Cards was not present in the config data");
+                Debug.Log("parsed config");
             }
-
-            // Decks
-            if (sheetToData.TryGetValue("Decks", out object[] rawDeckDatas))
-            {
-                BuildDeckDatas(rawDeckDatas);
-            }
-            else
-            {
-                throw new Exception("the string Decks was not present in the config data");
-            }
-
-            // Units
-            if (sheetToData.TryGetValue("Units", out object[] rawUnitsDatas))
-            {
-                BuildUnitDatas(rawUnitsDatas);
-            }
-            else
-            {
-                throw new Exception("the string Units was not present in the config data");
-            }
-
-            Debug.Log("parsed config");
         }
 
         // --------------------------------------------------------------------------------------------
-        private void BuildCardDatas(object[] rawCardDatas)
+        private bool TryParseRawData(string key, Dictionary<string, object[]> sheetData, ParseRawDataDelegate parseRawDataDelegate)
+        {
+            if (sheetData.TryGetValue(key, out object[] rawData))
+            {
+                return parseRawDataDelegate(rawData);
+            }
+
+            Debug.LogError($"the string {key} was not present in the sheeet data");
+            return false;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private bool BuildCardDatas(object[] rawCardDatas)
         {
             _idToCardData = new Dictionary<string, CardData>();
+            bool hasErrors = false;
 
             for (int i = 0; i < rawCardDatas.Length; i++)
             {
@@ -67,6 +71,7 @@ namespace Tofunaut.GridStrategy
                 }
                 else
                 {
+                    hasErrors |= true;
                     Debug.LogError($"card data index {i} is missing an id");
                 }
 
@@ -77,6 +82,7 @@ namespace Tofunaut.GridStrategy
                 }
                 else
                 {
+                    hasErrors |= true;
                     Debug.LogError($"card data index {i} is missing a display name");
                 }
 
@@ -89,11 +95,13 @@ namespace Tofunaut.GridStrategy
                     }
                     else
                     {
+                        hasErrors |= true;
                         Debug.LogError($"Could not parse {typeObj.ToString()} as Card.Type, index {i}");
                     }
                 }
                 else
                 {
+                    hasErrors |= true;
                     Debug.LogError($"card data index {i} is missing a card type");
                 }
 
@@ -106,32 +114,38 @@ namespace Tofunaut.GridStrategy
                     }
                     else
                     {
+                        hasErrors |= true;
                         Debug.LogError($"Could not parse {solidarityreqObject.ToString()} as int, index {i}");
                     }
                 }
                 else
                 {
+                    hasErrors |= true;
                     Debug.LogError($"card data index {i} is missing a value for solidarityreq");
                 }
 
                 _idToCardData.Add(cardData.id, cardData);
+
             }
+
+            return !hasErrors;
         }
 
         // --------------------------------------------------------------------------------------------
-        private void BuildDeckDatas(object[] rawDeckDatas)
+        private bool BuildDeckDatas(object[] rawDeckDatas)
         {
             _idToDeckData = new Dictionary<string, DeckData>();
-            
-            for(int i = 0; i < rawDeckDatas.Length; i++)
+            bool hasErrors = false;
+
+            for (int i = 0; i < rawDeckDatas.Length; i++)
             {
                 Dictionary<string, object> rawDeckData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(rawDeckDatas[i].ToString());
 
                 // decks are different because there are many "deck datas" with the same id. All of them should go in the same deck.
                 // this will error if id is not the first key, so TODO: make this more robust
-                foreach(string key in rawDeckData.Keys)
+                foreach (string key in rawDeckData.Keys)
                 {
-                    switch(key)
+                    switch (key)
                     {
                         case "id":
                             string deckId = rawDeckData["id"].ToString();
@@ -149,7 +163,7 @@ namespace Tofunaut.GridStrategy
                         case "card":
                             string deckIdForCard = rawDeckData["id"].ToString();
                             string cardId = rawDeckData["card"].ToString();
-                            if(_idToDeckData.TryGetValue(deckIdForCard, out DeckData deckData))
+                            if (_idToDeckData.TryGetValue(deckIdForCard, out DeckData deckData))
                             {
                                 int count = 0;
                                 deckData.cardIdToCount.TryGetValue(cardId, out count);
@@ -162,9 +176,10 @@ namespace Tofunaut.GridStrategy
                             string cardIdForCount = rawDeckData["card"].ToString();
                             if (_idToDeckData.TryGetValue(deckIdForCount, out DeckData deckDataForCount))
                             {
-                                if (!Int32.TryParse(rawDeckData["count"].ToString(), out int countForCard)) 
+                                if (!Int32.TryParse(rawDeckData["count"].ToString(), out int countForCard))
                                 {
-                                    Debug.Log($"could not parse string to int as count for card {cardIdForCount}: {rawDeckData["count"].ToString()}");
+                                    hasErrors = true;
+                                    Debug.LogError($"could not parse string to int as count for card {cardIdForCount}: {rawDeckData["count"].ToString()}");
                                 }
                                 else
                                 {
@@ -175,19 +190,23 @@ namespace Tofunaut.GridStrategy
                             }
                             break;
                         default:
+                            hasErrors = true;
                             Debug.LogError($"Unhandled column for deck data: {key}");
                             break;
                     }
-                    
+
                 }
             }
+
+            return !hasErrors;
         }
 
         // --------------------------------------------------------------------------------------------
-        private void BuildUnitDatas(object[] rawUnitsDatas)
+        private bool BuildUnitDatas(object[] rawUnitsDatas)
         {
-            _idToUnitData = new Dictionary<string, UnitData>(); 
-            
+            _idToUnitData = new Dictionary<string, UnitData>();
+            bool hasErrors = false;
+
             for (int i = 0; i < rawUnitsDatas.Length; i++)
             {
                 Dictionary<string, object> rawUnitData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(rawUnitsDatas[i].ToString());
@@ -201,6 +220,7 @@ namespace Tofunaut.GridStrategy
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing an id");
+                    hasErrors = true;
                 }
 
                 // prefabPath
@@ -211,6 +231,7 @@ namespace Tofunaut.GridStrategy
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a prefab");
+                    hasErrors = true;
                 }
 
                 // health
@@ -223,11 +244,13 @@ namespace Tofunaut.GridStrategy
                     else
                     {
                         Debug.LogError($"Could not parse {healthObj.ToString()} as int, index {i}");
+                        hasErrors = true;
                     }
                 }
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a value for health");
+                    hasErrors = true;
                 }
 
                 // moveSpeed
@@ -240,15 +263,69 @@ namespace Tofunaut.GridStrategy
                     else
                     {
                         Debug.LogError($"Could not parse {moveSpeedObj.ToString()} as int, index {i}");
+                        hasErrors = true;
                     }
                 }
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a value for move_speed");
+                    hasErrors = true;
                 }
 
                 _idToUnitData.Add(unitData.id, unitData);
             }
+
+            return !hasErrors;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private bool BuildOpponentDatas(object[] rawOpponentDatas)
+        {
+            _idToOpponentData = new Dictionary<string, OpponentData>();
+            bool hasError = false;
+
+            for (int i = 0; i < rawOpponentDatas.Length; i++)
+            {
+                Dictionary<string, object> rawOpponentData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(rawOpponentDatas[i].ToString());
+                OpponentData opponentData = new OpponentData();
+
+                // id
+                if (rawOpponentData.TryGetValue("id", out object idObj))
+                {
+                    opponentData.id = idObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"opponent data index {i} is missing an id");
+                    hasError = true;
+                }
+
+                // hero
+                if (rawOpponentData.TryGetValue("hero", out object heroObj))
+                {
+                    opponentData.heroId = heroObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"opponent data index {i} is missing a hero");
+                    hasError = true;
+                }
+
+                // deck
+                if (rawOpponentData.TryGetValue("deck", out object deckObj))
+                {
+                    opponentData.deckId = deckObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"opponent data index {i} is missing a deck");
+                    hasError = true;
+                }
+
+                _idToOpponentData.Add(opponentData.id, opponentData);
+            }
+
+            return !hasError;
         }
     }
 
@@ -278,5 +355,14 @@ namespace Tofunaut.GridStrategy
         public string prefabPath;
         public float health;
         public int moveSpeed;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    [Serializable]
+    public struct OpponentData
+    {
+        public string id;
+        public string heroId;
+        public string deckId;
     }
 }
