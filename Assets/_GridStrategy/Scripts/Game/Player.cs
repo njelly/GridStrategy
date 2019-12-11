@@ -36,14 +36,19 @@ namespace Tofunaut.GridStrategy.Game
         private Unit _hero;
 
         // --------------------------------------------------------------------------------------------
-        public Player(PlayerData playerData)
+        public Player(OpponentData playerData)
         {
             // create the player's deck
             _deck = new List<Card>();
-            //foreach(CardDataAsset cardDataAsset in playerData.deckDataAssets)
-            //{
-            //    _deck.Add(Card.Create(this, cardDataAsset.data));
-            //}
+            DeckData _deckData = AppManager.Config.GetDeckData(playerData.deckId);
+            foreach(string cardId in _deckData.cardIdToCount.Keys)
+            {
+                CardData cardData = AppManager.Config.GetCardData(cardId);
+                for (int i = 0; i < _deckData.cardIdToCount[cardId]; i++)
+                {
+                    _deck.Add(Card.Create(this, cardData));
+                }
+            }
 
             // create the player's hand, but it will be empty until the player draws cards
             _hand = new List<Card>();
@@ -53,7 +58,7 @@ namespace Tofunaut.GridStrategy.Game
 
             // create the list of units and the player's hero, and add the hero to the list of units
             _units = new List<Unit>();
-            _hero = Unit.Create(playerData.heroDataAsset.data);
+            _hero = Unit.Create(AppManager.Config.GetUnitData(playerData.heroId));
             _units.Add(_hero);
         }
 

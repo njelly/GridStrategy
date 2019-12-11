@@ -33,26 +33,6 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Bold SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 2696b8d416ba7b64cb052856ee55811d
-    m_Address: DefaultHeroUnitData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 3d3ca972c34658c40b56f31f5418f3e8
-    m_Address: WorkerUnitData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 5036abec454071c4eabb6a65b3777bca
-    m_Address: DefaultUserData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 5d747dd114a723d479d70668da5739e0
-    m_Address: FastLearnerCardData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 6569dc39272188a49a2a0e6e72ca0194
-    m_Address: TutorialDeckData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 6e7eb1c385a12f3439b6040b413c925c
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-UltraLight SDF.asset
     m_ReadOnly: 0
@@ -65,28 +45,12 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Italic SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 77f2b8e6a6e02f54596164b6e16f4b2c
-    m_Address: EnforcerCardData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 84aba26d29a7ebe4f8b7d97cd97a612d
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Regular SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 8ec22ffdcc86496429116afaa55b8bf5
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Book SDF.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 904ccb80d810687478f973365686f253
-    m_Address: WorkerCardData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: a4ee02282817a4c4ea0245f6db93b15c
-    m_Address: SolidifyCardData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: b260d7e9f1367364697d7823cd9fbbaf
-    m_Address: HardHatCardData
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: c81766c98586baf41b9b1625b8c39cf9
@@ -105,24 +69,12 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-LightItalic SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: d916ab71af0e65c4794998bf56a502a1
-    m_Address: FirstBossDeckData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: ddfc1b4d2faee244793024f9c45ac82f
-    m_Address: BeatStickCardData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: df56defdcdfabd449946ca5d1a07f165
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-BoldItalic SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: ea551d218c4216f46a25344d0fdb8619
     m_Address: Assets/_GridStrategy/Prefabs/BoardTileView.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: f85b4a95c61333e418afde327050b85b
-    m_Address: EnforcerUnitData
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

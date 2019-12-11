@@ -42,6 +42,54 @@ namespace Tofunaut.GridStrategy
         }
 
         // --------------------------------------------------------------------------------------------
+        public CardData GetCardData(string id)
+        {
+            if(_idToCardData.TryGetValue(id, out CardData cardData))
+            {
+                return cardData;
+            }
+
+            Debug.LogError($"no card for the id {id}");
+            return new CardData();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public DeckData GetDeckData(string id)
+        {
+            if (_idToDeckData.TryGetValue(id, out DeckData deckData))
+            {
+                return deckData;
+            }
+
+            Debug.LogError($"no deck for the id {id}");
+            return new DeckData();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public UnitData GetUnitData(string id)
+        {
+            if (_idToUnitData.TryGetValue(id, out UnitData unitData))
+            {
+                return unitData;
+            }
+
+            Debug.LogError($"no unit for the id {id}");
+            return new UnitData();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public OpponentData GetOpponentData(string id)
+        {
+            if (_idToOpponentData.TryGetValue(id, out OpponentData opponentData))
+            {
+                return opponentData;
+            }
+
+            Debug.LogError($"no opponent for the id {id}");
+            return new OpponentData();
+        }
+
+        // --------------------------------------------------------------------------------------------
         private bool TryParseRawData(string key, Dictionary<string, object[]> sheetData, ParseRawDataDelegate parseRawDataDelegate)
         {
             if (sheetData.TryGetValue(key, out object[] rawData))

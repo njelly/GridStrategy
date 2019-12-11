@@ -6,16 +6,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-using PlayFab;
 using System;
-using System.Collections.Generic;
 using Tofunaut.Core;
-using Tofunaut.PlayFabUtils;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy
 {
+    public struct UserData
+    {
+        public string name;
+
+        public static UserData DefaultUserData = new UserData()
+        {
+            name = "Default User",
+        };
+    }
+
     // --------------------------------------------------------------------------------------------
     public class LocalUserManager : AutomaticSingletonBehaviour<LocalUserManager>
     {
@@ -88,20 +95,8 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void IntializeWithDefaultData(Action onComplete)
         {
-            AppManager.AssetManager.Load(AssetPaths.UserData.Default, (bool success, UserDataAsset payload) =>
-            {
-                if(success)
-                {
-                    Debug.Log("initalized with default player data");
-
-                    LocalUserData = payload.data;
-                    onComplete();
-                }
-                else
-                {
-                    Debug.LogError("could not load asset containing default player data");
-                }
-            });
+            UserData userData = UserData.DefaultUserData;
+            onComplete?.Invoke();
         }
 
         // --------------------------------------------------------------------------------------------
