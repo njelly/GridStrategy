@@ -90,6 +90,25 @@ namespace Tofunaut.GridStrategy
         }
 
         // --------------------------------------------------------------------------------------------
+        public PlayerData GetPlayerDataFromOpponentId(string opponentId)
+        {
+            OpponentData opponentData = GetOpponentData(opponentId);
+
+            return new PlayerData()
+            {
+                name = opponentData.id, // TODO: convert this using a string library for i18n
+                deckData = GetDeckData(opponentData.deckId),
+                heroData = GetUnitData(opponentData.heroId),
+            };
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public List<string> GetCardIdsInDeck(string deckId)
+        {
+            return new List<string>(GetDeckData(deckId).cardIdToCount.Keys);
+        }
+
+        // --------------------------------------------------------------------------------------------
         private bool TryParseRawData(string key, Dictionary<string, object[]> sheetData, ParseRawDataDelegate parseRawDataDelegate)
         {
             if (sheetData.TryGetValue(key, out object[] rawData))
@@ -406,11 +425,26 @@ namespace Tofunaut.GridStrategy
     }
 
     // --------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Data for an AI opponent in a game.
+    /// </summary>
     [Serializable]
     public struct OpponentData
     {
         public string id;
         public string heroId;
         public string deckId;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Data for a player in a game.
+    /// </summary>
+    [Serializable]
+    public struct PlayerData
+    {
+        public string name;
+        public DeckData deckData;
+        public UnitData heroData;
     }
 }

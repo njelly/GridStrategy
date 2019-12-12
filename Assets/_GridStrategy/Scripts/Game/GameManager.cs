@@ -24,7 +24,7 @@ namespace Tofunaut.GridStrategy.Game
         private List<Player> _players;
 
         // --------------------------------------------------------------------------------------------
-        public GameManager(List<OpponentData> players, int firstPlayerIndex)
+        public GameManager(List<PlayerData> players, int firstPlayerIndex)
         {
             if(Instance != null)
             {
@@ -41,9 +41,9 @@ namespace Tofunaut.GridStrategy.Game
             sun.Render(AppManager.Transform);
 
             _players = new List<Player>();
-            foreach(OpponentData opponentData in players)
+            foreach(PlayerData playerData in players)
             {
-                _players.Add(new Player(opponentData));
+                _players.Add(new Player(playerData));
             }
 
             _currentPlayerIndex = firstPlayerIndex;

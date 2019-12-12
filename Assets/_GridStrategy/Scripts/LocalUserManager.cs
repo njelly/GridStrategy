@@ -7,19 +7,37 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
 using Tofunaut.Core;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy
 {
+    [Serializable]
     public struct UserData
     {
         public string name;
+        public List<string> heroLibrary;
+        public List<string> cardLibrary;
+        public List<DeckData> decks;
 
-        public static UserData DefaultUserData = new UserData()
+        public PlayerData GetPlayerData()
+        {
+            return new PlayerData
+            {
+                name = name,
+                deckData = decks[0],
+                heroData = AppManager.Config.GetUnitData(heroLibrary[0]),
+            };
+        }
+
+        public static UserData DefaultUserData = new UserData
         {
             name = "Default User",
+            heroLibrary = new List<string> { "default_hero" },
+            cardLibrary = new List<string>(AppManager.Config.GetDeckData("tutorial").cardIdToCount.Keys),
+            decks = new List<DeckData> { AppManager.Config.GetDeckData("tutorial") },
         };
     }
 
@@ -28,7 +46,7 @@ namespace Tofunaut.GridStrategy
     {
         public static UserData LocalUserData { get; set; }
 
-        private const string SerializedLocalPlayerDataKey = "local_user_data";
+        private const string SerializedLocalUserDataKey = "local_user_data";
 
         // --------------------------------------------------------------------------------------------
         protected override void Awake()
@@ -52,17 +70,16 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public void Initialize(Action onComplete)
         {
-            string serializedLocalPlayerData = PlayerPrefs.GetString(SerializedLocalPlayerDataKey, string.Empty);
+            string serializedLocalPlayerData = PlayerPrefs.GetString(SerializedLocalUserDataKey, string.Empty);
             if(!string.IsNullOrEmpty(serializedLocalPlayerData))
             {
                 try
                 {
-                    LocalUserData = JsonUtility.FromJson<UserData>(serializedLocalPlayerData);
+                    LocalUserData = Newtonsoft.Json.JsonConvert.DeserializeObject<UserData>(serializedLocalPlayerData);
                     onComplete();
                 }
                 catch
                 {
-                    PlayerPrefs.SetString(SerializedLocalPlayerDataKey, string.Empty);
                     IntializeWithDefaultData(onComplete);
                 }
             }
@@ -75,7 +92,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public void Save(Action onComplete)
         {
-            PlayerPrefs.SetString(SerializedLocalPlayerDataKey, JsonUtility.ToJson(LocalUserData));
+            PlayerPrefs.SetString(SerializedLocalUserDataKey, Newtonsoft.Json.JsonConvert.SerializeObject(LocalUserData));
 
             // if the user is logged in, attempt to write their data to their account
             if(AccountManager.LoggedIn)
@@ -95,7 +112,9 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void IntializeWithDefaultData(Action onComplete)
         {
-            UserData userData = UserData.DefaultUserData;
+            Debug.Log("init with default user data");
+
+            LocalUserData = UserData.DefaultUserData;
             onComplete?.Invoke();
         }
 

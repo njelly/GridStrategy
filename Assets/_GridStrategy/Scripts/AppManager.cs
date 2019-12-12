@@ -149,6 +149,7 @@ namespace Tofunaut.GridStrategy
             }
         }
 
+        // --------------------------------------------------------------------------------------------
         private void InGameController_Completed(object sender, ControllerCompletedEventArgs e)
         {
             _stateMachine.ChangeState(State.StartMenu);
@@ -157,6 +158,8 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void AccountManager_AuthenticatedSuccessfully(object sender, AccountManager.AuthenticatedSuccessfullyEventArgs e) 
         {
+            Debug.Log("authenticated succesfully");
+
             if(e.accountData.titleData.TryGetValue("required_version", out string versionString))
             {
                 IsClientValid = Version.IsValid(versionString, AppVersion);

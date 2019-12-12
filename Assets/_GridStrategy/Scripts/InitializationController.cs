@@ -8,7 +8,6 @@
 
 using Tofunaut.Core;
 using Tofunaut.GridStrategy.UI;
-using Tofunaut.SharpUnity;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
@@ -32,10 +31,11 @@ namespace Tofunaut.GridStrategy
         private void Awake()
         {
             _stateMachine = new TofuStateMachine();
-            _stateMachine.Register(State.InitializeLocalPlayer, InitializeLocalPlayer_Enter, null, null);
-            _stateMachine.Register(State.LogIn, LogIn_Enter, null, null);
             _stateMachine.Register(State.LoadEssentials, LoadEssentials_Enter, LoadEssentials_Update, null);
-            _stateMachine.ChangeState(State.InitializeLocalPlayer);
+            _stateMachine.Register(State.LogIn, LogIn_Enter, null, null);
+            _stateMachine.Register(State.InitializeLocalPlayer, InitializeLocalPlayer_Enter, null, null);
+
+            _stateMachine.ChangeState(State.LoadEssentials);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -45,29 +45,6 @@ namespace Tofunaut.GridStrategy
         }
 
         #region State Machine
-
-        // --------------------------------------------------------------------------------------------
-        private void InitializeLocalPlayer_Enter()
-        {
-            LocalUserManager.Instance.Initialize(() =>
-            {
-                _stateMachine.ChangeState(State.LogIn);
-            });
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void LogIn_Enter()
-        {
-            AccountManager.Instance.LogIn(() =>
-            {
-                _stateMachine.ChangeState(State.LoadEssentials);
-            }, 
-            (TofuError errorCode, string errorMessage) =>
-            {
-                Debug.LogError($"error code: {errorCode}, {errorMessage}");
-                _stateMachine.ChangeState(State.LoadEssentials);
-            });
-        }
 
         // --------------------------------------------------------------------------------------------
         private void LoadEssentials_Enter()
@@ -91,14 +68,38 @@ namespace Tofunaut.GridStrategy
             AppManager.AssetManager.Load<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityUltraLightItalic);
         }
 
+        // --------------------------------------------------------------------------------------------
         private void LoadEssentials_Update(float deltaTime)
         {
             _canvasFrameCounter++;
 
-            if(_canvasFrameCounter > 2 && AppManager.AssetManager.Ready)
+            if (_canvasFrameCounter > 2 && AppManager.AssetManager.Ready)
+            {
+                _stateMachine.ChangeState(State.LogIn);
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void LogIn_Enter()
+        {
+            AccountManager.Instance.LogIn(() =>
+            {
+                _stateMachine.ChangeState(State.InitializeLocalPlayer);
+            }, 
+            (TofuError errorCode, string errorMessage) =>
+            {
+                Debug.LogError($"error code: {errorCode}, {errorMessage}");
+                _stateMachine.ChangeState(State.InitializeLocalPlayer);
+            });
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void InitializeLocalPlayer_Enter()
+        {
+            LocalUserManager.Instance.Initialize(() =>
             {
                 Complete(new ControllerCompletedEventArgs(true));
-            }
+            });
         }
 
         #endregion State Machine

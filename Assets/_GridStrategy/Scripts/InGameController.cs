@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System.Collections.Generic;
 using Tofunaut.Core;
 using Tofunaut.GridStrategy.Game;
 using Tofunaut.UnityUtils;
@@ -54,7 +55,12 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void InGame_Enter()
         {
-            //_gameManager = new GameManager();
+
+            _gameManager = new GameManager(new List<PlayerData>
+            {
+                LocalUserManager.LocalUserData.GetPlayerData(),
+                AppManager.Config.GetPlayerDataFromOpponentId("first_boss"),
+            }, 0);
         }
 
         #endregion State Machine
