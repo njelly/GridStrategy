@@ -19,6 +19,7 @@ namespace Tofunaut.GridStrategy.Game
 
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
+        public readonly Board board;
 
         private int _currentPlayerIndex;
         private List<Player> _players;
@@ -40,6 +41,9 @@ namespace Tofunaut.GridStrategy.Game
             sun = SharpLight.Sun();
             sun.Render(AppManager.Transform);
 
+            board = new Board(8, 8);
+            board.Render(AppManager.Transform);
+
             _players = new List<Player>();
             foreach(PlayerData playerData in players)
             {
@@ -55,6 +59,7 @@ namespace Tofunaut.GridStrategy.Game
             Instance = null;
             gameCamera.Destroy();
             sun.Destroy();
+            board.Destroy();
         }
     }
 }

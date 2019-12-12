@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  LoginManager (c) 2019 Tofunaut
+//  UIMainCanvas (c) 2019 Tofunaut
 //
 //  Created by Nathaniel Ellingson for GridStrategy on 11/09/2019
 //

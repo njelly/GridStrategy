@@ -112,8 +112,6 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void IntializeWithDefaultData(Action onComplete)
         {
-            Debug.Log("init with default user data");
-
             LocalUserData = UserData.DefaultUserData;
             onComplete?.Invoke();
         }
