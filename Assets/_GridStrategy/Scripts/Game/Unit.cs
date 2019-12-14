@@ -2,7 +2,7 @@
 //
 //  Unit (c) 2019 Tofunaut
 //
-//  Created by Nathaniel Ellingson for WorldZone on 11/28/2019
+//  Created by Nathaniel Ellingson for GridStrategy on 11/28/2019
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -14,7 +14,7 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
-    public class Unit : SharpGameObject, Updater.IUpdateable
+    public class Unit : SharpGameObject
     {
         public static class State
         {
@@ -26,27 +26,17 @@ namespace Tofunaut.GridStrategy.Game
 
         public float Health { get; protected set; }
         public float MoveSpeed { get; protected set; }
-        public string CurrentState { get { return _stateMachine.CurrentState; } }
 
-        private UnitView _unitView;
+        private UnitView _view;
         private UnitData _data;
-        private TofuStateMachine _stateMachine;
 
         // --------------------------------------------------------------------------------------------
-        protected Unit(UnitData data) : base(data.id) 
+        public Unit(UnitData data) : base(data.id) 
         {
             _data = data;
 
             Health = _data.health;
             MoveSpeed = _data.moveSpeed;
-
-            _stateMachine = new TofuStateMachine();
-            _stateMachine.Register(State.Move, null, null, null);
-            _stateMachine.Register(State.Action, null, null, null);
-            _stateMachine.Register(State.Finished, null, null, null);
-            _stateMachine.Register(State.OutOfTurn, null, null, null);
-
-            _stateMachine.ChangeState(State.OutOfTurn);
         }
 
         #region SharpGameObject
@@ -54,38 +44,10 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         protected override void Build()
         {
-            // Load the UnitView asynchronously
-            AppManager.AssetManager.Load(_data.prefabPath, (bool succesfull, GameObject payload) =>
+            UnitView.Create(this, _data, (UnitView view) =>
             {
-                if(!succesfull)
-                {
-                    Debug.LogError($"Failed to load the UnitView prefab for {_data.id} at the path {_data.prefabPath}");
-                    return;
-                }
-
-                _unitView = Object.Instantiate(payload, Transform, false).GetComponent<UnitView>();
-                if(_unitView == null)
-                {
-                    Debug.LogError($"Failed to get the UnitView MonoBehaviour on instantiated prefab for {_data.id} at the path {_data.prefabPath}");
-                    return;
-                }
+                _view = view;
             });
-        }
-
-        // --------------------------------------------------------------------------------------------
-        protected override void PostRender()
-        {
-            base.PostRender();
-
-            Updater.Instance.Add(this);
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public override void Destroy()
-        {
-            base.Destroy();
-
-            Updater.Instance.Remove(this);
         }
 
         #endregion SharpGameObject
@@ -93,31 +55,11 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public virtual void OnPlayerTurnBegan() 
         {
-            if(CurrentState != State.Move)
-            {
-                _stateMachine.ChangeState(State.Move);
-            }
         }
 
         // --------------------------------------------------------------------------------------------
         public virtual void OnPlayerTurnEnded()
         {
-            if (CurrentState != State.OutOfTurn)
-            {
-                _stateMachine.ChangeState(State.OutOfTurn);
-            }
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public static Unit Create(UnitData data)
-        {
-            return new Unit(data);
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public void Update(float deltaTime)
-        {
-            _stateMachine.Update(deltaTime);
         }
     }
 }

@@ -25,10 +25,12 @@ namespace Tofunaut.GridStrategy.Game
 
         public static GameCamera Create()
         {
-            GameCamera toReturn = new GameCamera();
-            toReturn.Tag = "MainCamera";
-            toReturn.LocalPosition = new Vector3(0, 10, -10);
-            toReturn.LocalRotation = Quaternion.Euler(45, 0, 0);
+            GameCamera toReturn = new GameCamera
+            {
+                Tag = "MainCamera",
+                LocalPosition = new Vector3(0, 10, -10),
+                LocalRotation = Quaternion.Euler(45, 0, 0)
+            };
 
             return toReturn;
         }

@@ -25,7 +25,7 @@ namespace Tofunaut.GridStrategy
         }
 
         private TofuStateMachine _stateMachine;
-        private GameManager _gameManager;
+        private Game.Game _gameManager;
 
         // --------------------------------------------------------------------------------------------
         private void Awake()
@@ -56,7 +56,7 @@ namespace Tofunaut.GridStrategy
         private void InGame_Enter()
         {
 
-            _gameManager = new GameManager(new List<PlayerData>
+            _gameManager = new Game.Game(new List<PlayerData>
             {
                 LocalUserManager.LocalUserData.GetPlayerData(),
                 AppManager.Config.GetPlayerDataFromOpponentId("first_boss"),

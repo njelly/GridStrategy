@@ -20,6 +20,8 @@ namespace Tofunaut.GridStrategy.Game
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
         public Unit Hero { get { return _hero; } }
 
+        public readonly int playerIndex;
+
         // Cards the player does not have access to until they are drawn.
         private readonly List<Card> _deck;
 
@@ -35,9 +37,15 @@ namespace Tofunaut.GridStrategy.Game
         // The player's hero is the unit the player starts with. When it is defeated, the player loses.
         private Unit _hero;
 
+        private readonly Game _game;
+
         // --------------------------------------------------------------------------------------------
-        public Player(PlayerData playerData)
+        public Player(PlayerData playerData, Game game, int playerIndex)
         {
+            this.playerIndex = playerIndex;
+
+            _game = game;
+
             // create the player's deck
             _deck = new List<Card>();
             foreach(string cardId in playerData.deckData.cardIdToCount.Keys)
@@ -57,8 +65,11 @@ namespace Tofunaut.GridStrategy.Game
 
             // create the list of units and the player's hero, and add the hero to the list of units
             _units = new List<Unit>();
-            _hero = Unit.Create(playerData.heroData);
-            _units.Add(_hero);
+
+            // create the hero and place it on the board
+            _hero = new Unit(playerData.heroData);
+            _game.board.GetCoordinatesForHeroStartTile(playerIndex, out int xCoord, out int yCoord);
+            PlaceUnit(_hero, xCoord, yCoord);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -105,6 +116,18 @@ namespace Tofunaut.GridStrategy.Game
                 _deck[randomIndex] = _deck[i];
                 _deck[i] = temp;
             }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void PlaceUnit(Unit unit, int xCoord, int yCoord)
+        {
+            _units.Add(unit);
+
+            BoardTile boardTile = _game.board[xCoord, yCoord];
+
+            // remove the child from any previous parent
+            unit.Parent?.RemoveChild(unit, false);
+            boardTile.AddChild(unit);
         }
     }
 }

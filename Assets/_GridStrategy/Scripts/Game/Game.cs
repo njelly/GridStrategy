@@ -13,10 +13,8 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
-    public class GameManager
+    public class Game
     {
-        public static GameManager Instance { get; private set; }
-
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
         public readonly Board board;
@@ -25,16 +23,8 @@ namespace Tofunaut.GridStrategy.Game
         private List<Player> _players;
 
         // --------------------------------------------------------------------------------------------
-        public GameManager(List<PlayerData> players, int firstPlayerIndex)
+        public Game(List<PlayerData> playerDatas, int firstPlayerIndex)
         {
-            if(Instance != null)
-            {
-                Debug.LogError("Only one instance of GameManager can exist at a time!");
-                return;
-            }
-
-            Instance = this;
-
             gameCamera = GameCamera.Create();
             gameCamera.Render(AppManager.Transform);
 
@@ -45,9 +35,9 @@ namespace Tofunaut.GridStrategy.Game
             board.Render(AppManager.Transform);
 
             _players = new List<Player>();
-            foreach(PlayerData playerData in players)
+            for(int i = 0; i < playerDatas.Count; i++)
             {
-                _players.Add(new Player(playerData));
+                _players.Add(new Player(playerDatas[i], this, i));
             }
 
             _currentPlayerIndex = firstPlayerIndex;
@@ -56,7 +46,6 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void CleanUp()
         {
-            Instance = null;
             gameCamera.Destroy();
             sun.Destroy();
             board.Destroy();

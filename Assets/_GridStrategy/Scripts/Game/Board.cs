@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using Tofunaut.SharpUnity;
+using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
@@ -21,11 +22,17 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        public readonly int width;
+        public readonly int height;
+
         private BoardTile[,] _tiles;
 
         // --------------------------------------------------------------------------------------------
         public Board(int width, int height) : base("Board")
         {
+            this.width = width;
+            this.height = height;
+
             _tiles = new BoardTile[width, height];
             for(int x = 0; x < width; x++)
             {
@@ -35,6 +42,27 @@ namespace Tofunaut.GridStrategy.Game
                     AddChild(boardTile);
                     _tiles[x, y] = boardTile;
                 }
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void GetCoordinatesForHeroStartTile(int playerIndex, out int xCoord, out int yCoord)
+        {
+            switch(playerIndex)
+            {
+                case 0:
+                    xCoord = 0;
+                    yCoord = 0;
+                    return;
+                case 1:
+                    xCoord = width - 1;
+                    yCoord = height - 1;
+                    return;
+                default:
+                    Debug.LogError($"Unhandled player index for hero start tile: {playerIndex}");
+                    xCoord = -1;
+                    yCoord = -1;
+                    return;
             }
         }
 

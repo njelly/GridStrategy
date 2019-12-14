@@ -12,6 +12,27 @@ namespace Tofunaut.GridStrategy.Game
 {
     public class UnitView : MonoBehaviour
     {
+        public delegate void InstantiateDelegate(UnitView view);
 
+        public new Rigidbody rigidbody;
+        public new Collider collider;
+
+        private Unit _unit;
+
+        public static void Create(Unit unit, UnitData data, InstantiateDelegate callback)
+        {
+            AppManager.AssetManager.Load(data.prefabPath, (bool successful, GameObject payload) =>
+            {
+                if (successful)
+                {
+                    GameObject viewGo = Instantiate(payload, unit.Transform, false);
+
+                    UnitView view = viewGo.GetComponent<UnitView>();
+                    view._unit = unit;
+
+                    callback(view);
+                }
+            });
+        }
     }
 }

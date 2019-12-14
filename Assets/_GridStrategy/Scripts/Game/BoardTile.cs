@@ -17,6 +17,8 @@ namespace Tofunaut.GridStrategy.Game
         public readonly int xCoord;
         public readonly int yCoord;
 
+        public Vector3 UnitPosition { get { return new Vector3(Transform.position.x + 0.5f, 0, Transform.position.z + 0.5f); } }
+
         private BoardTileView _view;
 
         // --------------------------------------------------------------------------------------------
