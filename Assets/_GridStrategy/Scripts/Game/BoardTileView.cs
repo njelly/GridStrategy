@@ -13,6 +13,8 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class BoardTileView : MonoBehaviour
     {
+        public const float Size = 5f;
+
         public delegate void InstantiateDelegate(BoardTileView view);
 
         public MeshRenderer meshRenderer;

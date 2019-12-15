@@ -321,21 +321,21 @@ namespace Tofunaut.GridStrategy
                 }
 
                 // moveSpeed
-                if (rawUnitData.TryGetValue("movespeed", out object moveSpeedObj))
+                if (rawUnitData.TryGetValue("moverange", out object moveRangeObj))
                 {
-                    if (Int32.TryParse(moveSpeedObj.ToString(), out int moveSpeed))
+                    if (Int32.TryParse(moveRangeObj.ToString(), out int moveRange))
                     {
-                        unitData.moveSpeed = moveSpeed;
+                        unitData.moveRange = moveRange;
                     }
                     else
                     {
-                        Debug.LogError($"Could not parse {moveSpeedObj.ToString()} as int, index {i}");
+                        Debug.LogError($"Could not parse {moveRangeObj.ToString()} as int, index {i}");
                         hasErrors = true;
                     }
                 }
                 else
                 {
-                    Debug.LogError($"unit data index {i} is missing a value for move_speed");
+                    Debug.LogError($"unit data index {i} is missing a value for moverange");
                     hasErrors = true;
                 }
 
@@ -421,7 +421,7 @@ namespace Tofunaut.GridStrategy
         public string id;
         public string prefabPath;
         public float health;
-        public int moveSpeed;
+        public int moveRange;
     }
 
     // --------------------------------------------------------------------------------------------

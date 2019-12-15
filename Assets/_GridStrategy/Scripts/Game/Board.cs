@@ -46,23 +46,17 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void GetCoordinatesForHeroStartTile(int playerIndex, out int xCoord, out int yCoord)
+        public BoardTile GetHeroStartTile(int playerIndex)
         {
             switch(playerIndex)
             {
                 case 0:
-                    xCoord = 0;
-                    yCoord = 0;
-                    return;
+                    return this[0, 0];
                 case 1:
-                    xCoord = width - 1;
-                    yCoord = height - 1;
-                    return;
+                    return this[width - 1, height - 1];
                 default:
                     Debug.LogError($"Unhandled player index for hero start tile: {playerIndex}");
-                    xCoord = -1;
-                    yCoord = -1;
-                    return;
+                    return null;
             }
         }
 

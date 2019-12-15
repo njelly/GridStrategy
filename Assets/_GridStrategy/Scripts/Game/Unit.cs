@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System.Collections.Generic;
+using TofuCore;
+using Tofunaut.Animation;
 using Tofunaut.Core;
 using Tofunaut.SharpUnity;
 using Tofunaut.UnityUtils;
@@ -16,27 +19,46 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Unit : SharpGameObject
     {
-        public static class State
+        public enum EFacing
         {
-            public const string Move = "move";
-            public const string Action = "action";
-            public const string Finished = "finished";
-            public const string OutOfTurn = "out_of_turn";
+            North = 1,
+            South = 2,
+            East = 3,
+            West = 4,
         }
 
+        private static int _idCounter;
+        private static readonly List<Unit> _idToUnit = new List<Unit>();
+
+        public BoardTile BoardTile { get; private set; }
+
         public float Health { get; protected set; }
-        public float MoveSpeed { get; protected set; }
+        public float MoveRange { get; protected set; }
+        public EFacing Facing { get { return _facing; } }
+
+        public bool HasMoved { get; private set; }
+        public bool HasDoneAction { get; private set; }
+
+        public readonly int id;
 
         private UnitView _view;
         private UnitData _data;
 
+        private EFacing _facing;
+        private TofuAnimation _facingAnim;
+
         // --------------------------------------------------------------------------------------------
-        public Unit(UnitData data) : base(data.id) 
+        public Unit(UnitData data, BoardTile boardTile) : base(data.id) 
         {
+            id = _idCounter++;
+            _idToUnit.Add(this);
+
             _data = data;
 
+            BoardTile = boardTile;
+
             Health = _data.health;
-            MoveSpeed = _data.moveSpeed;
+            MoveRange = _data.moveRange;
         }
 
         #region SharpGameObject
@@ -53,6 +75,53 @@ namespace Tofunaut.GridStrategy.Game
         #endregion SharpGameObject
 
         // --------------------------------------------------------------------------------------------
+        public void MoveTo(BoardTile boardTile)
+        {
+
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void SetFacing(EFacing facing, bool animate)
+        {
+            _facing = facing;
+
+            float targetRot = 0f;
+            switch(facing)
+            {
+                case EFacing.North:
+                    targetRot = 90;
+                    break;
+                case EFacing.South:
+                    targetRot = 270;
+                    break;
+                case EFacing.East:
+                    targetRot = 0;
+                    break;
+                case EFacing.West:
+                    targetRot = 180;
+                    break;
+            }
+
+            _facingAnim?.Stop();
+            Quaternion endRot = Quaternion.Euler(0f, targetRot, 0f);
+
+            if(animate)
+            {
+                Quaternion startRot = LocalRotation;
+                _facingAnim = new TofuAnimation()
+                    .Value01(0.5f, EEaseType.EaseOutExpo, (float newValue) =>
+                    {
+                        LocalRotation = Quaternion.SlerpUnclamped(startRot, endRot, newValue);
+                    })
+                    .Play();
+            }
+            else
+            {
+                LocalRotation = endRot;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
         public virtual void OnPlayerTurnBegan() 
         {
         }
@@ -60,6 +129,17 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public virtual void OnPlayerTurnEnded()
         {
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static Unit GetUnit(int id)
+        {
+            if(id >= _idToUnit.Count)
+            {
+                Debug.LogError($"no unit for id {id}");
+            }
+
+            return _idToUnit[id];
         }
     }
 }

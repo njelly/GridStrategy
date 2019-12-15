@@ -17,8 +17,6 @@ namespace Tofunaut.GridStrategy.Game
         public readonly int xCoord;
         public readonly int yCoord;
 
-        public Vector3 UnitPosition { get { return new Vector3(Transform.position.x + 0.5f, 0, Transform.position.z + 0.5f); } }
-
         private BoardTileView _view;
 
         // --------------------------------------------------------------------------------------------
@@ -27,7 +25,8 @@ namespace Tofunaut.GridStrategy.Game
             this.xCoord = xCoord;
             this.yCoord = yCoord;
 
-            LocalPosition = new Vector3(xCoord, 0, yCoord);
+            LocalPosition = new Vector3(xCoord * BoardTileView.Size, 0, yCoord * BoardTileView.Size);
+            Debug.Log($"xCoord: {xCoord}, yCoord: {yCoord}, LocalPosition: {LocalPosition}");
         }
 
         // --------------------------------------------------------------------------------------------

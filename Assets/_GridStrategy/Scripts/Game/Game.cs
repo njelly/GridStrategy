@@ -21,6 +21,8 @@ namespace Tofunaut.GridStrategy.Game
 
         private int _currentPlayerIndex;
         private List<Player> _players;
+        private List<PlayerAction> _playerActions;
+        private int _actionIndex;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int firstPlayerIndex)
@@ -29,6 +31,7 @@ namespace Tofunaut.GridStrategy.Game
             gameCamera.Render(AppManager.Transform);
 
             sun = SharpLight.Sun();
+            sun.LocalRotation = Quaternion.Euler(125, 45, 0);
             sun.Render(AppManager.Transform);
 
             board = new Board(8, 8);
@@ -41,6 +44,36 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             _currentPlayerIndex = firstPlayerIndex;
+
+            _playerActions = new List<PlayerAction>();
+            _actionIndex = -1;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void QueueAction(PlayerAction action)
+        {
+            _playerActions.Add(action);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void ExecuteNextPlayerAction()
+        {
+            _actionIndex++;
+
+            // first verify that this action can be executed based on the current game state
+            if(!_playerActions[_actionIndex].IsValid(this))
+            {
+                Debug.LogError($"PlayerAction {_actionIndex} cannot be executed.");
+                return;
+            }
+
+            switch(_playerActions[_actionIndex].type)
+            {
+                case PlayerAction.EType.Invalid:
+                    Debug.LogError($"PlayerAction {_actionIndex} has the type Invalid!");
+                    break;
+
+            }
         }
 
         // --------------------------------------------------------------------------------------------

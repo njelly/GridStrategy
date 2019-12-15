@@ -126,6 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12299b3501af3cb43a5e775d96ed2c5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animMoveSpeed: 10
   rigidbody: {fileID: 1531960483557231409}
   collider: {fileID: 2668799772829549957}
 --- !u!136 &2668799772829549957
@@ -153,7 +154,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80

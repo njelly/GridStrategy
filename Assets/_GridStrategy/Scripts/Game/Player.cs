@@ -67,9 +67,7 @@ namespace Tofunaut.GridStrategy.Game
             _units = new List<Unit>();
 
             // create the hero and place it on the board
-            _hero = new Unit(playerData.heroData);
-            _game.board.GetCoordinatesForHeroStartTile(playerIndex, out int xCoord, out int yCoord);
-            PlaceUnit(_hero, xCoord, yCoord);
+            _hero = PlaceUnit(playerData.heroData, _game.board.GetHeroStartTile(playerIndex));
         }
 
         // --------------------------------------------------------------------------------------------
@@ -119,15 +117,14 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        private void PlaceUnit(Unit unit, int xCoord, int yCoord)
+        private Unit PlaceUnit(UnitData unitData, BoardTile boardTile)
         {
+            Unit unit = new Unit(unitData, boardTile);
+            boardTile.AddChild(unit);
+
             _units.Add(unit);
 
-            BoardTile boardTile = _game.board[xCoord, yCoord];
-
-            // remove the child from any previous parent
-            unit.Parent?.RemoveChild(unit, false);
-            boardTile.AddChild(unit);
+            return unit;
         }
     }
 }
