@@ -22,10 +22,21 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        public Vector3 CenterPos
+        {
+            get
+            {
+                return new Vector3(
+                    BoardTileView.Size * width / 2f,
+                    LocalPosition.y,
+                    BoardTileView.Size * height / 2f);
+            }
+        }
+
         public readonly int width;
         public readonly int height;
 
-        private BoardTile[,] _tiles;
+        private readonly BoardTile[,] _tiles;
 
         // --------------------------------------------------------------------------------------------
         public Board(int width, int height) : base("Board")

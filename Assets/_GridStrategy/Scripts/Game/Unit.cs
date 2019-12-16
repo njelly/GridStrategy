@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using TofuCore;
 using Tofunaut.Animation;
@@ -21,10 +22,11 @@ namespace Tofunaut.GridStrategy.Game
     {
         public enum EFacing
         {
-            North = 1,
-            South = 2,
-            East = 3,
-            West = 4,
+            // counter-clockwise
+            East = 1,
+            North = 2,
+            West = 3,
+            South = 4,
         }
 
         private static int _idCounter;
@@ -46,6 +48,7 @@ namespace Tofunaut.GridStrategy.Game
 
         private EFacing _facing;
         private TofuAnimation _facingAnim;
+        private TofuAnimation _moveAnim;
 
         // --------------------------------------------------------------------------------------------
         public Unit(UnitData data, BoardTile boardTile) : base(data.id) 
@@ -55,10 +58,10 @@ namespace Tofunaut.GridStrategy.Game
 
             _data = data;
 
-            BoardTile = boardTile;
-
             Health = _data.health;
             MoveRange = _data.moveRange;
+
+            MoveTo(boardTile, false);
         }
 
         #region SharpGameObject
@@ -75,9 +78,20 @@ namespace Tofunaut.GridStrategy.Game
         #endregion SharpGameObject
 
         // --------------------------------------------------------------------------------------------
-        public void MoveTo(BoardTile boardTile)
+        public void MoveTo(BoardTile boardTile, bool animate)
         {
+            // leave the current tile, if it exists
+            boardTile?.RemoveOccupant(this);
 
+            // set the new tile, then add this unit as an occupant
+            BoardTile = boardTile;
+            boardTile.AddOccupant(this);
+
+            if(animate)
+            {
+                _moveAnim?.Stop();
+                
+            }
         }
 
         // --------------------------------------------------------------------------------------------
@@ -140,6 +154,17 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             return _idToUnit[id];
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static EFacing VectorToFacing(Vector2 v)
+        {
+            float angle = Mathf.Atan2(-v.y, -v.x);
+            angle += Mathf.PI;
+            angle /= Mathf.PI / 2f;
+            int halfQuarter = Convert.ToInt32(angle);
+            halfQuarter %= 4;
+            return (EFacing)(halfQuarter + 1);
         }
     }
 }

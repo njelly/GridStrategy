@@ -122,6 +122,10 @@ namespace Tofunaut.GridStrategy.Game
             Unit unit = new Unit(unitData, boardTile);
             boardTile.AddChild(unit);
 
+            // when placed, face the center of the board
+            // TODO: is this the default behavior? should the player be able to choose the initial facing direction?
+            unit.SetFacing(Unit.VectorToFacing(_game.board.CenterPos - unit.Transform.position), false);
+
             _units.Add(unit);
 
             return unit;
