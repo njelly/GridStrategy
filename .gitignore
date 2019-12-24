@@ -40,3 +40,6 @@ Assets/Plugins/TofuUnity
 Assets/Plugins/TofuUnity.meta
 Assets/Plugins/TofuCore
 Assets/Plugins/TofuCore.meta
+
+# MacOS
+*.DS_Store
