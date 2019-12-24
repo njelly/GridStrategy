@@ -15,12 +15,12 @@ namespace Tofunaut.GridStrategy.Game
     {
         public delegate void InstantiateDelegate(UnitView view);
 
+        public Unit Unit { get; private set; }
+
         public float animMoveSpeed = 10;
 
         public new Rigidbody rigidbody;
         public new Collider collider;
-
-        private Unit _unit;
 
         // --------------------------------------------------------------------------------------------
         public static void Create(Unit unit, UnitData data, InstantiateDelegate callback)
@@ -32,7 +32,7 @@ namespace Tofunaut.GridStrategy.Game
                     GameObject viewGo = Instantiate(payload, unit.Transform, false);
 
                     UnitView view = viewGo.GetComponent<UnitView>();
-                    view._unit = unit;
+                    view.Unit = unit;
 
                     callback(view);
                 }

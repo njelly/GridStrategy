@@ -7,13 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
+using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
-    public class Game
+    public class Game : UIWorldInteractionManager.IListener
     {
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
@@ -23,6 +24,7 @@ namespace Tofunaut.GridStrategy.Game
         private List<Player> _players;
         private List<PlayerAction> _playerActions;
         private int _actionIndex;
+        private UIWorldInteractionManager _worldInteractionManager;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int firstPlayerIndex)
@@ -42,6 +44,8 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _players.Add(new Player(playerDatas[i], this, i));
             }
+
+            _worldInteractionManager = UIWorldInteractionManager.Create(this, this);
 
             _currentPlayerIndex = firstPlayerIndex;
 
@@ -82,6 +86,11 @@ namespace Tofunaut.GridStrategy.Game
             gameCamera.Destroy();
             sun.Destroy();
             board.Destroy();
+        }
+
+        public void OnSelectedUnitView(UnitView unitView)
+        {
+            Debug.Log($"Selected unit: {unitView.Unit.name} + {unitView.Unit.id}");
         }
     }
 }
