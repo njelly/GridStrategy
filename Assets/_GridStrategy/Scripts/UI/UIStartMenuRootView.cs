@@ -54,6 +54,7 @@ namespace Tofunaut.GridStrategy.UI
         protected override SharpUIBase BuildMainPanel()
         {
             _background = new SharpUIImage("UIStartMenuView", null);
+            _background.Color = FadeInStartColor;
             _background.SetFillSize();
 
             _canvasGroup = new SharpUICanvasGroup("CanvasGroup");
@@ -83,6 +84,32 @@ namespace Tofunaut.GridStrategy.UI
 
             _buttonLayout = BuildButtonLayout();
             _canvasGroup.AddChild(_buttonLayout);
+
+            if(!AppManager.IsClientValid)
+            {
+                SharpUITextMeshPro clientValidationErrorMessage = new SharpUITextMeshPro("ClientValidationErrorMessage", string.Empty);
+                clientValidationErrorMessage.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityRegular);
+                clientValidationErrorMessage.Color = Color.red;
+                clientValidationErrorMessage.SetFixedSize(200, 25);
+                clientValidationErrorMessage.SetFontSize(28);
+                clientValidationErrorMessage.alignment = EAlignment.TopLeft;
+                clientValidationErrorMessage.margin = new RectOffset(20, 0, 20, 0);
+                clientValidationErrorMessage.TextAlignment = TMPro.TextAlignmentOptions.Left;
+                _canvasGroup.AddChild(clientValidationErrorMessage);
+
+                switch(AppManager.ClientState)
+                {
+                    case AppManager.EClientState.ValidationError:
+                        clientValidationErrorMessage.Text = "Client failed to validate correctly";
+                        break;
+                    case AppManager.EClientState.Offline:
+                        clientValidationErrorMessage.Text = "Client is offline";
+                        break;
+                    case AppManager.EClientState.NeedsUpdate:
+                        clientValidationErrorMessage.Text = "Client must update";
+                        break;
+                }
+            }
 
             return _background;
         }

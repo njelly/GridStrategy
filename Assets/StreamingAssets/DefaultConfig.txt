@@ -1,0 +1,180 @@
+{
+    "Cards": [
+        {
+            "id": "enforcer",
+            "displayname": "Enforcer",
+            "type": "Ally",
+            "solidarityreq": 1
+        },
+        {
+            "id": "fast_learner",
+            "displayname": "Fast Learner",
+            "type": "Equip",
+            "solidarityreq": 3
+        },
+        {
+            "id": "solidify",
+            "displayname": "Solidify",
+            "type": "Skill",
+            "solidarityreq": 2
+        },
+        {
+            "id": "sound_off",
+            "displayname": "Sound Off",
+            "type": "Skill",
+            "solidarityreq": 6
+        },
+        {
+            "id": "fire_sprite",
+            "displayname": "Fire Sprite",
+            "type": "Ally",
+            "solidarityreq": 2
+        },
+        {
+            "id": "water_sprite",
+            "displayname": "Water Sprite",
+            "type": "Ally",
+            "solidarityreq": 2
+        },
+        {
+            "id": "air_sprite",
+            "displayname": "Air Sprite",
+            "type": "Ally",
+            "solidarityreq": 2
+        },
+        {
+            "id": "earth_sprite",
+            "displayname": "Earth Sprite",
+            "type": "Ally",
+            "solidarityreq": 2
+        }
+    ],
+    "Decks": [
+        {
+            "id": "tutorial",
+            "card": "fire_sprite",
+            "count": 14
+        },
+        {
+            "id": "tutorial",
+            "card": "solidify",
+            "count": 4
+        },
+        {
+            "id": "tutorial",
+            "card": "fast_learner",
+            "count": 2
+        },
+        {
+            "id": "tutorial",
+            "card": "sound_off",
+            "count": 2
+        },
+        {
+            "id": "first_boss",
+            "card": "enforcer",
+            "count": 16
+        },
+        {
+            "id": "first_boss",
+            "card": "solidify",
+            "count": 4
+        },
+        {
+            "id": "first_boss",
+            "card": "fast_learner",
+            "count": 2
+        }
+    ],
+    "Units": [
+        {
+            "id": "default_hero",
+            "prefab": "DefaultHeroView",
+            "attribute": "None",
+            "health": 60,
+            "power": 30,
+            "moverange": 1
+        },
+        {
+            "id": "enforcer",
+            "prefab": "EnforcerView",
+            "attribute": "None",
+            "health": 30,
+            "power": 20,
+            "moverange": 2
+        },
+        {
+            "id": "fire_sprite",
+            "prefab": "FireSpriteView",
+            "attribute": "Fire",
+            "health": 20,
+            "power": 20,
+            "moverange": 3
+        },
+        {
+            "id": "water_sprite",
+            "prefab": "WaterSpriteView",
+            "attribute": "Water",
+            "health": 20,
+            "power": 20,
+            "moverange": 3
+        },
+        {
+            "id": "air_sprite",
+            "prefab": "AirSpriteView",
+            "attribute": "Air",
+            "health": 20,
+            "power": 20,
+            "moverange": 3
+        },
+        {
+            "id": "earth_sprite",
+            "prefab": "EarthSpriteView",
+            "attribute": "Earth",
+            "health": 20,
+            "power": 20,
+            "moverange": 3
+        }
+    ],
+    "Opponents": [
+        {
+            "id": "first_boss",
+            "hero": "default_hero",
+            "deck": "first_boss"
+        }
+    ],
+    "i18n": [
+        {
+            "id": "air_sprite",
+            "en": "Air Sprite"
+        },
+        {
+            "id": "earth_sprite",
+            "en": "Earth Sprite"
+        },
+        {
+            "id": "enforcer",
+            "en": "Enforcer"
+        },
+        {
+            "id": "fast_learner",
+            "en": "Fast Learner"
+        },
+        {
+            "id": "fire_sprite",
+            "en": "Fire Sprite"
+        },
+        {
+            "id": "solidify",
+            "en": "Solidify"
+        },
+        {
+            "id": "sound_off",
+            "en": "Sound Off"
+        },
+        {
+            "id": "water_sprite",
+            "en": "Water Sprite"
+        }
+    ]
+}

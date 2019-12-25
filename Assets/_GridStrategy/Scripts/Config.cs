@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Tofunaut.GridStrategy.Game;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace Tofunaut.GridStrategy
     // --------------------------------------------------------------------------------------------
     public class Config
     {
+        private static readonly string DefaultConfigPath = Path.Combine(Application.streamingAssetsPath, "DefaultConfig.txt");
+
         private const string CardsKey = "Cards";
         private const string DecksKey = "Decks";
         private const string UnitsKey = "Units";
@@ -21,7 +24,7 @@ namespace Tofunaut.GridStrategy
         private Dictionary<string, OpponentData> _idToOpponentData;
 
         // --------------------------------------------------------------------------------------------
-        public Config(string serializedData)
+        public Config(string serializedData, bool overwriteDefaultConfig)
         {
             Dictionary<string, object[]> sheetData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object[]>>(serializedData);
 
@@ -38,7 +41,14 @@ namespace Tofunaut.GridStrategy
             else
             {
                 Debug.Log("parsed config");
+
+                if (overwriteDefaultConfig)
+                {
+                    // write all data to the DefaultConfigPath so we're always up to date
+                    File.WriteAllLines(DefaultConfigPath, new[] { serializedData });
+                }
             }
+
         }
 
         // --------------------------------------------------------------------------------------------
@@ -393,6 +403,18 @@ namespace Tofunaut.GridStrategy
             }
 
             return !hasError;
+        }
+
+        public static Config DefaultConfig()
+        {
+            if(!File.Exists(DefaultConfigPath))
+            {
+                Debug.LogError("no data found for the default config!");
+                return null;
+            }
+
+            string serializedData = File.ReadAllText(DefaultConfigPath);
+            return new Config(serializedData, false);
         }
     }
 

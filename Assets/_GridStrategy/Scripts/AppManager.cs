@@ -26,8 +26,33 @@ namespace Tofunaut.GridStrategy
             public const string InGame = "in_game";
         }
 
+        // --------------------------------------------------------------------------------------------
+        public enum EClientState
+        {
+            /// <summary>
+            /// An error occured while validating the client.
+            /// </summary>
+            ValidationError = 0,
+
+            /// <summary>
+            /// The client is offline, and could not be validated.
+            /// </summary>
+            Offline = 1,
+
+            /// <summary>
+            /// The client needs to be updated.
+            /// </summary>
+            NeedsUpdate = 2,
+
+            /// <summary>
+            /// The client has succesfully validated.
+            /// </summary>
+            Valid = 3,
+        }
+
         public static Version AppVersion { get; private set; }
-        public static bool IsClientValid { get; private set; }
+        public static EClientState ClientState { get; private set; }
+        public static bool IsClientValid { get { return ClientState == EClientState.Valid; } }
         public static AssetManager AssetManager { get { return _instance._assetManager; } }
         public static Transform Transform { get { return _instance.transform; } }
         public static Config Config { get; private set; }
@@ -51,6 +76,7 @@ namespace Tofunaut.GridStrategy
             Debug.Log($"GridStrategy {AppVersion} (c) Tofunaut 2019");
 
             AccountManager.AuthenticatedSuccessfully += AccountManager_AuthenticatedSuccessfully;
+            AccountManager.FailedToAuthenticate += AccountManager_FailedToAuthenticate;
 
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Initializing, Initializing_Enter, null, Initializing_Exit);
@@ -67,6 +93,7 @@ namespace Tofunaut.GridStrategy
             base.OnDestroy();
 
             AccountManager.AuthenticatedSuccessfully -= AccountManager_AuthenticatedSuccessfully;
+            AccountManager.FailedToAuthenticate -= AccountManager_FailedToAuthenticate;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -162,10 +189,18 @@ namespace Tofunaut.GridStrategy
 
             if(e.accountData.titleData.TryGetValue("required_version", out string versionString))
             {
-                IsClientValid = Version.IsValid(versionString, AppVersion);
+                if(Version.IsValid(versionString, AppVersion))
+                {
+                    ClientState = EClientState.Valid;
+                }
+                else
+                {
+                    ClientState = EClientState.NeedsUpdate;
+                }
             }
             else
             {
+                ClientState = EClientState.ValidationError;
                 throw new System.Exception($"the key required_version wasn't found in the title data");
             }
 
@@ -174,12 +209,23 @@ namespace Tofunaut.GridStrategy
                 serializedConfig = serializedConfig.Replace(@"\r", "");
                 serializedConfig = serializedConfig.Replace(@"\n", "");
 
-                Config = new Config(serializedConfig);
+                Config = new Config(serializedConfig, true);
             }
             else
             {
-                throw new System.Exception("the key game_config wasn't found in the title data");
+                Debug.LogError("the key game_config wasn't found in the title data");
+
+                Config = Config.DefaultConfig();
             }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void AccountManager_FailedToAuthenticate(object sender, System.EventArgs e)
+        {
+            Debug.Log("failed to authenticate, continuing with default data");
+
+            ClientState = EClientState.Offline;
+            Config = Config.DefaultConfig();
         }
     }
 }

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using PlayFab;
+using System;
 using System.Collections.Generic;
 using Tofunaut.Core;
 using Tofunaut.PlayFabUtils;
@@ -20,7 +21,8 @@ namespace Tofunaut.GridStrategy
     {
         public static bool LoggedIn { get { return PlayFabClientAPI.IsClientLoggedIn(); } }
 
-        public static event System.EventHandler<AuthenticatedSuccessfullyEventArgs> AuthenticatedSuccessfully;
+        public static event EventHandler<AuthenticatedSuccessfullyEventArgs> AuthenticatedSuccessfully;
+        public static event EventHandler FailedToAuthenticate;
 
         private PlayFabAccountAuthenticationManager _authenticationManager;
         private PlayFabAccountData _accountData;
@@ -55,7 +57,10 @@ namespace Tofunaut.GridStrategy
                 _accountData = _authenticationManager.AccountData;
                 AuthenticatedSuccessfully?.Invoke(this, new AuthenticatedSuccessfullyEventArgs(_accountData));
                 onSuccess();
-            }, onFailure);
+            }, (TofuError errorCode, string errorMessage) => {
+                FailedToAuthenticate?.Invoke(this, EventArgs.Empty);
+                onFailure(errorCode, errorMessage);
+            } );
         }
 
 
