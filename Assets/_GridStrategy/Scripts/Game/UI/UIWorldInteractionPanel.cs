@@ -18,7 +18,7 @@ using UnityEngine.EventSystems;
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class UIWorldInteractionManager : SharpUIBase
+    public class UIWorldInteractionPanel : SharpUIBase
     {
         private const float SelectUnitTimeLimit = 0.4f;
 
@@ -26,18 +26,20 @@ namespace Tofunaut.GridStrategy.Game.UI
         public interface IListener
         {
             void OnSelectedUnitView(UnitView unitView);
+            void OnDrag(Vector2 prevDragPosition, Vector2 dragDelta);
         }
 
-        private static UIWorldInteractionManager _instance;
+        private static UIWorldInteractionPanel _instance;
 
         private readonly Game _game;
         private readonly IListener _listener;
 
         private UnitView _potentialSelectedUnitView; // the pointer is down, if a raycast hits a unit, we might be selecting it.
         private float _potentialSelectedUnitTime;
+        private Vector2 _previousDragPoint;
 
         // --------------------------------------------------------------------------------------------
-        private UIWorldInteractionManager(IListener listener, Game game) : base("UIWorldIteractionPanel")
+        private UIWorldInteractionPanel(IListener listener, Game game) : base("UIWorldIteractionPanel")
         {
             _game = game;
             _listener = listener;
@@ -47,6 +49,7 @@ namespace Tofunaut.GridStrategy.Game.UI
 
             SubscribeToEvent(EEventType.PointerDown, OnPointerDown);
             SubscribeToEvent(EEventType.PointerUp, OnPointerUp);
+            SubscribeToEvent(EEventType.Drag, OnPointerDrag);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -71,6 +74,12 @@ namespace Tofunaut.GridStrategy.Game.UI
                     // this could be null
                     _potentialSelectedUnitView = hit.collider.GetComponentInParent<UnitView>();
                     _potentialSelectedUnitTime = Time.time;
+                }
+
+                // if the potential slected unit view is still null, lets raycast to our plane
+                if(_potentialSelectedUnitView == null)
+                {
+                    _previousDragPoint = pointerEventData.position;
                 }
             }
         }
@@ -98,7 +107,20 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         // --------------------------------------------------------------------------------------------
-        public static UIWorldInteractionManager Create(IListener listener, Game game)
+        private void OnPointerDrag(object sender, EventSystemEventArgs e)
+        {
+            if(_potentialSelectedUnitView != null)
+            {
+                return;
+            }
+
+            PointerEventData pointerEventData = e.eventData as PointerEventData;
+            _listener.OnDrag(_previousDragPoint, pointerEventData.position - _previousDragPoint);
+            _previousDragPoint = pointerEventData.position;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static UIWorldInteractionPanel Create(IListener listener, Game game)
         {
             if (_instance != null)
             {
@@ -106,7 +128,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 return null;
             }
 
-            _instance = new UIWorldInteractionManager(listener, game);
+            _instance = new UIWorldInteractionPanel(listener, game);
             UIMainCanvas.Instance.AddChild(_instance, UIPriorities.UIWorldInteractionManager);
 
             return _instance;

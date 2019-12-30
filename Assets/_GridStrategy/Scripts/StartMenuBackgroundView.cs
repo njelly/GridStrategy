@@ -94,17 +94,9 @@ namespace Tofunaut.GridStrategy
             public StartMenuBackgroundCamera() : base("StartMenuBackgroundCamera") 
             {
                 LocalPosition = new Vector3(0, 1.5f, -10f);
-            }
-
-
-            // --------------------------------------------------------------------------------------------
-            protected override void Build()
-            {
-                base.Build();
-
-                _unityCamera.clearFlags = CameraClearFlags.SolidColor;
-                _unityCamera.backgroundColor = Color.black;
-                _unityCamera.fieldOfView = 11.5f;
+                CameraClearFlags = CameraClearFlags.SolidColor;
+                CameraBackgroundColor = Color.black;
+                CameraFieldOfView = 11.5f;
             }
         }
     }

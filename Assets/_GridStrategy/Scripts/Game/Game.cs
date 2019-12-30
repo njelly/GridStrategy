@@ -14,7 +14,7 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
-    public class Game : UIWorldInteractionManager.IListener
+    public class Game
     {
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
@@ -24,20 +24,18 @@ namespace Tofunaut.GridStrategy.Game
         private List<Player> _players;
         private List<PlayerAction> _playerActions;
         private int _actionIndex;
-        private UIWorldInteractionManager _worldInteractionManager;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int firstPlayerIndex)
         {
-            gameCamera = GameCamera.Create();
-            gameCamera.Render(AppManager.Transform);
+            _currentPlayerIndex = firstPlayerIndex;
+
+            board = new Board(8, 8);
+            board.Render(AppManager.Transform);
 
             sun = SharpLight.Sun();
             sun.LocalRotation = Quaternion.Euler(125, 45, 0);
             sun.Render(AppManager.Transform);
-
-            board = new Board(8, 8);
-            board.Render(AppManager.Transform);
 
             _players = new List<Player>();
             for(int i = 0; i < playerDatas.Count; i++)
@@ -45,9 +43,8 @@ namespace Tofunaut.GridStrategy.Game
                 _players.Add(new Player(playerDatas[i], this, i));
             }
 
-            _worldInteractionManager = UIWorldInteractionManager.Create(this, this);
-
-            _currentPlayerIndex = firstPlayerIndex;
+            gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
+            gameCamera.Render(AppManager.Transform);
 
             _playerActions = new List<PlayerAction>();
             _actionIndex = -1;
@@ -86,11 +83,6 @@ namespace Tofunaut.GridStrategy.Game
             gameCamera.Destroy();
             sun.Destroy();
             board.Destroy();
-        }
-
-        public void OnSelectedUnitView(UnitView unitView)
-        {
-            Debug.Log($"Selected unit: {unitView.Unit.name} + {unitView.Unit.id}");
         }
     }
 }
