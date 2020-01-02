@@ -73,7 +73,7 @@ namespace Tofunaut.GridStrategy
             DontDestroyOnLoad(gameObject);
 
             AppVersion = new Version(string.Format("{0}{1}{2}", Application.version, Version.Delimeter, BuildNumberUtil.ReadBuildNumber()));
-            Debug.Log($"GridStrategy {AppVersion} (c) Tofunaut 2019");
+            Debug.Log($"GridStrategy {AppVersion} (c) Tofunaut 2020");
 
             AccountManager.AuthenticatedSuccessfully += AccountManager_AuthenticatedSuccessfully;
             AccountManager.FailedToAuthenticate += AccountManager_FailedToAuthenticate;
