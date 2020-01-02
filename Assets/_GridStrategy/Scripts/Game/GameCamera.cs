@@ -51,7 +51,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public Vector3 CalculateOffsetFromTarget()
         {
-            return Quaternion.Euler(0, -1 * _orbitAngle, 0) * (Quaternion.Euler(0, 0, _horizonAngle) * (Vector3.right * _distanceFromLookTarget));
+            return Quaternion.Euler(0, -1 * _orbitAngle, _horizonAngle) * (Vector3.right * _distanceFromLookTarget);
         }
 
         // --------------------------------------------------------------------------------------------
