@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
+using TofuCore;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
 using UnityEngine;
@@ -48,6 +49,10 @@ namespace Tofunaut.GridStrategy.Game
 
             _playerActions = new List<PlayerAction>();
             _actionIndex = -1;
+
+            // TEST
+            QueueAction(new MoveAction(_currentPlayerIndex, _players[_currentPlayerIndex].Hero.id, new[] { new IntVector2(1, 0) }));
+            ExecuteNextPlayerAction();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -68,12 +73,18 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            switch(_playerActions[_actionIndex].type)
+            PlayerAction nextAction = _playerActions[_actionIndex];
+
+            switch (nextAction.type)
             {
                 case PlayerAction.EType.Invalid:
                     Debug.LogError($"PlayerAction {_actionIndex} has the type Invalid!");
                     break;
-
+                case PlayerAction.EType.MoveUnit:
+                    MoveAction moveAction = nextAction as MoveAction;
+                    Unit toMove = Unit.GetUnit(moveAction.unitId);
+                    toMove.Move(moveAction.path, false);
+                    break;
             }
         }
 

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
+using TofuCore;
 using Tofunaut.SharpUnity;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace Tofunaut.GridStrategy.Game
     public class BoardTile : SharpGameObject
     {
         public IReadOnlyCollection<Unit> Occupants { get { return _occupants.AsReadOnly(); } }
+        public IntVector2 Coord { get { return new IntVector2(xCoord, yCoord); } }
 
         public readonly int xCoord;
         public readonly int yCoord;
@@ -53,6 +55,19 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _view = view;
             });
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public int GetMoveCostForUnit(Unit unit)
+        {
+            // TODO: depending on modifiers on the unit or tile, maybe return a different number?
+            return 1;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool IsAdjacentTo(BoardTile other)
+        {
+            return (Coord - other.Coord).ManhattanDistance == 1;
         }
     }
 }

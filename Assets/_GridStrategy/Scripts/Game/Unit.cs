@@ -49,19 +49,19 @@ namespace Tofunaut.GridStrategy.Game
         private EFacing _facing;
         private TofuAnimation _facingAnim;
         private TofuAnimation _moveAnim;
+        private readonly Game _game;
 
         // --------------------------------------------------------------------------------------------
-        public Unit(UnitData data, BoardTile boardTile) : base(data.id) 
+        public Unit(UnitData data, Game game) : base(data.id) 
         {
             id = _idCounter++;
             _idToUnit.Add(this);
 
             _data = data;
+            _game = game;
 
             Health = _data.health;
             MoveRange = _data.moveRange;
-
-            MoveTo(boardTile, false);
         }
 
         #region SharpGameObject
@@ -78,8 +78,17 @@ namespace Tofunaut.GridStrategy.Game
         #endregion SharpGameObject
 
         // --------------------------------------------------------------------------------------------
-        public void MoveTo(BoardTile boardTile, bool animate)
+        public void Move(IntVector2[] path, bool animate)
         {
+            for(int i = 0; i < path.Length; i++)
+            {
+                BoardTile boardTile = _game.board[path[i].x, path[i].y];
+                OccupyBoardTile(boardTile);
+            }
+        }
+
+        public void OccupyBoardTile(BoardTile boardTile)
+        {            
             // leave the current tile, if it exists
             boardTile?.RemoveOccupant(this);
 
@@ -87,11 +96,9 @@ namespace Tofunaut.GridStrategy.Game
             BoardTile = boardTile;
             boardTile.AddOccupant(this);
 
-            if(animate)
-            {
-                _moveAnim?.Stop();
-                throw new NotImplementedException("hey animate the unit to the board tile somehow");
-            }
+            // parent the unit to the tile and zero out its local position
+            boardTile.AddChild(this);
+            LocalPosition = Vector3.zero;
         }
 
         // --------------------------------------------------------------------------------------------

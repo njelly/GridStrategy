@@ -8,6 +8,7 @@
 
 using System;
 using TofuCore;
+using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
@@ -54,13 +55,61 @@ namespace Tofunaut.GridStrategy.Game
     public class MoveAction : PlayerAction
     {
         public int unitId;
-        public IntVector2 toCoord;
+        public IntVector2[] path;
 
         // --------------------------------------------------------------------------------------------
-        public MoveAction(int playerIndex, int unitId, IntVector2 toCoord) : base(EType.MoveUnit, playerIndex)
+        public MoveAction(int playerIndex, int unitId, IntVector2[] path) : base(EType.MoveUnit, playerIndex)
         {
             this.unitId = unitId;
-            this.toCoord = toCoord;
+            this.path = path;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override bool IsValid(Game game)
+        {
+            Unit toMove = Unit.GetUnit(unitId);
+
+            if(path.Length == 0)
+            {
+                Debug.LogError("the path is empty");
+            }
+
+            if(toMove.HasMoved)
+            {
+                Debug.LogError($"{toMove.id} has already moved!");
+                return false;
+            }
+
+            if(!toMove.BoardTile.IsAdjacentTo(game.board[path[0].x, path[0].y]))
+            {
+                Debug.LogError($"{toMove.id} must be on a board tile adjacent to the first tile in the path");
+                return false;
+            }
+
+            int cost = 0;
+            for (int i = 0; i < path.Length; i++)
+            {
+                if (i >= path.Length - 1)
+                {
+                    break;
+                }
+
+                if ((path[i] - path[i + 1]).ManhattanDistance != 1)
+                {
+                    Debug.LogError("the path is not continuous!");
+                    return false;
+                }
+
+                cost += game.board[path[i].x, path[i].y].GetMoveCostForUnit(toMove);
+            }
+
+            if(cost > toMove.MoveRange)
+            {
+                Debug.Log($"{cost} is greater than {toMove.MoveRange}");
+                return false;
+            }
+
+            return true;
         }
     }
 
