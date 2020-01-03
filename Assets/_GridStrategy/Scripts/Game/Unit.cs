@@ -90,7 +90,7 @@ namespace Tofunaut.GridStrategy.Game
             if(animate)
             {
                 _moveAnim?.Stop();
-                
+                throw new NotImplementedException("hey animate the unit to the board tile somehow");
             }
         }
 

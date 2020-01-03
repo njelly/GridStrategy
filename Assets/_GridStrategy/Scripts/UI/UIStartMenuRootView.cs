@@ -16,7 +16,7 @@ namespace Tofunaut.GridStrategy.UI
 {
 
     // --------------------------------------------------------------------------------------------
-    public class UIStartMenuRootView : SharpUIView
+    public class UIStartMenuRootView : GridStrategyUIView
     {
         public interface IUIStartMenuRootViewListener
         {
@@ -44,7 +44,7 @@ namespace Tofunaut.GridStrategy.UI
 
 
         // --------------------------------------------------------------------------------------------
-        public UIStartMenuRootView(IUIStartMenuRootViewListener listener) : base(UIMainCanvas.Instance)
+        public UIStartMenuRootView(IUIStartMenuRootViewListener listener)
         {
             _listener = listener;
         }
@@ -216,7 +216,6 @@ namespace Tofunaut.GridStrategy.UI
             private const float PressAnimTime = 0.3f;
             private const float AnimateAwayDistance = -300;
             private const float AnimateAwayTime = 0.5f;
-            private const float AnimateSelectedDistance = 50;
             private const float AnimateSelectedTime = 0.5f;
             private const float AnimateSelectedScale = 1.2f;
 
