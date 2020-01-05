@@ -26,18 +26,25 @@ namespace Tofunaut.GridStrategy.Game
         private float _horizonAngle;
         private float _orbitAngle;
         private Plane _groundPlane;
+        private UIWorldInteractionPanel _uiWorldInteractionPanel;
 
         // --------------------------------------------------------------------------------------------
         protected GameCamera(Game game) : base("GameCamera")
         {
-            UIWorldInteractionPanel.Create(this, game);
+            _uiWorldInteractionPanel = UIWorldInteractionPanel.Create(this, game);
             dragEnabled = true;
         }
 
-        public void LookAt (Vector3 lookTarget) => LookAt(lookTarget, false);
-        public void LookAt (Vector3 lookTarget, bool doAnimate)
+        public override void Destroy()
         {
-            if(doAnimate)
+            base.Destroy();
+            _uiWorldInteractionPanel.Destroy();
+        }
+
+        public void LookAt(Vector3 lookTarget) => LookAt(lookTarget, false);
+        public void LookAt(Vector3 lookTarget, bool doAnimate)
+        {
+            if (doAnimate)
             {
                 throw new NotImplementedException("animate plz");
             }
@@ -82,16 +89,16 @@ namespace Tofunaut.GridStrategy.Game
 
         public void OnDrag(Vector2 prevDragPosition, Vector2 dragDelta)
         {
-            if(!dragEnabled)
+            if (!dragEnabled)
             {
                 return;
             }
 
             Ray prevRay = _unityCamera.ScreenPointToRay(prevDragPosition);
-            if(_groundPlane.Raycast(prevRay, out float prevDistance))
+            if (_groundPlane.Raycast(prevRay, out float prevDistance))
             {
                 Ray nextRay = _unityCamera.ScreenPointToRay(prevDragPosition + dragDelta);
-                if(_groundPlane.Raycast(nextRay, out float nextDistance))
+                if (_groundPlane.Raycast(nextRay, out float nextDistance))
                 {
                     LookAt(LookingAt + (prevRay.GetPoint(prevDistance) - nextRay.GetPoint(nextDistance)));
                 }

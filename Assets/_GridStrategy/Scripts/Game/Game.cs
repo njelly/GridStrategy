@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using TofuCore;
 using Tofunaut.GridStrategy.Game.UI;
@@ -17,6 +18,17 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Game
     {
+        public event EventHandler PlayerTurnStart;
+        public event EventHandler PlayerTurnEnd;
+
+        public bool HasBegun { get; private set; }
+        public bool HasFinished { get; private set; }
+
+        ///<summary>
+        /// Get the player whose turn it is.
+        ///</summary>
+        public Player CurrentPlayer => _players[_currentPlayerIndex];
+
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
         public readonly Board board;
@@ -25,6 +37,7 @@ namespace Tofunaut.GridStrategy.Game
         private List<Player> _players;
         private List<PlayerAction> _playerActions;
         private int _actionIndex;
+        private HUDManager _hudManager;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int firstPlayerIndex)
@@ -39,7 +52,7 @@ namespace Tofunaut.GridStrategy.Game
             sun.Render(AppManager.Transform);
 
             _players = new List<Player>();
-            for(int i = 0; i < playerDatas.Count; i++)
+            for (int i = 0; i < playerDatas.Count; i++)
             {
                 _players.Add(new Player(playerDatas[i], this, i));
             }
@@ -50,9 +63,21 @@ namespace Tofunaut.GridStrategy.Game
             _playerActions = new List<PlayerAction>();
             _actionIndex = -1;
 
-            // TEST
-            QueueAction(new MoveAction(_currentPlayerIndex, _players[_currentPlayerIndex].Hero.id, new[] { new IntVector2(1, 0) }));
-            ExecuteNextPlayerAction();
+            _hudManager = HUDManager.Create(this);
+            _hudManager.Render(AppManager.Transform);
+        }
+
+        public void BeginGame()
+        {
+            if (HasBegun)
+            {
+                Debug.LogError("the game has already begun");
+                return;
+            }
+
+            HasBegun = true;
+
+            PlayerTurnStart?.Invoke(this, EventArgs.Empty);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -67,7 +92,7 @@ namespace Tofunaut.GridStrategy.Game
             _actionIndex++;
 
             // first verify that this action can be executed based on the current game state
-            if(!_playerActions[_actionIndex].IsValid(this))
+            if (!_playerActions[_actionIndex].IsValid(this))
             {
                 Debug.LogError($"PlayerAction {_actionIndex} cannot be executed.");
                 return;
@@ -85,6 +110,14 @@ namespace Tofunaut.GridStrategy.Game
                     Unit toMove = Unit.GetUnit(moveAction.unitId);
                     toMove.Move(moveAction.path, false);
                     break;
+                case PlayerAction.EType.AttackUnit:
+                    throw new NotImplementedException();
+                case PlayerAction.EType.EndTurn:
+                    PlayerTurnEnd?.Invoke(this, EventArgs.Empty);
+                    _currentPlayerIndex += 1;
+                    _currentPlayerIndex %= _players.Count;
+                    PlayerTurnStart?.Invoke(this, EventArgs.Empty);
+                    break;
             }
         }
 
@@ -94,6 +127,7 @@ namespace Tofunaut.GridStrategy.Game
             gameCamera.Destroy();
             sun.Destroy();
             board.Destroy();
+            _hudManager.Destroy();
         }
     }
 }

@@ -69,18 +69,18 @@ namespace Tofunaut.GridStrategy.Game
         {
             Unit toMove = Unit.GetUnit(unitId);
 
-            if(path.Length == 0)
+            if (path.Length == 0)
             {
                 Debug.LogError("the path is empty");
             }
 
-            if(toMove.HasMoved)
+            if (toMove.HasMoved)
             {
                 Debug.LogError($"{toMove.id} has already moved!");
                 return false;
             }
 
-            if(!toMove.BoardTile.IsAdjacentTo(game.board[path[0].x, path[0].y]))
+            if (!toMove.BoardTile.IsAdjacentTo(game.board[path[0].x, path[0].y]))
             {
                 Debug.LogError($"{toMove.id} must be on a board tile adjacent to the first tile in the path");
                 return false;
@@ -103,7 +103,7 @@ namespace Tofunaut.GridStrategy.Game
                 cost += game.board[path[i].x, path[i].y].GetMoveCostForUnit(toMove);
             }
 
-            if(cost > toMove.MoveRange)
+            if (cost > toMove.MoveRange)
             {
                 Debug.Log($"{cost} is greater than {toMove.MoveRange}");
                 return false;

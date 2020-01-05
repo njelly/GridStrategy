@@ -62,6 +62,33 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         // --------------------------------------------------------------------------------------------
+        protected override void PostRender()
+        {
+            base.PostRender();
+
+            if (_instance != null)
+            {
+                Debug.LogError("An instance of UIWorldIteractionManager already exists!");
+                Destroy();
+            }
+            else
+            {
+                _instance = this;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override void Destroy()
+        {
+            base.Destroy();
+
+            if (_instance == this)
+            {
+                _instance = null;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
         private void OnPointerDown(object sender, EventSystemEventArgs e)
         {
             // if we have no potential selected unit yet, try to find one
@@ -77,7 +104,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 }
 
                 // if the potential slected unit view is still null, lets raycast to our plane
-                if(_potentialSelectedUnitView == null)
+                if (_potentialSelectedUnitView == null)
                 {
                     _previousDragPoint = pointerEventData.position;
                 }
@@ -109,7 +136,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         private void OnPointerDrag(object sender, EventSystemEventArgs e)
         {
-            if(_potentialSelectedUnitView != null)
+            if (_potentialSelectedUnitView != null)
             {
                 return;
             }
@@ -128,10 +155,10 @@ namespace Tofunaut.GridStrategy.Game.UI
                 return null;
             }
 
-            _instance = new UIWorldInteractionPanel(listener, game);
-            UIMainCanvas.Instance.AddChild(_instance, UIPriorities.UIWorldInteractionManager);
+            UIWorldInteractionPanel toReturn = new UIWorldInteractionPanel(listener, game);
+            UIMainCanvas.Instance.AddChild(toReturn, UIPriorities.UIWorldInteractionManager);
 
-            return _instance;
+            return toReturn;
         }
     }
 }

@@ -25,15 +25,18 @@ namespace Tofunaut.GridStrategy
         }
 
         private TofuStateMachine _stateMachine;
-        private Game.Game _gameManager;
+        private Game.Game _game;
 
         // --------------------------------------------------------------------------------------------
         private void Awake()
         {
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Loading, Loading_Enter, null, null);
-            _stateMachine.Register(State.InGame, InGame_Enter, null, null);
+            _stateMachine.Register(State.InGame, InGame_Enter, InGame_Update, null);
+        }
 
+        private void OnEnable()
+        {
             _stateMachine.ChangeState(State.Loading);
         }
 
@@ -41,6 +44,11 @@ namespace Tofunaut.GridStrategy
         private void Update()
         {
             _stateMachine.Update(Time.deltaTime);
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                this.Complete(new ControllerCompletedEventArgs(false));
+            }
         }
 
         #region State Machine
@@ -55,12 +63,35 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void InGame_Enter()
         {
-
-            _gameManager = new Game.Game(new List<PlayerData>
+            _game = new Game.Game(new List<PlayerData>
             {
                 LocalUserManager.LocalUserData.GetPlayerData(),
                 AppManager.Config.GetPlayerDataFromOpponentId("first_boss"),
             }, 0);
+
+            _fakeDelay = 0f;
+        }
+
+        private float _fakeDelay;
+        private void InGame_Update(float deltaTime)
+        {
+            if (_game.HasFinished)
+            {
+                this.Complete(new ControllerCompletedEventArgs(true));
+                return;
+            }
+
+            if (_game.HasBegun)
+            {
+                return;
+            }
+
+            // TODO: Eventually we want to only call this once all clients have determined they are ready to begin
+            _fakeDelay += deltaTime;
+            if (_fakeDelay > 1f)
+            {
+                _game.BeginGame();
+            }
         }
 
         #endregion State Machine
@@ -69,10 +100,10 @@ namespace Tofunaut.GridStrategy
         {
             base.Complete(e);
 
-            if (_gameManager != null)
+            if (_game != null)
             {
-                _gameManager.CleanUp();
-                _gameManager = null;
+                _game.CleanUp();
+                _game = null;
             }
         }
     }

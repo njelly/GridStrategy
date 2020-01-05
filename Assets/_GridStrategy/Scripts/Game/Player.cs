@@ -21,6 +21,7 @@ namespace Tofunaut.GridStrategy.Game
         public Unit Hero { get { return _hero; } }
 
         public readonly int playerIndex;
+        public readonly string name;
 
         // Cards the player does not have access to until they are drawn.
         private readonly List<Card> _deck;
@@ -43,12 +44,13 @@ namespace Tofunaut.GridStrategy.Game
         public Player(PlayerData playerData, Game game, int playerIndex)
         {
             this.playerIndex = playerIndex;
+            this.name = playerData.name;
 
             _game = game;
 
             // create the player's deck
             _deck = new List<Card>();
-            foreach(string cardId in playerData.deckData.cardIdToCount.Keys)
+            foreach (string cardId in playerData.deckData.cardIdToCount.Keys)
             {
                 CardData cardData = AppManager.Config.GetCardData(cardId);
                 for (int i = 0; i < playerData.deckData.cardIdToCount[cardId]; i++)
@@ -73,7 +75,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void BeginTurn()
         {
-            foreach(Unit gameEntity in _units)
+            foreach (Unit gameEntity in _units)
             {
                 gameEntity.OnPlayerTurnBegan();
             }
@@ -91,9 +93,9 @@ namespace Tofunaut.GridStrategy.Game
         public void Discard(Card card)
         {
             // first attempt to remove the card from the player's hand, then try to remove it from the players deck
-            if(!_hand.Remove(card))
+            if (!_hand.Remove(card))
             {
-                if(_deck.Remove(card))
+                if (_deck.Remove(card))
                 {
                     Debug.LogError($"the card {card.name} is not owned by this player");
                     return;
@@ -107,7 +109,7 @@ namespace Tofunaut.GridStrategy.Game
         public void ShuffleDeck()
         {
             // TODO: might want to make this guaranteed to be deterministic
-            for(int i = 0; i < _deck.Count; i++)
+            for (int i = 0; i < _deck.Count; i++)
             {
                 int randomIndex = Random.Range(0, _deck.Count - 1);
                 Card temp = _deck[randomIndex];

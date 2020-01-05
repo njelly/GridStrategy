@@ -78,7 +78,7 @@ namespace Tofunaut.GridStrategy
                 _backgroundView,
             }).LoadAll((float progress) =>
             {
-                if(progress.IsApproximately(1f))
+                if (progress.IsApproximately(1f))
                 {
                     _stateMachine.ChangeState(State.Root);
                 }
@@ -103,7 +103,10 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Root_Exit()
         {
-            _uiStartMenuRootView.Hide();
+            if (_uiStartMenuRootView.IsShowing)
+            {
+                _uiStartMenuRootView.Hide();
+            }
         }
 
 
