@@ -30,6 +30,15 @@ namespace Tofunaut.GridStrategy
 
 
         // --------------------------------------------------------------------------------------------
+        public static class Sprites
+        {
+            public const string DefaultEnemyHead = "default_enemy_head";
+            public const string DefaultHeroHead = "default_hero_head";
+            public const string CircleWhite2048 = "circle_white_2048";
+        }
+
+
+        // --------------------------------------------------------------------------------------------
         public static class UserData
         {
             public const string Default = "DefaultUserData";

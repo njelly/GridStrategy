@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Tofunaut.GridStrategy.Game;
+using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy
@@ -54,7 +55,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public CardData GetCardData(string id)
         {
-            if(_idToCardData.TryGetValue(id, out CardData cardData))
+            if (_idToCardData.TryGetValue(id, out CardData cardData))
             {
                 return cardData;
             }
@@ -109,6 +110,7 @@ namespace Tofunaut.GridStrategy
                 name = opponentData.id, // TODO: convert this using a string library for i18n
                 deckData = GetDeckData(opponentData.deckId),
                 heroData = GetUnitData(opponentData.heroId),
+                headSpritePath = opponentData.headSpritePath,
             };
         }
 
@@ -399,6 +401,17 @@ namespace Tofunaut.GridStrategy
                     hasError = true;
                 }
 
+                // head sprite path
+                if (rawOpponentData.TryGetValue("headspritepath", out object headSpritePathObj))
+                {
+                    opponentData.headSpritePath = headSpritePathObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"opponent data index {i} is missing a headSpritePath");
+                    hasError = true;
+                }
+
                 _idToOpponentData.Add(opponentData.id, opponentData);
             }
 
@@ -407,7 +420,7 @@ namespace Tofunaut.GridStrategy
 
         public static Config DefaultConfig()
         {
-            if(!File.Exists(DefaultConfigPath))
+            if (!File.Exists(DefaultConfigPath))
             {
                 Debug.LogError("no data found for the default config!");
                 return null;
@@ -456,6 +469,7 @@ namespace Tofunaut.GridStrategy
         public string id;
         public string heroId;
         public string deckId;
+        public string headSpritePath;
     }
 
     // --------------------------------------------------------------------------------------------
@@ -468,5 +482,18 @@ namespace Tofunaut.GridStrategy
         public string name;
         public DeckData deckData;
         public UnitData heroData;
+        public string headSpritePath;
+
+        // --------------------------------------------------------------------------------------------
+        public void LoadAssets(AssetManager assetManager)
+        {
+            assetManager.Load<Sprite>(headSpritePath);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void ReleaseAssets(AssetManager assetManager)
+        {
+            assetManager.Release<Sprite>(headSpritePath);
+        }
     }
 }

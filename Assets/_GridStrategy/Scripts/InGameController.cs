@@ -26,18 +26,26 @@ namespace Tofunaut.GridStrategy
 
         private TofuStateMachine _stateMachine;
         private Game.Game _game;
+        private List<PlayerData> _playerDatas;
 
         // --------------------------------------------------------------------------------------------
         private void Awake()
         {
             _stateMachine = new TofuStateMachine();
-            _stateMachine.Register(State.Loading, Loading_Enter, null, null);
+            _stateMachine.Register(State.Loading, Loading_Enter, Loading_Update, null);
             _stateMachine.Register(State.InGame, InGame_Enter, InGame_Update, null);
         }
 
         private void OnEnable()
         {
             _stateMachine.ChangeState(State.Loading);
+
+            // TODO: eventually this will either need to be synced over the network or somehow decided before the game starts
+            _playerDatas = new List<PlayerData>()
+            {
+                LocalUserManager.LocalUserData.GetPlayerData(),
+                AppManager.Config.GetPlayerDataFromOpponentId("first_boss"),
+            };
         }
 
         // --------------------------------------------------------------------------------------------
@@ -56,22 +64,29 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Loading_Enter()
         {
-            // TODO: Actually load stuff
-            _stateMachine.ChangeState(State.InGame);
+            // load all necessary assets based on the playerdatas
+            foreach (PlayerData playerData in _playerDatas)
+            {
+                playerData.LoadAssets(AppManager.AssetManager);
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void Loading_Update(float deltaTime)
+        {
+            if (AppManager.AssetManager.Ready)
+            {
+                _stateMachine.ChangeState(State.InGame);
+            }
         }
 
         // --------------------------------------------------------------------------------------------
         private void InGame_Enter()
         {
-            _game = new Game.Game(new List<PlayerData>
-            {
-                LocalUserManager.LocalUserData.GetPlayerData(),
-                AppManager.Config.GetPlayerDataFromOpponentId("first_boss"),
-            }, 0);
-
-            _fakeDelay = 0f;
+            _game = new Game.Game(_playerDatas, 0);
         }
 
+        // --------------------------------------------------------------------------------------------
         private float _fakeDelay;
         private void InGame_Update(float deltaTime)
         {
@@ -91,6 +106,7 @@ namespace Tofunaut.GridStrategy
             if (_fakeDelay > 1f)
             {
                 _game.BeginGame();
+                _fakeDelay = 0f;
             }
         }
 
@@ -99,6 +115,12 @@ namespace Tofunaut.GridStrategy
         protected override void Complete(ControllerCompletedEventArgs e)
         {
             base.Complete(e);
+
+            // release assets now that we don't need them anymore
+            foreach (PlayerData playerData in _playerDatas)
+            {
+                playerData.ReleaseAssets(AppManager.AssetManager);
+            }
 
             if (_game != null)
             {

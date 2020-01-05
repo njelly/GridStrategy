@@ -66,6 +66,9 @@ namespace Tofunaut.GridStrategy
             AppManager.AssetManager.Load<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityRegular);
             AppManager.AssetManager.Load<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityUltraLight);
             AppManager.AssetManager.Load<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityUltraLightItalic);
+
+            // load a few more general use sprites
+            AppManager.AssetManager.Load<Sprite>(AssetPaths.Sprites.CircleWhite2048);
         }
 
         // --------------------------------------------------------------------------------------------

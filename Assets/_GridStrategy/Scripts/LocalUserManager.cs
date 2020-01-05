@@ -29,6 +29,7 @@ namespace Tofunaut.GridStrategy
                 name = name,
                 deckData = decks[0],
                 heroData = AppManager.Config.GetUnitData(heroLibrary[0]),
+                headSpritePath = AssetPaths.Sprites.DefaultHeroHead,
             };
         }
 
@@ -71,7 +72,7 @@ namespace Tofunaut.GridStrategy
         public void Initialize(Action onComplete)
         {
             string serializedLocalPlayerData = PlayerPrefs.GetString(SerializedLocalUserDataKey, string.Empty);
-            if(!string.IsNullOrEmpty(serializedLocalPlayerData))
+            if (!string.IsNullOrEmpty(serializedLocalPlayerData))
             {
                 try
                 {
@@ -95,7 +96,7 @@ namespace Tofunaut.GridStrategy
             PlayerPrefs.SetString(SerializedLocalUserDataKey, Newtonsoft.Json.JsonConvert.SerializeObject(LocalUserData));
 
             // if the user is logged in, attempt to write their data to their account
-            if(AccountManager.LoggedIn)
+            if (AccountManager.LoggedIn)
             {
                 AccountManager.Instance.WriteUserData(LocalUserData, onComplete, (TofuError errorCode, string errorMessage) =>
                 {
@@ -122,7 +123,7 @@ namespace Tofunaut.GridStrategy
             UserData copy = LocalUserData;
 
             string displayName = e.accountData.playerProfileModel.DisplayName;
-            if(!string.IsNullOrEmpty(displayName))
+            if (!string.IsNullOrEmpty(displayName))
             {
                 copy.name = displayName;
             }

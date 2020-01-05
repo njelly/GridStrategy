@@ -93,7 +93,7 @@
             "attribute": "None",
             "health": 60,
             "power": 30,
-            "moverange": 1
+            "moverange": 4
         },
         {
             "id": "enforcer",
@@ -140,7 +140,8 @@
         {
             "id": "first_boss",
             "hero": "default_hero",
-            "deck": "first_boss"
+            "deck": "first_boss",
+            "headspritepath": "default_enemy_head"
         }
     ],
     "i18n": [

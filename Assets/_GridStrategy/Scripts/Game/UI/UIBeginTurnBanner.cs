@@ -1,12 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-//  UIHUDManager (c) 2020 Tofunaut
+//  UIBeginTurnBanner (c) 2020 Tofunaut
 //
 //  Created by Nathaniel Ellingson for GridStrategy on 01/05/2020
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-using System;
 using Tofunaut.Animation;
 using Tofunaut.SharpUnity.UI;
 using UnityEngine;
@@ -17,15 +16,18 @@ namespace Tofunaut.GridStrategy.UI
     {
         private const int BannerHeight = 300;
         private Color BackgroundStartColor => new Color(1f, 1f, 1f, 0f);
-        private Color BackgroundEndColor => new Color(1f, 1f, 1f, 0.3f);
+        private Color BackgroundEndColor => new Color(1f, 1f, 1f, 0.4f);
         private const float AnimateInTime = 1f;
         private const float AnimateHoldTime = 2f;
-        private const float AnimateOutTime = 1f;
+        private const float AnimateOutTime = 0.5f;
 
         private SharpUIImage _bannerBackground;
         private SharpUITextMeshPro _bannerLabel;
         private string _playerName;
         private TofuAnimation _anim;
+
+        // always render behind the UIWorldIteractionManager so that this doesn't block input
+        public UIBeginTurnBanner() : base(UIPriorities.UIWorldInteractionManager - 1) { }
 
         protected override SharpUIBase BuildMainPanel()
         {
@@ -90,7 +92,7 @@ namespace Tofunaut.GridStrategy.UI
                 {
                     _bannerBackground.Color = Color.Lerp(BackgroundEndColor, BackgroundStartColor, newValue);
                 })
-                .Value01(AnimateInTime, EEaseType.EaseInOutCirc, (float newValue) =>
+                .Value01(AnimateOutTime, EEaseType.EaseInOutCirc, (float newValue) =>
                 {
                     _bannerLabel.LocalPosition = Vector3.LerpUnclamped(holdLabelPos, endLabelPos, newValue);
                 })

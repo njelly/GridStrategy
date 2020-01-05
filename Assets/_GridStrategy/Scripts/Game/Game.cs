@@ -18,8 +18,9 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Game
     {
-        public event EventHandler PlayerTurnStart;
-        public event EventHandler PlayerTurnEnd;
+        public event EventHandler GameBegan;
+        public event EventHandler PlayerTurnStarted;
+        public event EventHandler PlayerTurnEnded;
 
         public bool HasBegun { get; private set; }
         public bool HasFinished { get; private set; }
@@ -28,10 +29,13 @@ namespace Tofunaut.GridStrategy.Game
         /// Get the player whose turn it is.
         ///</summary>
         public Player CurrentPlayer => _players[_currentPlayerIndex];
+        public Player LocalPlayer => _players[_localPlayerIndex];
 
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
         public readonly Board board;
+
+        private readonly int _localPlayerIndex;
 
         private int _currentPlayerIndex;
         private List<Player> _players;
@@ -40,9 +44,10 @@ namespace Tofunaut.GridStrategy.Game
         private HUDManager _hudManager;
 
         // --------------------------------------------------------------------------------------------
-        public Game(List<PlayerData> playerDatas, int firstPlayerIndex)
+        public Game(List<PlayerData> playerDatas, int localPlayerIndex)
         {
-            _currentPlayerIndex = firstPlayerIndex;
+            _currentPlayerIndex = 0;
+            _localPlayerIndex = localPlayerIndex;
 
             board = new Board(8, 8);
             board.Render(AppManager.Transform);
@@ -77,7 +82,9 @@ namespace Tofunaut.GridStrategy.Game
 
             HasBegun = true;
 
-            PlayerTurnStart?.Invoke(this, EventArgs.Empty);
+            GameBegan?.Invoke(this, EventArgs.Empty);
+
+            PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -113,12 +120,18 @@ namespace Tofunaut.GridStrategy.Game
                 case PlayerAction.EType.AttackUnit:
                     throw new NotImplementedException();
                 case PlayerAction.EType.EndTurn:
-                    PlayerTurnEnd?.Invoke(this, EventArgs.Empty);
+                    PlayerTurnEnded?.Invoke(this, EventArgs.Empty);
                     _currentPlayerIndex += 1;
                     _currentPlayerIndex %= _players.Count;
-                    PlayerTurnStart?.Invoke(this, EventArgs.Empty);
+                    PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
                     break;
             }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public Player GetPlayer(int index)
+        {
+            return _players[index];
         }
 
         // --------------------------------------------------------------------------------------------

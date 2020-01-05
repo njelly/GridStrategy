@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
@@ -17,6 +18,8 @@ namespace Tofunaut.GridStrategy.Game.UI
     {
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
+        private UILeftPlayerPanel _localPlayerPanel;
+        private List<UIRightPlayerPanel> _opponentPlayerPanels;
 
         private HUDManager(Game game) : base("UIHUDManager")
         {
@@ -26,18 +29,46 @@ namespace Tofunaut.GridStrategy.Game.UI
         protected override void Build()
         {
             _beginTurnBanner = new UIBeginTurnBanner();
+            _localPlayerPanel = new UILeftPlayerPanel(_game.LocalPlayer);
+
+            //TODO: Put this in a vertical layout group for all opponent players
+            _opponentPlayerPanels = new List<UIRightPlayerPanel>
+            {
+                // TODO: 1 is not guranteed to be an opponent player
+                new UIRightPlayerPanel(_game.GetPlayer(1)),
+            };
         }
 
         protected override void PostRender()
         {
             base.PostRender();
-            _game.PlayerTurnStart += OnPlayerTurnStart;
+            _game.PlayerTurnStarted += OnPlayerTurnStart;
+            _game.GameBegan += OnGameBegan;
         }
 
         public override void Destroy()
         {
             base.Destroy();
-            _game.PlayerTurnStart -= OnPlayerTurnStart;
+
+            _localPlayerPanel.Hide();
+
+            foreach (UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
+            {
+                opponentPanel.Hide();
+            }
+
+            _game.PlayerTurnStarted -= OnPlayerTurnStart;
+            _game.GameBegan -= OnGameBegan;
+        }
+
+        private void OnGameBegan(object sender, EventArgs e)
+        {
+            _localPlayerPanel.Show();
+
+            foreach(UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
+            {
+                opponentPanel.Show();
+            }
         }
 
         private void OnPlayerTurnStart(object sender, EventArgs e)

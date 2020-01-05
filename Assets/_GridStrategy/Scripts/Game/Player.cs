@@ -19,6 +19,7 @@ namespace Tofunaut.GridStrategy.Game
         public IReadOnlyCollection<Card> DiscardPile { get { return _discardPile.AsReadOnly(); } }
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
         public Unit Hero { get { return _hero; } }
+        public PlayerData PlayerData { get { return _playerData; } }
 
         public readonly int playerIndex;
         public readonly string name;
@@ -39,6 +40,7 @@ namespace Tofunaut.GridStrategy.Game
         private Unit _hero;
 
         private readonly Game _game;
+        private readonly PlayerData _playerData;
 
         // --------------------------------------------------------------------------------------------
         public Player(PlayerData playerData, Game game, int playerIndex)
@@ -47,6 +49,7 @@ namespace Tofunaut.GridStrategy.Game
             this.name = playerData.name;
 
             _game = game;
+            _playerData = playerData;
 
             // create the player's deck
             _deck = new List<Card>();

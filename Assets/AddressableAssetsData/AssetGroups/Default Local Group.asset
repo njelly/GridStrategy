@@ -49,8 +49,20 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Regular SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 8ca32ce8d203d4f1baae118ac84be8ad
+    m_Address: default_hero_head
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 8ec22ffdcc86496429116afaa55b8bf5
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Book SDF.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b51d45bb328d247b6b8188e24246fcc8
+    m_Address: default_enemy_head
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b7f78b27123634bae85f2f86f281f6ea
+    m_Address: circle_white_2048
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: c81766c98586baf41b9b1625b8c39cf9
