@@ -18,9 +18,9 @@ namespace Tofunaut.GridStrategy.UI
         private const int BannerHeight = 300;
         private Color BackgroundStartColor => new Color(1f, 1f, 1f, 0f);
         private Color BackgroundEndColor => new Color(1f, 1f, 1f, 0.3f);
-        private const float AnimateInTime = 0.5f;
-        private const float AnimateHoldTime = 3f;
-        private const float AnimateOutTime = 0.5f;
+        private const float AnimateInTime = 1f;
+        private const float AnimateHoldTime = 2f;
+        private const float AnimateOutTime = 1f;
 
         private SharpUIImage _bannerBackground;
         private SharpUITextMeshPro _bannerLabel;
@@ -36,6 +36,7 @@ namespace Tofunaut.GridStrategy.UI
             _bannerBackground.alignment = EAlignment.MiddleCenter;
 
             _bannerLabel = new SharpUITextMeshPro($"{_bannerBackground.name}_Label", _playerName);
+            _bannerLabel.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityLightItalic);
             _bannerLabel.SetFillSize();
             _bannerLabel.TextAlignment = TMPro.TextAlignmentOptions.Center;
             _bannerLabel.AutoSizeFont();
@@ -69,26 +70,36 @@ namespace Tofunaut.GridStrategy.UI
         {
             _anim?.Stop();
 
-            // temp animation to make sure everything is aligned right
+            Vector2 startLabelPos = new Vector2(_bannerBackground.Width, 0f);
+            Vector2 holdLabelPos = new Vector2(0f, 0f);
+            Vector2 endLabelPos = new Vector2(-_bannerBackground.Width, 0f);
+
             _anim = new TofuAnimation()
+                .Value01(AnimateInTime, EEaseType.Linear, (float newValue) =>
+                {
+                    _bannerBackground.Color = Color.Lerp(BackgroundStartColor, BackgroundEndColor, newValue);
+                })
+                .Value01(AnimateInTime, EEaseType.EaseInOutCirc, (float newValue) =>
+                {
+                    _bannerLabel.LocalPosition = Vector3.LerpUnclamped(startLabelPos, holdLabelPos, newValue);
+                })
+                .Then()
                 .Wait(AnimateHoldTime)
+                .Then()
+                .Value01(AnimateInTime, EEaseType.Linear, (float newValue) =>
+                {
+                    _bannerBackground.Color = Color.Lerp(BackgroundEndColor, BackgroundStartColor, newValue);
+                })
+                .Value01(AnimateInTime, EEaseType.EaseInOutCirc, (float newValue) =>
+                {
+                    _bannerLabel.LocalPosition = Vector3.LerpUnclamped(holdLabelPos, endLabelPos, newValue);
+                })
                 .Then()
                 .Execute(() =>
                 {
-                    _anim = null;
                     Hide();
                 })
                 .Play();
-
-            //new TofuAnimation()
-            //    .Value01(AnimateInTime, EEaseType.Linear, (float newValue) =>
-            //    {
-            //        _bannerBackground.Color = Color.Lerp(BackgroundStartColor, BackgroundEndColor, newValue);
-            //    })
-            //    .Value01(AnimateInTime, EEaseType.EaseInExpo, (float newValue) =>
-            //    {
-            //        _bannerLabel.LocalPosition
-            //    })
         }
     }
 }
