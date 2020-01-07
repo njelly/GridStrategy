@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using TofuCore;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
+using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -146,29 +147,6 @@ namespace Tofunaut.GridStrategy.Game
             board.Destroy();
             _hudManager.Destroy();
             _uiWorldInteractionManager.Destroy();
-        }
-    }
-}
-
-namespace Tofunaut.SharpUnity
-{
-    public class SharpLineRenderer : SharpGameObject
-    {
-        private LineRenderer _lineRenderer;
-
-        public SharpLineRenderer(string name) : base(name) { }
-
-        protected override List<Type> GetComponentTypes()
-        {
-            List<Type> toReturn = base.GetComponentTypes();
-            toReturn.Add(typeof(LineRenderer));
-
-            return toReturn;
-        }
-
-        protected override void Build()
-        {
-            _lineRenderer = GameObject.GetComponent<LineRenderer>();
         }
     }
 }
