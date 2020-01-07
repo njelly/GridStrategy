@@ -42,6 +42,7 @@ namespace Tofunaut.GridStrategy.Game
         private List<PlayerAction> _playerActions;
         private int _actionIndex;
         private HUDManager _hudManager;
+        private UIWorldInteractionPanel _uiWorldInteractionManager;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int localPlayerIndex)
@@ -61,6 +62,9 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _players.Add(new Player(playerDatas[i], this, i));
             }
+
+            // This needs to happen before gameCamera, since it needs to register itself as a listener to UIWorldIteractionPanel
+            _uiWorldInteractionManager = UIWorldInteractionPanel.Create(this);
 
             gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
             gameCamera.Render(AppManager.Transform);
@@ -141,6 +145,30 @@ namespace Tofunaut.GridStrategy.Game
             sun.Destroy();
             board.Destroy();
             _hudManager.Destroy();
+            _uiWorldInteractionManager.Destroy();
+        }
+    }
+}
+
+namespace Tofunaut.SharpUnity
+{
+    public class SharpLineRenderer : SharpGameObject
+    {
+        private LineRenderer _lineRenderer;
+
+        public SharpLineRenderer(string name) : base(name) { }
+
+        protected override List<Type> GetComponentTypes()
+        {
+            List<Type> toReturn = base.GetComponentTypes();
+            toReturn.Add(typeof(LineRenderer));
+
+            return toReturn;
+        }
+
+        protected override void Build()
+        {
+            _lineRenderer = GameObject.GetComponent<LineRenderer>();
         }
     }
 }

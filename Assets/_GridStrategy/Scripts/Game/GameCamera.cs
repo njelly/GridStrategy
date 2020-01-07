@@ -22,23 +22,26 @@ namespace Tofunaut.GridStrategy.Game
 
         public bool dragEnabled;
 
+        private readonly Game _game;
+
         private float _distanceFromLookTarget;
         private float _horizonAngle;
         private float _orbitAngle;
         private Plane _groundPlane;
-        private UIWorldInteractionPanel _uiWorldInteractionPanel;
 
         // --------------------------------------------------------------------------------------------
         protected GameCamera(Game game) : base("GameCamera")
         {
-            _uiWorldInteractionPanel = UIWorldInteractionPanel.Create(this, game);
             dragEnabled = true;
+
+            _game = game;
         }
 
         public override void Destroy()
         {
             base.Destroy();
-            _uiWorldInteractionPanel.Destroy();
+
+            UIWorldInteractionPanel.RemoveListener(this);
         }
 
         public void LookAt(Vector3 lookTarget) => LookAt(lookTarget, false);
@@ -79,6 +82,8 @@ namespace Tofunaut.GridStrategy.Game
             toReturn.CameraBackgroundColor = Color.black;
             toReturn.CameraFieldOfView = 30f;
 
+            UIWorldInteractionPanel.AddListener(toReturn);
+
             return toReturn;
         }
 
@@ -87,7 +92,7 @@ namespace Tofunaut.GridStrategy.Game
             //LookAt(unitView.Unit.LocalPosition);
         }
 
-        public void OnDrag(Vector2 prevDragPosition, Vector2 dragDelta)
+        public void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta)
         {
             if (!dragEnabled)
             {
@@ -104,5 +109,8 @@ namespace Tofunaut.GridStrategy.Game
                 }
             }
         }
+
+        // do nothing?
+        public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta) { }
     }
 }
