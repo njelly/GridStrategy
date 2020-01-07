@@ -17,6 +17,8 @@ namespace Tofunaut.GridStrategy.Game
 
         public delegate void InstantiateDelegate(BoardTileView view);
 
+        public BoardTile BoardTile { get { return _boardTile; } }
+
         public MeshRenderer meshRenderer;
         public Material evenMaterial;
         public Material oddMaterial;

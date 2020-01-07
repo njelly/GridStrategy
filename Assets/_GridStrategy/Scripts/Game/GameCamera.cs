@@ -87,10 +87,7 @@ namespace Tofunaut.GridStrategy.Game
             return toReturn;
         }
 
-        public void OnSelectedUnitView(UnitView unitView)
-        {
-            //LookAt(unitView.Unit.LocalPosition);
-        }
+        public void OnSelectedUnitView(UnitView unitView) { }
 
         public void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta)
         {
@@ -110,7 +107,7 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
-        // do nothing?
         public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta) { }
+        public void OnReleasedBoard(Vector2 releasePosition) { }
     }
 }

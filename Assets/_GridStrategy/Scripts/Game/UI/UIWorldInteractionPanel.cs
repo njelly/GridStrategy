@@ -26,6 +26,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         public interface IListener
         {
             void OnSelectedUnitView(UnitView unitView);
+            void OnReleasedBoard(Vector2 releasePosition);
             void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta);
             void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta);
         }
@@ -126,10 +127,11 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         private void OnPointerUp(object sender, EventSystemEventArgs e)
         {
+            bool upOnUnitView = false;
+            PointerEventData pointerEventData = e.eventData as PointerEventData;
             if (Time.time - _potentialSelectedUnitTime < SelectUnitTimeLimit && _potentialSelectedUnitView != null)
             {
                 // if we have no potential selected unit yet, try to find one
-                PointerEventData pointerEventData = e.eventData as PointerEventData;
                 Ray ray = _game.gameCamera.ScreenPointToRay(pointerEventData.position);
                 if (Physics.Raycast(ray, out RaycastHit hit))
                 {
@@ -141,7 +143,16 @@ namespace Tofunaut.GridStrategy.Game.UI
                         {
                             listener.OnSelectedUnitView(view);
                         }
+                        upOnUnitView = true;
                     }
+                }
+            }
+
+            if(!upOnUnitView)
+            {
+                foreach (IListener listener in _listeners)
+                {
+                    listener.OnReleasedBoard(pointerEventData.position);
                 }
             }
 

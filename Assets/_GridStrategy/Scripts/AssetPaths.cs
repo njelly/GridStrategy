@@ -46,6 +46,12 @@ namespace Tofunaut.GridStrategy
 
 
         // --------------------------------------------------------------------------------------------
+        public static class Materials
+        {
+            public const string WaypointPath = "waypoint_mat";
+        }
+
+        // --------------------------------------------------------------------------------------------
         public static class Prefabs
         {
             public const string BoardTileView = "BoardTileView";

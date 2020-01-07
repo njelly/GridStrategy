@@ -33,6 +33,10 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Bold SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 63dfbe822f20ee64a92e5f4df937a1c3
+    m_Address: waypoint_mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 6e7eb1c385a12f3439b6040b413c925c
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-UltraLight SDF.asset
     m_ReadOnly: 0

@@ -64,6 +64,8 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Loading_Enter()
         {
+            AppManager.AssetManager.Load<Material>(AssetPaths.Materials.WaypointPath);
+
             // load all necessary assets based on the playerdatas
             foreach (PlayerData playerData in _playerDatas)
             {
@@ -115,6 +117,8 @@ namespace Tofunaut.GridStrategy
         protected override void Complete(ControllerCompletedEventArgs e)
         {
             base.Complete(e);
+
+            AppManager.AssetManager.Release<Material>(AssetPaths.Materials.WaypointPath);
 
             // release assets now that we don't need them anymore
             foreach (PlayerData playerData in _playerDatas)
