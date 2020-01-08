@@ -1,15 +1,25 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UnitPathSelectionManager (c) 2020 Tofunaut
+//
+//  Created by Nathaniel Ellingson for GridStrategy on 01/07/2020
+//
+////////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Collections.Generic;
 using TofuCore;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
+using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
     public class UnitPathSelectionManager : UIWorldInteractionPanel.IListener
     {
+        private const float PathViewHeight = 1.5f;
+
         private event EventHandler<PathEventArgs> OnPathSelected;
 
         private readonly Game _game;
@@ -23,6 +33,8 @@ namespace Tofunaut.GridStrategy.Game
 
             _pathView = new SharpLineRenderer("PathSelectionView", new[] { AppManager.AssetManager.Get<Material>(AssetPaths.Materials.WaypointPath) }, new Vector3[0]);
             _pathView.TexOffsetAnimVelocity = new Vector2(-1f, 0f);
+            _pathView.TextureMode = LineTextureMode.Tile;
+            _pathView.UseWorldSpace = true;
         }
 
         #region UIWorldInteractionPanel.IListener
@@ -55,17 +67,17 @@ namespace Tofunaut.GridStrategy.Game
                 }
             }
 
-            if(hitCoord != null && hitCoord != _currentPath[_currentPath.Length - 1])
+            if(hitCoord != _currentPath[_currentPath.Length - 1])
             {
                 if(_currentPath.Length == 1)
                 {
                     _currentPath = new[] { _currentPath[0], hitCoord };
                 }
-                else if(hitCoord.IsCollinear(_currentPath[_currentPath.Length - 1]))
+                else if(_currentPath.Length > 1 && hitCoord.IsCollinear(_currentPath[_currentPath.Length - 2]))
                 {
                     _currentPath[_currentPath.Length - 1] = hitCoord;
                 }
-                else
+                else if(IsNewPathPointValid(hitCoord))
                 {
                     List<IntVector2> pathAsList = new List<IntVector2>(_currentPath);
                     pathAsList.Add(hitCoord);
@@ -78,8 +90,22 @@ namespace Tofunaut.GridStrategy.Game
                 if(!_pathView.IsBuilt)
                 {
                     _pathView.Render(AppManager.Transform);
-                    _pathView.Positions = 
                 }
+
+                Vector3[] positions = new Vector3[_currentPath.Length];
+                for (int i = 0; i < _currentPath.Length; i++)
+                {
+                    positions[i] = new Vector3(_currentPath[i].x * BoardTileView.Size, PathViewHeight, _currentPath[i].y * BoardTileView.Size);
+                }
+
+                _pathView.Positions = positions;
+            }
+            else 
+            {
+                if(_pathView.IsBuilt) 
+                {
+                    _pathView.Destroy();
+                } 
             }
         }
 
@@ -87,10 +113,45 @@ namespace Tofunaut.GridStrategy.Game
 
         public void OnReleasedBoard(Vector2 releasePosition)
         {
-            throw new NotImplementedException();
+            if (_pathView.IsBuilt)
+            {
+                _pathView.Destroy();
+            }
+
+            _currentPath = null;
         }
 
         #endregion
+
+        private bool IsNewPathPointValid(IntVector2 newPathPoint)
+        {
+            if (newPathPoint == null)
+            {
+                return false;
+            }
+
+            if (_currentPath == null)
+            {
+                return false;
+            }
+
+            if ((newPathPoint - _currentPath[_currentPath.Length - 1]).ManhattanDistance != 1)
+            {
+                return false;
+            }
+
+            bool pathAlreadyContainsPoint = false;
+            for (int i = 1; i < _currentPath.Length; i++)
+            {
+                pathAlreadyContainsPoint |= newPathPoint.IsCollinear(_currentPath[i - 1], _currentPath[i]);
+            }
+            if (pathAlreadyContainsPoint)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         public class PathEventArgs : EventArgs
         {

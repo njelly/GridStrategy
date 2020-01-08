@@ -43,7 +43,8 @@ namespace Tofunaut.GridStrategy.Game
         private List<PlayerAction> _playerActions;
         private int _actionIndex;
         private HUDManager _hudManager;
-        private UIWorldInteractionPanel _uiWorldInteractionManager;
+        private UIWorldInteractionPanel _uiWorldInteractionPanel;
+        private UnitPathSelectionManager _unitPathSelectionManager;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int localPlayerIndex)
@@ -65,7 +66,10 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             // This needs to happen before gameCamera, since it needs to register itself as a listener to UIWorldIteractionPanel
-            _uiWorldInteractionManager = UIWorldInteractionPanel.Create(this);
+            _uiWorldInteractionPanel = UIWorldInteractionPanel.Create(this);
+
+            _unitPathSelectionManager = new UnitPathSelectionManager(this);
+            UIWorldInteractionPanel.AddListener(_unitPathSelectionManager);
 
             gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
             gameCamera.Render(AppManager.Transform);
@@ -142,11 +146,13 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void CleanUp()
         {
+            UIWorldInteractionPanel.RemoveListener(_unitPathSelectionManager);
+
             gameCamera.Destroy();
             sun.Destroy();
             board.Destroy();
             _hudManager.Destroy();
-            _uiWorldInteractionManager.Destroy();
+            _uiWorldInteractionPanel.Destroy();
         }
     }
 }
