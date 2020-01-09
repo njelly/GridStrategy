@@ -94,7 +94,7 @@
             "health": 60,
             "power": 30,
             "moverange": 4,
-            "travelspeed": 5
+            "travelspeed": 10
         },
         {
             "id": "enforcer",
@@ -103,7 +103,7 @@
             "health": 30,
             "power": 20,
             "moverange": 2,
-            "travelspeed": 5
+            "travelspeed": 10
         },
         {
             "id": "fire_sprite",
@@ -112,7 +112,7 @@
             "health": 20,
             "power": 20,
             "moverange": 3,
-            "travelspeed": 5
+            "travelspeed": 10
         },
         {
             "id": "water_sprite",
@@ -121,7 +121,7 @@
             "health": 20,
             "power": 20,
             "moverange": 3,
-            "travelspeed": 5
+            "travelspeed": 10
         },
         {
             "id": "air_sprite",
@@ -130,7 +130,7 @@
             "health": 20,
             "power": 20,
             "moverange": 3,
-            "travelspeed": 5
+            "travelspeed": 10
         },
         {
             "id": "earth_sprite",
@@ -139,7 +139,7 @@
             "health": 20,
             "power": 20,
             "moverange": 3,
-            "travelspeed": 5
+            "travelspeed": 10
         }
     ],
     "Opponents": [

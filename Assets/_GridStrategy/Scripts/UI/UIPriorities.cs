@@ -4,5 +4,6 @@ namespace Tofunaut.GridStrategy.UI
     {
         public const int UIWorldInteractionManager = -1;
         public const int Default = 0;
+        public const int Popup = 100;
     }
 }
