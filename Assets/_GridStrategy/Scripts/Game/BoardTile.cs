@@ -61,7 +61,16 @@ namespace Tofunaut.GridStrategy.Game
         public int GetMoveCostForUnit(Unit unit)
         {
             // TODO: depending on modifiers on the unit or tile, maybe return a different number?
-            return 1;
+
+            if(unit.BoardTile.Coord.Equals(Coord))
+            {
+                // no cost to move out of the tile the unit is currently on -- should this always be the case?
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
         }
 
         // --------------------------------------------------------------------------------------------

@@ -37,6 +37,7 @@ namespace Tofunaut.GridStrategy.Game
             _game = game;
         }
 
+        // --------------------------------------------------------------------------------------------
         public override void Destroy()
         {
             base.Destroy();
@@ -44,6 +45,7 @@ namespace Tofunaut.GridStrategy.Game
             UIWorldInteractionPanel.RemoveListener(this);
         }
 
+        // --------------------------------------------------------------------------------------------
         public void LookAt(Vector3 lookTarget) => LookAt(lookTarget, false);
         public void LookAt(Vector3 lookTarget, bool doAnimate)
         {
@@ -87,8 +89,12 @@ namespace Tofunaut.GridStrategy.Game
             return toReturn;
         }
 
+        #region UIWorldInteractionPanel.IListener
+
+        // --------------------------------------------------------------------------------------------
         public void OnSelectedUnitView(UnitView unitView) { }
 
+        // --------------------------------------------------------------------------------------------
         public void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta)
         {
             if (!dragEnabled)
@@ -107,7 +113,12 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        // --------------------------------------------------------------------------------------------
         public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta) { }
+
+        // --------------------------------------------------------------------------------------------
         public void OnReleasedBoard(Vector2 releasePosition) { }
+
+        #endregion UIWorldInteractionPanel.IListener
     }
 }

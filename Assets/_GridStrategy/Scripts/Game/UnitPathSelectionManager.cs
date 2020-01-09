@@ -78,20 +78,40 @@ namespace Tofunaut.GridStrategy.Game
             // check:
             // 1) the hitCoord is not null
             // 2) the hitCoord is different from the last coord on the current path
-            // 3) the hitCoord is adjacent to the last coord on the current path
-            if(hitCoord != null && hitCoord != _currentPath[_currentPath.Length - 1] && (hitCoord - _currentPath[_currentPath.Length - 1]).ManhattanDistance == 1)
+            if(hitCoord != null && hitCoord != _currentPath[_currentPath.Length - 1])
             {
+                int pathCost = CalculatePathCost();
+                int costOfHitTile = _game.board[hitCoord.x, hitCoord.y].GetMoveCostForUnit(_draggingFrom.Unit);
+
                 if (_currentPath.Length == 1)
                 {
+                    if(pathCost + costOfHitTile > _draggingFrom.Unit.MoveRange)
+                    {
+                        // return immediately if this would create a path that is too expensive
+                        return;
+                    }
+
                     // always add the hitCoord when it is only the second coord in the path
                     _currentPath = new[] { _currentPath[0], hitCoord };
                 }
                 else if(!DoesCurrentPathContainCoord(hitCoord))
                 {
-                    // if the hitCoord is not covered by the current path, add it
-                    List<IntVector2> pathAsList = new List<IntVector2>(_currentPath);
-                    pathAsList.Add(hitCoord);
-                    _currentPath = pathAsList.ToArray();
+                    //if the hitCoord is not covered by the current path
+
+                    if (pathCost + costOfHitTile > _draggingFrom.Unit.MoveRange)
+                    {
+                        // return immediately if this would create a path that is too expensive
+                        return;
+                    }
+
+                    if ((hitCoord - _currentPath[_currentPath.Length - 1]).ManhattanDistance == 1)
+                    {
+                        // if it is adjacent to the last path point, add it
+                        // if its collinear, this will be cleaned up in SimplifyPath()
+                        List<IntVector2> pathAsList = new List<IntVector2>(_currentPath);
+                        pathAsList.Add(hitCoord);
+                        _currentPath = pathAsList.ToArray();
+                    }
                 }
                 else
                 {
@@ -229,6 +249,29 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             return toReturn;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private int CalculatePathCost()
+        {
+            if(_currentPath == null || _draggingFrom == null || _currentPath.Length == 0)
+            {
+                return 0;
+            }
+
+            int cost = _game.board[_currentPath[0].x, _currentPath[0].y].GetMoveCostForUnit(_draggingFrom.Unit);
+            for (int i = 1; i < _currentPath.Length; i++)
+            {
+                cost += _game.board[_currentPath[i].x, _currentPath[i].y].GetMoveCostForUnit(_draggingFrom.Unit);
+                IntVector2 step = _currentPath[i].StepToward(_currentPath[i - 1]);
+                while (!step.Equals(_currentPath[i - 1]))
+                {
+                    cost += _game.board[step.x, step.y].GetMoveCostForUnit(_draggingFrom.Unit);
+                    step = step.StepToward(_currentPath[i - 1]);
+                }
+            }
+
+            return cost;
         }
 
         // --------------------------------------------------------------------------------------------
