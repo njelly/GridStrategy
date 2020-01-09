@@ -114,27 +114,7 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            PlayerAction nextAction = _playerActions[_actionIndex];
-
-            switch (nextAction.type)
-            {
-                case PlayerAction.EType.Invalid:
-                    Debug.LogError($"PlayerAction {_actionIndex} has the type Invalid!");
-                    break;
-                case PlayerAction.EType.MoveUnit:
-                    MoveAction moveAction = nextAction as MoveAction;
-                    Unit toMove = Unit.GetUnit(moveAction.unitId);
-                    toMove.Move(moveAction.path, false);
-                    break;
-                case PlayerAction.EType.AttackUnit:
-                    throw new NotImplementedException();
-                case PlayerAction.EType.EndTurn:
-                    PlayerTurnEnded?.Invoke(this, EventArgs.Empty);
-                    _currentPlayerIndex += 1;
-                    _currentPlayerIndex %= _players.Count;
-                    PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
-                    break;
-            }
+            _playerActions[_actionIndex].Execute(this, () => { });
         }
 
         // --------------------------------------------------------------------------------------------
@@ -153,6 +133,15 @@ namespace Tofunaut.GridStrategy.Game
             board.Destroy();
             _hudManager.Destroy();
             _uiWorldInteractionPanel.Destroy();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void EndTurn()
+        {
+            PlayerTurnEnded?.Invoke(this, EventArgs.Empty);
+            _currentPlayerIndex += 1;
+            _currentPlayerIndex %= _players.Count;
+            PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
         }
     }
 }

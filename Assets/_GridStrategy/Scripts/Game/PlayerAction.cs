@@ -45,6 +45,8 @@ namespace Tofunaut.GridStrategy.Game
         {
             return false;
         }
+
+        public abstract void Execute(Game game, Action OnComplete);
     }
 
     // --------------------------------------------------------------------------------------------
@@ -80,36 +82,25 @@ namespace Tofunaut.GridStrategy.Game
                 return false;
             }
 
-            if (!toMove.BoardTile.IsAdjacentTo(game.board[path[0].x, path[0].y]))
+            if (!Board.IsPathValid(path))
             {
-                Debug.LogError($"{toMove.id} must be on a board tile adjacent to the first tile in the path");
+                Debug.LogError("not a valid path");
                 return false;
             }
 
-            int cost = 0;
-            for (int i = 0; i < path.Length; i++)
+            if(game.board.CalculatePathCost(path, toMove) > toMove.MoveRange)
             {
-                if (i >= path.Length - 1)
-                {
-                    break;
-                }
-
-                if ((path[i] - path[i + 1]).ManhattanDistance != 1)
-                {
-                    Debug.LogError("the path is not continuous!");
-                    return false;
-                }
-
-                cost += game.board[path[i].x, path[i].y].GetMoveCostForUnit(toMove);
-            }
-
-            if (cost > toMove.MoveRange)
-            {
-                Debug.Log($"{cost} is greater than {toMove.MoveRange}");
+                Debug.LogError("path is too expensive");
                 return false;
             }
 
             return true;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override void Execute(Game game, Action OnComplete)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -129,6 +120,12 @@ namespace Tofunaut.GridStrategy.Game
             this.attackerId = attackerId;
             this.defenderId = defenderId;
         }
+
+        // --------------------------------------------------------------------------------------------
+        public override void Execute(Game game, Action OnComplete)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     // --------------------------------------------------------------------------------------------
@@ -140,5 +137,12 @@ namespace Tofunaut.GridStrategy.Game
     {
         // --------------------------------------------------------------------------------------------
         public EndTurnAction(int playerIndex) : base(EType.EndTurn, playerIndex) { }
+
+        // --------------------------------------------------------------------------------------------
+        public override void Execute(Game game, Action OnComplete)
+        {
+            game.EndTurn();
+            OnComplete?.Invoke();
+        }
     }
 }

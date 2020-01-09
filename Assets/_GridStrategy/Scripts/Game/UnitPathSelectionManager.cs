@@ -41,6 +41,15 @@ namespace Tofunaut.GridStrategy.Game
             _pathView.UseWorldSpace = true;
         }
 
+        public void ClearSelection()
+        {
+            if (_pathView.IsBuilt)
+            {
+                _pathView.Destroy();
+            }
+            _currentPath = null;
+        }
+
         #region UIWorldInteractionPanel.IListener
 
         // --------------------------------------------------------------------------------------------
@@ -80,7 +89,7 @@ namespace Tofunaut.GridStrategy.Game
             // 2) the hitCoord is different from the last coord on the current path
             if(hitCoord != null && hitCoord != _currentPath[_currentPath.Length - 1])
             {
-                int pathCost = CalculatePathCost();
+                int pathCost = _game.board.CalculatePathCost(_currentPath, _draggingFrom.Unit);
                 int costOfHitTile = _game.board[hitCoord.x, hitCoord.y].GetMoveCostForUnit(_draggingFrom.Unit);
 
                 if (_currentPath.Length == 1)
@@ -91,10 +100,18 @@ namespace Tofunaut.GridStrategy.Game
                         return;
                     }
 
+                    List<IntVector2> potentialPath = new List<IntVector2>(_currentPath);
+                    potentialPath.Add(hitCoord);
+                    if (!Board.IsPathValid(potentialPath.ToArray()))
+                    {
+                        // return if the path would not be valid by adding the hitCoord
+                        return;
+                    }
+
                     // always add the hitCoord when it is only the second coord in the path
                     _currentPath = new[] { _currentPath[0], hitCoord };
                 }
-                else if(!DoesCurrentPathContainCoord(hitCoord))
+                else if(!Board.DoesPathContainCoord(_currentPath, hitCoord))
                 {
                     //if the hitCoord is not covered by the current path
 
@@ -116,11 +133,11 @@ namespace Tofunaut.GridStrategy.Game
                 else
                 {
                     // the path already contains this point, so backtrack to it
-                    BacktrackTo(hitCoord);
+                    _currentPath = Board.BacktrackTo(_currentPath, hitCoord);
                 }
             }
 
-            SimplifyPath();
+            _currentPath = Board.SimplifyPath(_currentPath);
 
             if(_currentPath.Length > 1)
             {
@@ -155,147 +172,10 @@ namespace Tofunaut.GridStrategy.Game
             OnPathSelected?.Invoke(this, new PathEventArgs(_draggingFrom, _currentPath));
 
             // TODO: probably don't destroy the path view immediately
-            if (_pathView.IsBuilt)
-            {
-                _pathView.Destroy();
-            }
-            _currentPath = null;
+            ClearSelection();
         }
 
         #endregion
-
-        // --------------------------------------------------------------------------------------------
-        private void SimplifyPath()
-        {
-            bool removePoint = false;
-            int i;
-            for(i = 1; i < _currentPath.Length; i++)
-            {
-                if(_currentPath[i].Equals(_currentPath[i - 1]))
-                {
-                    // remove equal coords
-                    removePoint = true;
-                    break;
-                }
-
-                if(i < _currentPath.Length - 1 && _currentPath[i].IsCollinear(_currentPath[i - 1], _currentPath[i + 1]))
-                {
-                    // remove coords that are collinear with the previous and next coords
-                    removePoint = true;
-                    break;
-                }
-            }
-
-            // keep attempting to simplify the path until there are no more points to be removed
-            if (removePoint)
-            {
-                List<IntVector2> pathAsList = new List<IntVector2>(_currentPath);
-                pathAsList.RemoveAt(i);
-                _currentPath = pathAsList.ToArray();
-
-                SimplifyPath();
-            }
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void BacktrackTo(IntVector2 coord)
-        {
-            // edge case when backtracking to the first square
-            if (coord.Equals(_currentPath[0]))
-            {
-                _currentPath = new[] { _currentPath[0] };
-                return;
-            }
-
-            List<IntVector2> pathAsList = new List<IntVector2>();
-            pathAsList.Add(_currentPath[0]);
-
-            for(int i = 1; i < _currentPath.Length; i++)
-            {
-                if (coord.Equals(_currentPath[i]) || coord.IsCollinearAndBetween(_currentPath[i - 1], _currentPath[i]))
-                {
-                    pathAsList.Add(coord);
-                    break;
-                }
-
-                pathAsList.Add(_currentPath[i]);
-            }
-
-            _currentPath = pathAsList.ToArray();
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private bool DoesCurrentPathContainCoord(IntVector2 coord)
-        {
-            if (_currentPath == null)
-            {
-                return false;
-            }
-
-            if(_currentPath.Length <= 0)
-            {
-                return false;
-            }
-
-            if(coord.Equals(_currentPath[0]))
-            {
-                return true;
-            }
-
-            bool toReturn = false;
-            for (int i = 1; i < _currentPath.Length; i++)
-            {
-                toReturn |= coord.Equals(_currentPath[i]) || coord.IsCollinearAndBetween(_currentPath[i - 1], _currentPath[i]);
-            }
-
-            return toReturn;
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private int CalculatePathCost()
-        {
-            if(_currentPath == null || _draggingFrom == null || _currentPath.Length == 0)
-            {
-                return 0;
-            }
-
-            int cost = _game.board[_currentPath[0].x, _currentPath[0].y].GetMoveCostForUnit(_draggingFrom.Unit);
-            for (int i = 1; i < _currentPath.Length; i++)
-            {
-                cost += _game.board[_currentPath[i].x, _currentPath[i].y].GetMoveCostForUnit(_draggingFrom.Unit);
-                IntVector2 step = _currentPath[i].StepToward(_currentPath[i - 1]);
-                while (!step.Equals(_currentPath[i - 1]))
-                {
-                    cost += _game.board[step.x, step.y].GetMoveCostForUnit(_draggingFrom.Unit);
-                    step = step.StepToward(_currentPath[i - 1]);
-                }
-            }
-
-            return cost;
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void DebugPrintCurrentPath()
-        {
-            if(_currentPath == null)
-            {
-                Debug.Log("NULL PATH");
-                return;
-            }
-            if(_currentPath.Length == 0)
-            {
-                Debug.Log("EMPTY PATH");
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < _currentPath.Length; i++)
-            {
-                sb.Append(_currentPath[i].ToString());
-                sb.Append(" | ");
-            }
-            Debug.Log(sb.ToString());
-        }
 
         // --------------------------------------------------------------------------------------------
         public class PathEventArgs : EventArgs

@@ -24,6 +24,10 @@ namespace Tofunaut.GridStrategy
             public const string InGame = "InGame";
         }
 
+        public static Game.Game Game => _instance._game;
+
+        private static InGameController _instance;
+
         private TofuStateMachine _stateMachine;
         private Game.Game _game;
         private List<PlayerData> _playerDatas;
@@ -31,6 +35,14 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Awake()
         {
+            if(_instance != null)
+            {
+                Debug.LogError("Only one instance of InGameController can exist at at a time");
+                Destroy(this);
+            }
+
+            _instance = this;
+
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Loading, Loading_Enter, Loading_Update, null);
             _stateMachine.Register(State.InGame, InGame_Enter, InGame_Update, null);
@@ -56,6 +68,15 @@ namespace Tofunaut.GridStrategy
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 this.Complete(new ControllerCompletedEventArgs(false));
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnDestroy()
+        {
+            if(_instance == this)
+            {
+                _instance = null;
             }
         }
 

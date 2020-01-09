@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -13,25 +14,30 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class BoardTileView : MonoBehaviour
     {
+        private static Dictionary<BoardTile, BoardTileView> _boardTileToView = new Dictionary<BoardTile, BoardTileView>();
+
         public const float Size = 5f;
 
         public delegate void InstantiateDelegate(BoardTileView view);
 
-        public BoardTile BoardTile { get { return _boardTile; } }
+        public BoardTile BoardTile { get; private set; }
 
         public MeshRenderer meshRenderer;
         public Material evenMaterial;
         public Material oddMaterial;
 
-        private BoardTile _boardTile;
+        private void OnDestroy()
+        {
+            _boardTileToView.Remove(BoardTile);
+        }
 
         // --------------------------------------------------------------------------------------------
         private void SetMaterial()
         {
             Material toUse;
-            if (_boardTile.yCoord % 2 == 0)
+            if (BoardTile.yCoord % 2 == 0)
             {
-                if (_boardTile.xCoord % 2 == 0)
+                if (BoardTile.xCoord % 2 == 0)
                 {
                     toUse = evenMaterial;
                 }
@@ -42,7 +48,7 @@ namespace Tofunaut.GridStrategy.Game
             }
             else
             {
-                if (_boardTile.xCoord % 2 == 0)
+                if (BoardTile.xCoord % 2 == 0)
                 {
                     toUse = oddMaterial;
                 }
@@ -67,12 +73,20 @@ namespace Tofunaut.GridStrategy.Game
                     GameObject viewGo = Instantiate(payload, boardTile.Transform, false);
 
                     BoardTileView view = viewGo.GetComponent<BoardTileView>();
-                    view._boardTile = boardTile;
+                    view.BoardTile = boardTile;
                     view.SetMaterial();
+
+                    _boardTileToView.Add(boardTile, view);
 
                     callback(view);
                 }
             });
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static bool TryGetView(BoardTile boardTile, out BoardTileView view)
+        {
+            return _boardTileToView.TryGetValue(boardTile, out view);
         }
     }
 }

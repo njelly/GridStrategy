@@ -78,16 +78,27 @@ namespace Tofunaut.GridStrategy.Game
         #endregion SharpGameObject
 
         // --------------------------------------------------------------------------------------------
-        public void Move(IntVector2[] path, bool animate)
+        public void Move(IntVector2[] path, bool animate, Action onComplete)
         {
-            for(int i = 0; i < path.Length; i++)
+            if (animate)
             {
-                BoardTile boardTile = _game.board[path[i].x, path[i].y];
-                OccupyBoardTile(boardTile);
+                _moveAnim = new TofuAnimation();
+                throw new NotImplementedException();
+            }
+            else
+            {
+                for (int i = 0; i < path.Length; i++)
+                {
+                    BoardTile boardTile = _game.board[path[i].x, path[i].y];
+                    OccupyBoardTile(boardTile, true);
+                }
+
+                onComplete?.Invoke();
             }
         }
 
-        public void OccupyBoardTile(BoardTile boardTile)
+        // --------------------------------------------------------------------------------------------
+        public void OccupyBoardTile(BoardTile boardTile, bool asChild)
         {            
             // leave the current tile, if it exists
             boardTile?.RemoveOccupant(this);
@@ -96,9 +107,12 @@ namespace Tofunaut.GridStrategy.Game
             BoardTile = boardTile;
             boardTile.AddOccupant(this);
 
-            // parent the unit to the tile and zero out its local position
-            boardTile.AddChild(this);
-            LocalPosition = Vector3.zero;
+            if (asChild)
+            {
+                // parent the unit to the tile and zero out its local position
+                boardTile.AddChild(this);
+                LocalPosition = Vector3.zero;
+            }
         }
 
         // --------------------------------------------------------------------------------------------

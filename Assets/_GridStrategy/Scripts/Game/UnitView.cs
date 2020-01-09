@@ -6,6 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
+using System.Collections.Generic;
+using TofuCore;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -13,6 +16,8 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class UnitView : MonoBehaviour
     {
+        private static Dictionary<Unit, UnitView> _unitToView = new Dictionary<Unit, UnitView>();
+
         public delegate void InstantiateDelegate(UnitView view);
 
         public Unit Unit { get; private set; }
@@ -21,6 +26,12 @@ namespace Tofunaut.GridStrategy.Game
 
         public new Rigidbody rigidbody;
         public new Collider collider;
+
+        // --------------------------------------------------------------------------------------------
+        private void OnDestroy()
+        {
+            _unitToView.Remove(Unit);
+        }
 
         // --------------------------------------------------------------------------------------------
         public static void Create(Unit unit, UnitData data, InstantiateDelegate callback)
@@ -34,9 +45,17 @@ namespace Tofunaut.GridStrategy.Game
                     UnitView view = viewGo.GetComponent<UnitView>();
                     view.Unit = unit;
 
+                    _unitToView.Add(unit, view);
+
                     callback(view);
                 }
             });
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static bool TryGetView(Unit unit, out UnitView view)
+        {
+            return _unitToView.TryGetValue(unit, out view);
         }
     }
 }
