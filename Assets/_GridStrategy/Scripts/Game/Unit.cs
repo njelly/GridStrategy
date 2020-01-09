@@ -33,11 +33,10 @@ namespace Tofunaut.GridStrategy.Game
         private static readonly List<Unit> _idToUnit = new List<Unit>();
 
         public BoardTile BoardTile { get; private set; }
-
         public float Health { get; protected set; }
         public float MoveRange { get; protected set; }
         public EFacing Facing { get { return _facing; } }
-
+        public bool IsMoving => _moveAnim != null;
         public bool HasMoved { get; private set; }
         public bool HasDoneAction { get; private set; }
 
@@ -82,14 +81,70 @@ namespace Tofunaut.GridStrategy.Game
         {
             if (animate)
             {
+                if(_moveAnim != null)
+                {
+                    Debug.LogError("move anim in progress!");
+                    return;
+                }
+
                 _moveAnim = new TofuAnimation();
-                throw new NotImplementedException();
+
+                Parent.RemoveChild(this, false);
+
+                for (int i = 1; i < path.Length; i++)
+                {
+                    Vector3 fromPos = _game.board.GetTile(path[i - 1]).Transform.position;
+                    Vector3 toPos = _game.board.GetTile(path[i]).Transform.position;
+                    float time = (toPos - fromPos).magnitude / _data.travelSpeed;
+
+                    if(i != 1)
+                    {
+                        // we don't need to call Then() on the first loop
+                        _moveAnim.Then();
+                    }
+
+                    _moveAnim.Execute(() =>
+                    {
+                        LocalRotation = Quaternion.LookRotation(toPos - fromPos, Vector3.up);
+                    })
+                    .Value01(time, EEaseType.Linear, (float newValue) =>
+                    {
+                        Transform.position = Vector3.LerpUnclamped(fromPos, toPos, newValue);
+
+                        Ray ray = new Ray(Transform.position + Vector3.up, Vector3.down);
+                        RaycastHit[] hits = Physics.RaycastAll(ray, 2f);
+                        for(int j = 0; j < hits.Length; j++)
+                        {
+                            BoardTileView boardTileView = hits[j].collider.GetComponentInParent<BoardTileView>();
+                            if(boardTileView == null)
+                            {
+                                continue;
+                            }
+                            if(boardTileView.BoardTile != BoardTile)
+                            {
+                                OccupyBoardTile(boardTileView.BoardTile, false);
+                            }
+
+                            break;
+                        }
+                    });
+                }
+
+                _moveAnim.Then()
+                    .Execute(() =>
+                    {
+                        OccupyBoardTile(BoardTile, true);
+                        _moveAnim = null;
+
+                        onComplete?.Invoke();
+                    })
+                    .Play();
             }
             else
             {
                 for (int i = 0; i < path.Length; i++)
                 {
-                    BoardTile boardTile = _game.board[path[i].x, path[i].y];
+                    BoardTile boardTile = _game.board.GetTile(path[i]);
                     OccupyBoardTile(boardTile, true);
                 }
 
@@ -99,13 +154,17 @@ namespace Tofunaut.GridStrategy.Game
 
         // --------------------------------------------------------------------------------------------
         public void OccupyBoardTile(BoardTile boardTile, bool asChild)
-        {            
-            // leave the current tile, if it exists
-            boardTile?.RemoveOccupant(this);
+        {           
+            // do this check so that OccupyBoardTile can be called arbitrarily without re-occupying the same boardtile
+            if(BoardTile != boardTile)
+            {
+                // leave the current tile, if it exists
+                boardTile?.RemoveOccupant(this);
 
-            // set the new tile, then add this unit as an occupant
-            BoardTile = boardTile;
-            boardTile.AddOccupant(this);
+                // set the new tile, then add this unit as an occupant
+                BoardTile = boardTile;
+                boardTile.AddOccupant(this);
+            }
 
             if (asChild)
             {

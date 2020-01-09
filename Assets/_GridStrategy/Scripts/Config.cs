@@ -184,17 +184,17 @@ namespace Tofunaut.GridStrategy
                     Debug.LogError($"card data index {i} is missing a card type");
                 }
 
-                // solidarityreq
-                if (rawCardData.TryGetValue("solidarityreq", out object solidarityreqObject))
+                // energyreq
+                if (rawCardData.TryGetValue("energyreq", out object energyReqObj))
                 {
-                    if (Int32.TryParse(solidarityreqObject.ToString(), out int solidarityRequired))
+                    if (Int32.TryParse(energyReqObj.ToString(), out int energyRequired))
                     {
-                        cardData.solidarityRequired = solidarityRequired;
+                        cardData.energyRequired = energyRequired;
                     }
                     else
                     {
                         hasErrors |= true;
-                        Debug.LogError($"Could not parse {solidarityreqObject.ToString()} as int, index {i}");
+                        Debug.LogError($"Could not parse {energyReqObj.ToString()} as int, index {i}");
                     }
                 }
                 else
@@ -351,6 +351,25 @@ namespace Tofunaut.GridStrategy
                     hasErrors = true;
                 }
 
+                // travelSpeed
+                if(rawUnitData.TryGetValue("travelspeed", out object travelSpeedObj))
+                {
+                    if (float.TryParse(travelSpeedObj.ToString(), out float travelSpeed))
+                    {
+                        unitData.travelSpeed = travelSpeed;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {travelSpeedObj.ToString()} as float, index {i}");
+                        hasErrors = true;
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"unit data index {i} is missing a value for travelspeed");
+                    hasErrors = true;
+                }
+
                 _idToUnitData.Add(unitData.id, unitData);
             }
 
@@ -438,7 +457,7 @@ namespace Tofunaut.GridStrategy
         public string id;
         public string displayName;
         public Card.Type type;
-        public int solidarityRequired;
+        public int energyRequired;
     }
 
     // --------------------------------------------------------------------------------------------
@@ -457,6 +476,7 @@ namespace Tofunaut.GridStrategy
         public string prefabPath;
         public float health;
         public int moveRange;
+        public float travelSpeed;
     }
 
     // --------------------------------------------------------------------------------------------

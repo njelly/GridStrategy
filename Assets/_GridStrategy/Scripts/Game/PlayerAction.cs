@@ -98,9 +98,10 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public override void Execute(Game game, Action OnComplete)
+        public override void Execute(Game game, Action onComplete)
         {
-            throw new NotImplementedException();
+            Unit toMove = Unit.GetUnit(unitId);
+            toMove.Move(path, true, onComplete);
         }
     }
 

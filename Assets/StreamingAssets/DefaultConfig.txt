@@ -4,49 +4,49 @@
             "id": "enforcer",
             "displayname": "Enforcer",
             "type": "Ally",
-            "solidarityreq": 1
+            "energyreq": 1
         },
         {
             "id": "fast_learner",
             "displayname": "Fast Learner",
             "type": "Equip",
-            "solidarityreq": 3
+            "energyreq": 3
         },
         {
             "id": "solidify",
             "displayname": "Solidify",
             "type": "Skill",
-            "solidarityreq": 2
+            "energyreq": 2
         },
         {
             "id": "sound_off",
             "displayname": "Sound Off",
             "type": "Skill",
-            "solidarityreq": 6
+            "energyreq": 6
         },
         {
             "id": "fire_sprite",
             "displayname": "Fire Sprite",
             "type": "Ally",
-            "solidarityreq": 2
+            "energyreq": 2
         },
         {
             "id": "water_sprite",
             "displayname": "Water Sprite",
             "type": "Ally",
-            "solidarityreq": 2
+            "energyreq": 2
         },
         {
             "id": "air_sprite",
             "displayname": "Air Sprite",
             "type": "Ally",
-            "solidarityreq": 2
+            "energyreq": 2
         },
         {
             "id": "earth_sprite",
             "displayname": "Earth Sprite",
             "type": "Ally",
-            "solidarityreq": 2
+            "energyreq": 2
         }
     ],
     "Decks": [
@@ -93,7 +93,8 @@
             "attribute": "None",
             "health": 60,
             "power": 30,
-            "moverange": 4
+            "moverange": 4,
+            "travelspeed": 5
         },
         {
             "id": "enforcer",
@@ -101,7 +102,8 @@
             "attribute": "None",
             "health": 30,
             "power": 20,
-            "moverange": 2
+            "moverange": 2,
+            "travelspeed": 5
         },
         {
             "id": "fire_sprite",
@@ -109,7 +111,8 @@
             "attribute": "Fire",
             "health": 20,
             "power": 20,
-            "moverange": 3
+            "moverange": 3,
+            "travelspeed": 5
         },
         {
             "id": "water_sprite",
@@ -117,7 +120,8 @@
             "attribute": "Water",
             "health": 20,
             "power": 20,
-            "moverange": 3
+            "moverange": 3,
+            "travelspeed": 5
         },
         {
             "id": "air_sprite",
@@ -125,7 +129,8 @@
             "attribute": "Air",
             "health": 20,
             "power": 20,
-            "moverange": 3
+            "moverange": 3,
+            "travelspeed": 5
         },
         {
             "id": "earth_sprite",
@@ -133,7 +138,8 @@
             "attribute": "Earth",
             "health": 20,
             "power": 20,
-            "moverange": 3
+            "moverange": 3,
+            "travelspeed": 5
         }
     ],
     "Opponents": [

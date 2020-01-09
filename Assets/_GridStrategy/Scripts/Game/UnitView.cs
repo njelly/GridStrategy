@@ -22,8 +22,6 @@ namespace Tofunaut.GridStrategy.Game
 
         public Unit Unit { get; private set; }
 
-        public float animMoveSpeed = 10;
-
         public new Rigidbody rigidbody;
         public new Collider collider;
 

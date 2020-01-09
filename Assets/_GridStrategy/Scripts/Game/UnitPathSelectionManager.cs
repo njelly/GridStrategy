@@ -22,13 +22,27 @@ namespace Tofunaut.GridStrategy.Game
     {
         private const float PathViewHeight = 1.5f;
 
-        private event EventHandler<PathEventArgs> OnPathSelected;
+        public event EventHandler<PathEventArgs> OnPathSelected;
+
+        public bool Enabled
+        {
+            get { return _enabled; }
+            set
+            {
+                _enabled = value;
+                if (!_enabled)
+                {
+                    ClearSelection();
+                }
+            }
+        }
 
         private readonly Game _game;
 
         private UnitView _draggingFrom;
         private IntVector2[] _currentPath;
         private SharpLineRenderer _pathView;
+        private bool _enabled;
 
         // --------------------------------------------------------------------------------------------
         public UnitPathSelectionManager(Game game)
@@ -39,6 +53,8 @@ namespace Tofunaut.GridStrategy.Game
             _pathView.TexOffsetAnimVelocity = new Vector2(-1f, 0f);
             _pathView.TextureMode = LineTextureMode.Tile;
             _pathView.UseWorldSpace = true;
+
+            _enabled = true;
         }
 
         public void ClearSelection()
@@ -58,6 +74,11 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta)
         {
+            if(!_enabled)
+            {
+                return;
+            }
+
             if(_currentPath == null)
             {
                 _currentPath = new[] { unitView.Unit.BoardTile.Coord };
@@ -169,6 +190,16 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void OnReleasedBoard(Vector2 releasePosition)
         {
+            if (!_enabled)
+            {
+                return;
+            }
+            
+            if(_currentPath == null)
+            {
+                return;
+            }
+
             OnPathSelected?.Invoke(this, new PathEventArgs(_draggingFrom, _currentPath));
 
             // TODO: probably don't destroy the path view immediately

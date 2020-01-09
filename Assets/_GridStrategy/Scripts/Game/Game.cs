@@ -69,6 +69,7 @@ namespace Tofunaut.GridStrategy.Game
             _uiWorldInteractionPanel = UIWorldInteractionPanel.Create(this);
 
             _unitPathSelectionManager = new UnitPathSelectionManager(this);
+            _unitPathSelectionManager.OnPathSelected += OnPathSelected;
             UIWorldInteractionPanel.AddListener(_unitPathSelectionManager);
 
             gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
@@ -103,7 +104,7 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void ExecuteNextPlayerAction()
+        public void ExecuteNextPlayerAction(Action onComplete)
         {
             _actionIndex++;
 
@@ -114,7 +115,7 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            _playerActions[_actionIndex].Execute(this, () => { });
+            _playerActions[_actionIndex].Execute(this, onComplete);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -126,6 +127,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void CleanUp()
         {
+            _unitPathSelectionManager.OnPathSelected -= OnPathSelected;
             UIWorldInteractionPanel.RemoveListener(_unitPathSelectionManager);
 
             gameCamera.Destroy();
@@ -142,6 +144,18 @@ namespace Tofunaut.GridStrategy.Game
             _currentPlayerIndex += 1;
             _currentPlayerIndex %= _players.Count;
             PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnPathSelected(object sender, UnitPathSelectionManager.PathEventArgs e)
+        {
+            QueueAction(new MoveAction(_currentPlayerIndex, e.unitView.Unit.id, e.path));
+
+            _unitPathSelectionManager.Enabled = false;
+            ExecuteNextPlayerAction(() =>
+            {
+                _unitPathSelectionManager.Enabled = true;
+            });
         }
     }
 }
