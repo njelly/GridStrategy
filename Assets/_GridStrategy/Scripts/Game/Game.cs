@@ -149,12 +149,18 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void OnPathSelected(object sender, UnitPathSelectionManager.PathEventArgs e)
         {
-            QueueAction(new MoveAction(_currentPlayerIndex, e.unitView.Unit.id, e.path));
-
-            _unitPathSelectionManager.Enabled = false;
-            ExecuteNextPlayerAction(() =>
+            _hudManager.ShowConfirmationDialog(() =>
             {
-                _unitPathSelectionManager.Enabled = true;
+                _unitPathSelectionManager.Enabled = false;
+                QueueAction(new MoveAction(_currentPlayerIndex, e.unitView.Unit.id, e.path));
+
+                ExecuteNextPlayerAction(() =>
+                {
+                    _unitPathSelectionManager.Enabled = true;
+                });
+            }, () =>
+            {
+                _unitPathSelectionManager.ClearSelection();
             });
         }
     }

@@ -19,6 +19,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
         private UILeftPlayerPanel _localPlayerPanel;
+        private UIConfirmationDialogView _confirmationDialog;
         private List<UIRightPlayerPanel> _opponentPlayerPanels;
 
         private HUDManager(Game game) : base("UIHUDManager")
@@ -30,6 +31,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         {
             _beginTurnBanner = new UIBeginTurnBanner();
             _localPlayerPanel = new UILeftPlayerPanel(_game.LocalPlayer);
+            _confirmationDialog = new UIConfirmationDialogView();
 
             //TODO: Put this in a vertical layout group for all opponent players
             _opponentPlayerPanels = new List<UIRightPlayerPanel>
@@ -59,6 +61,22 @@ namespace Tofunaut.GridStrategy.Game.UI
 
             _game.PlayerTurnStarted -= OnPlayerTurnStart;
             _game.GameBegan -= OnGameBegan;
+        }
+
+        public void ShowConfirmationDialog(Action onConfirm, Action onCancel)
+        {
+            _confirmationDialog.OnOKClicked = () =>
+            {
+                onConfirm?.Invoke();
+                _confirmationDialog.Hide();
+            };
+            _confirmationDialog.OnCancelClicked = () =>
+            {
+                onCancel?.Invoke();
+                _confirmationDialog.Hide();
+            };
+
+            _confirmationDialog.Show();
         }
 
         private void OnGameBegan(object sender, EventArgs e)

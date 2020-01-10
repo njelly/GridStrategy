@@ -195,15 +195,18 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
             
-            if(_currentPath == null)
+            if (_currentPath == null)
             {
                 return;
             }
 
-            OnPathSelected?.Invoke(this, new PathEventArgs(_draggingFrom, _currentPath));
+            if (_currentPath.Length <= 1)
+            {
+                ClearSelection();
+                return;
+            }
 
-            // TODO: probably don't destroy the path view immediately
-            ClearSelection();
+            OnPathSelected?.Invoke(this, new PathEventArgs(_draggingFrom, _currentPath));
         }
 
         #endregion

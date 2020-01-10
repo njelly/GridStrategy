@@ -40,6 +40,20 @@ namespace Tofunaut.GridStrategy.Game.UI
             _background.SetFixedSize(Size);
             _background.alignment = EAlignment.MiddleCenter;
             _background.Color = new Color(0f, 0f, 0f, 0.5f);
+            toReturn.AddChild(_background);
+
+            SharpUIHorizontalLayout buttonLayout = new SharpUIHorizontalLayout($"{toReturn.name}_button_layout");
+            buttonLayout.SetFitSize();
+            buttonLayout.spacing = 40;
+            buttonLayout.alignment = EAlignment.BottomCenter;
+            buttonLayout.margin = new RectOffset(0, 0, 0, 20);
+            _background.AddChild(buttonLayout);
+
+            ChoiceButton okButton = new ChoiceButton(() => { OnOKClicked?.Invoke(); }, $"{toReturn.name}_ok_button", "OK");
+            buttonLayout.AddChild(okButton);
+
+            ChoiceButton cancelButton = new ChoiceButton(() => { OnCancelClicked?.Invoke(); }, $"{toReturn.name}_cancel_button", "Cancel");
+            buttonLayout.AddChild(cancelButton);
 
             return toReturn;
         }
@@ -62,9 +76,21 @@ namespace Tofunaut.GridStrategy.Game.UI
                 label.AutoSizeFont();
                 label.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityBook);
                 label.Color = Color.black;
+                label.TextAlignment = TMPro.TextAlignmentOptions.Center;
+                label.Color = Color.white;
                 AddChild(label);
+            }
 
-                SubscribeToEvent(EEventType.PointerClick, (object sender, EventSystemEventArgs e))
+            protected override void PostRender()
+            {
+                base.PostRender();
+
+                SubscribeToEvent(EEventType.PointerClick, OnPointerClick);
+            }
+
+            private void OnPointerClick(object sender, EventSystemEventArgs e)
+            {
+                _onClick?.Invoke();
             }
         }
     }
