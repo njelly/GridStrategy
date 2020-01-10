@@ -7,10 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using Tofunaut.Animation;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
-using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game

@@ -103,6 +103,12 @@ namespace Tofunaut.GridStrategy.Game
             {
                 return toReturn;
             }
+            if(!IsPathValid(path))
+            {
+                Debug.LogError("path is not valid");
+                return toReturn;
+            }
+
 
             for(int i = 0; i < path.Length; i++)
             {
