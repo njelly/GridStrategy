@@ -43,6 +43,8 @@ namespace Tofunaut.GridStrategy.Game
         private IntVector2[] _currentPath;
         private SharpLineRenderer _pathView;
         private bool _enabled;
+        private bool _hitEnemy;
+        private BoardTile _endTile;
 
         // --------------------------------------------------------------------------------------------
         public UnitPathSelectionManager(Game game)
@@ -64,6 +66,32 @@ namespace Tofunaut.GridStrategy.Game
                 _pathView.Destroy();
             }
             _currentPath = null;
+            _hitEnemy = false;
+            _endTile = null;
+        }
+
+        private void UpdatePathColor()
+        {
+            bool isEnemy = false;
+            foreach(Unit occupant in _endTile.Occupants)
+            {
+                if (!_draggingFrom.Unit.IsAllyOf(occupant))
+                {
+                    isEnemy = true;
+                    break;
+                }
+            }
+
+            if (isEnemy)
+            {
+                _pathView.StartColor = Color.red;
+                _pathView.EndColor = Color.red;
+            }
+            else
+            {
+                _pathView.StartColor = Color.white;
+                _pathView.EndColor = Color.white;
+            }
         }
 
         #region UIWorldInteractionPanel.IListener
@@ -156,6 +184,9 @@ namespace Tofunaut.GridStrategy.Game
                     // the path already contains this point, so backtrack to it
                     _currentPath = Board.BacktrackTo(_currentPath, hitCoord);
                 }
+
+                _endTile = _game.board.GetTile(hitCoord);
+                UpdatePathColor();
             }
 
             _currentPath = Board.SimplifyPath(_currentPath);

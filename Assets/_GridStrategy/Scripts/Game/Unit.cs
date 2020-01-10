@@ -38,26 +38,30 @@ namespace Tofunaut.GridStrategy.Game
         public EFacing Facing { get { return _facing; } }
         public bool IsMoving => _moveAnim != null;
         public bool HasMoved { get; private set; }
-        public bool HasDoneAction { get; private set; }
+        public bool HasUsedSkill { get; private set; }
+        public Player Owner => _owner;
 
         public readonly int id;
 
         private UnitView _view;
         private UnitData _data;
+        private Player _owner;
 
         private EFacing _facing;
         private TofuAnimation _facingAnim;
         private TofuAnimation _moveAnim;
+        private Action _onMoveComplete;
         private readonly Game _game;
 
         // --------------------------------------------------------------------------------------------
-        public Unit(UnitData data, Game game) : base(data.id) 
+        public Unit(UnitData data, Game game, Player owner) : base(data.id) 
         {
             id = _idCounter++;
             _idToUnit.Add(this);
 
             _data = data;
             _game = game;
+            _owner = owner;
 
             Health = _data.health;
             MoveRange = _data.moveRange;
@@ -79,6 +83,20 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void Move(IntVector2[] path, bool animate, Action onComplete)
         {
+            if (HasMoved)
+            {
+                Debug.LogError($"Unit {id} has already moved this turn");
+                return;
+            }
+
+            _onMoveComplete = () =>
+            {
+                onComplete?.Invoke();
+                _onMoveComplete = null;
+            };
+
+            HasMoved = true;
+
             if (animate)
             {
                 if(_moveAnim != null)
@@ -105,7 +123,7 @@ namespace Tofunaut.GridStrategy.Game
 
                     _moveAnim.Execute(() =>
                     {
-                        LocalRotation = Quaternion.LookRotation(toPos - fromPos, Vector3.up);
+                        SetFacing(VectorToFacing(fromPos - toPos), false);
                     })
                     .Value01(time, EEaseType.Linear, (float newValue) =>
                     {
@@ -133,10 +151,7 @@ namespace Tofunaut.GridStrategy.Game
                 _moveAnim.Then()
                     .Execute(() =>
                     {
-                        OccupyBoardTile(BoardTile, true);
-                        _moveAnim = null;
-
-                        onComplete?.Invoke();
+                        StopOnTile();
                     })
                     .Play();
             }
@@ -145,11 +160,34 @@ namespace Tofunaut.GridStrategy.Game
                 for (int i = 0; i < path.Length; i++)
                 {
                     BoardTile boardTile = _game.board.GetTile(path[i]);
-                    OccupyBoardTile(boardTile, true);
+                    StopOnTile();
                 }
 
-                onComplete?.Invoke();
+                _onMoveComplete?.Invoke();
             }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void UseSkill(Action onComplete)
+        {
+            if (HasUsedSkill)
+            {
+                Debug.LogError($"Unit {id} has already used its skill this turn");
+                return;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void StopOnTile()
+        {
+            if(_moveAnim != null)
+            {
+                _moveAnim.Stop();
+                _onMoveComplete?.Invoke();
+            }
+
+            OccupyBoardTile(BoardTile, true);
+            LocalPosition = Vector3.zero;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -218,11 +256,25 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public virtual void OnPlayerTurnBegan() 
         {
+            HasMoved = false;
+            HasUsedSkill = false;
         }
 
         // --------------------------------------------------------------------------------------------
         public virtual void OnPlayerTurnEnded()
         {
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool IsAllyOf(Unit other)
+        {
+            return other.Owner == _owner;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool IsEnemyOf(Unit other)
+        {
+            return other.Owner != _owner;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -237,6 +289,7 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
+        public static EFacing VectorToFacing(Vector3 v) => VectorToFacing(new Vector2(v.x, v.z));
         public static EFacing VectorToFacing(Vector2 v)
         {
             float angle = Mathf.Atan2(-v.y, -v.x);
@@ -245,6 +298,25 @@ namespace Tofunaut.GridStrategy.Game
             int halfQuarter = Convert.ToInt32(angle);
             halfQuarter %= 4;
             return (EFacing)(halfQuarter + 1);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static IntVector2 RotateVectorForFacingDir(EFacing facing, IntVector2 v)
+        {
+            switch (facing)
+            {
+                case EFacing.East:
+                    return v;
+                case EFacing.South:
+                    return v.Rotate90Clockwise();
+                case EFacing.West:
+                    return v.Rotate90Clockwise().Rotate90Clockwise();
+                case EFacing.North:
+                    return v.Rotate90Clockwise().Rotate90Clockwise().Rotate90Clockwise();
+                default:
+                    Debug.LogError($"Facing not implemented: {facing}, can't rotate");
+                    return v;
+            }
         }
     }
 }

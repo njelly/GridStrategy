@@ -26,7 +26,7 @@ namespace Tofunaut.GridStrategy.Game
         {
             Invalid = 0,
             MoveUnit = 1,
-            AttackUnit = 2,
+            UseSkill = 2,
             EndTurn = 3,
         }
 
@@ -110,16 +110,14 @@ namespace Tofunaut.GridStrategy.Game
     /// Have a unit attack another unit.
     /// </summary>
     [Serializable]
-    public class AttackAction : PlayerAction
+    public class UseSkillAction : PlayerAction
     {
-        public int attackerId;
-        public int defenderId;
+        public int unitId;
 
         // --------------------------------------------------------------------------------------------
-        public AttackAction(int playerIndex, int attackerId, int defenderId) : base(EType.AttackUnit, playerIndex)
+        public UseSkillAction(int playerIndex, int unitId) : base(EType.UseSkill, playerIndex)
         {
-            this.attackerId = attackerId;
-            this.defenderId = defenderId;
+            this.unitId = unitId;
         }
 
         // --------------------------------------------------------------------------------------------

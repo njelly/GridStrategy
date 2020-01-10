@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TofuCore;
 using Tofunaut.GridStrategy.Game;
 using Tofunaut.UnityUtils;
 using UnityEngine;
@@ -23,6 +24,7 @@ namespace Tofunaut.GridStrategy
         private Dictionary<string, DeckData> _idToDeckData;
         private Dictionary<string, UnitData> _idToUnitData;
         private Dictionary<string, OpponentData> _idToOpponentData;
+        private Dictionary<string, SkillData> _idToSkillData;
 
         // --------------------------------------------------------------------------------------------
         public Config(string serializedData, bool overwriteDefaultConfig)
@@ -98,6 +100,18 @@ namespace Tofunaut.GridStrategy
 
             Debug.LogError($"no opponent for the id {id}");
             return new OpponentData();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public SkillData GetSkillData(string id)
+        {
+            if (_idToSkillData.TryGetValue(id, out SkillData skillData))
+            {
+                return skillData;
+            }
+
+            Debug.LogError($"no skill for the id {id}");
+            return new SkillData();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -352,7 +366,7 @@ namespace Tofunaut.GridStrategy
                 }
 
                 // travelSpeed
-                if(rawUnitData.TryGetValue("travelspeed", out object travelSpeedObj))
+                if (rawUnitData.TryGetValue("travelspeed", out object travelSpeedObj))
                 {
                     if (float.TryParse(travelSpeedObj.ToString(), out float travelSpeed))
                     {
@@ -437,6 +451,50 @@ namespace Tofunaut.GridStrategy
             return !hasError;
         }
 
+        private bool BuildSkillDatas(object[] rawSkillDatas)
+        {
+            _idToSkillData = new Dictionary<string, SkillData>();
+            bool hasError = false;
+
+            for(int i = 0; i < rawSkillDatas.Length; i++)
+            {
+                Dictionary<string, object> rawSkillData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(rawSkillDatas[i].ToString());
+                SkillData skillData = new SkillData();
+                
+                // id
+                if (rawSkillData.TryGetValue("id", out object idObj))
+                {
+                    skillData.id = idObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing an id");
+                    hasError = true;
+
+                    // break so this isn't added to the dictionary
+                    break;
+                }
+
+                // as
+                if (rawSkillData.TryGetValue("id", out object idObj))
+                {
+                    skillData.id = idObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing an id");
+                    hasError = true;
+
+                    // break so this isn't added to the dictionary
+                    break;
+                }
+
+                _idToSkillData.Add(skillData.id, skillData);
+            }
+
+            return !hasError;
+        }
+
         public static Config DefaultConfig()
         {
             if (!File.Exists(DefaultConfigPath))
@@ -473,10 +531,36 @@ namespace Tofunaut.GridStrategy
     public struct UnitData
     {
         public string id;
+        public EAspect aspect;
         public string prefabPath;
         public float health;
         public int moveRange;
         public float travelSpeed;
+        public string skillId;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    [Serializable]
+    public struct SkillData
+    {
+        public enum EAreaType
+        {
+            None = 0,
+            Single = 1,
+            Line = 2,
+            Cone = 3,
+            Diamond = 4,
+            Circle = 5,
+            Square = 6,
+        }
+
+        public string id;
+        public EAspect aspect;
+        public int areaSize;
+        public EAreaType areaType;
+        public IntVector2 areaOffset;
+        public int damageDealt;
+        public bool damageAllies;
     }
 
     // --------------------------------------------------------------------------------------------

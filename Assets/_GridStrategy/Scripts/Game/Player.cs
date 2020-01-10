@@ -124,7 +124,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private Unit PlaceUnit(UnitData unitData, BoardTile boardTile)
         {
-            Unit unit = new Unit(unitData, _game);
+            Unit unit = new Unit(unitData, _game, this);
             unit.OccupyBoardTile(boardTile, true);
 
             // when placed, face the center of the board
