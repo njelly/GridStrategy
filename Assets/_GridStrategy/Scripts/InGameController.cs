@@ -48,6 +48,7 @@ namespace Tofunaut.GridStrategy
             _stateMachine.Register(State.InGame, InGame_Enter, InGame_Update, null);
         }
 
+        // --------------------------------------------------------------------------------------------
         private void OnEnable()
         {
             _stateMachine.ChangeState(State.Loading);

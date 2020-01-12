@@ -8,20 +8,21 @@
 
 using System;
 using System.Collections.Generic;
-using TofuCore;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
-using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Represents a single instance of a GridStrategy game.
+    /// </summary>
+    // TODO: Extend this class for NetworkedGame, LocalGame, etc.
     public class Game
     {
         public event EventHandler GameBegan;
-        public event EventHandler PlayerTurnStarted;
-        public event EventHandler PlayerTurnEnded;
+        public event EventHandler<PlayerActionEventArgs> PlayerActionCompleted;
 
         public bool HasBegun { get; private set; }
         public bool HasFinished { get; private set; }
@@ -70,6 +71,8 @@ namespace Tofunaut.GridStrategy.Game
 
             _unitPathSelectionManager = new UnitPathSelectionManager(this);
             _unitPathSelectionManager.OnPathSelected += OnPathSelected;
+            _unitPathSelectionManager.OnBoardTileSelected += OnBoardTileSelected;
+            _unitPathSelectionManager.OnUnitSelected += OnUnitSelected;
             UIWorldInteractionPanel.AddListener(_unitPathSelectionManager);
 
             gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
@@ -82,6 +85,7 @@ namespace Tofunaut.GridStrategy.Game
             _hudManager.Render(AppManager.Transform);
         }
 
+        // --------------------------------------------------------------------------------------------
         public void BeginGame()
         {
             if (HasBegun)
@@ -94,17 +98,24 @@ namespace Tofunaut.GridStrategy.Game
 
             GameBegan?.Invoke(this, EventArgs.Empty);
 
-            PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
+            CurrentPlayer.StartTurn();
         }
 
         // --------------------------------------------------------------------------------------------
-        public void QueueAction(PlayerAction action)
+        public void QueueAction(PlayerAction action, Action onComplete)
         {
             _playerActions.Add(action);
+
+            // TODO: a networked game would do an RPC call and then maybe wait for a confirmation from clients
+            ExecuteNextPlayerAction(() =>
+            {
+                onComplete?.Invoke();
+                PlayerActionCompleted?.Invoke(this, new PlayerActionEventArgs(action));
+            });
         }
 
         // --------------------------------------------------------------------------------------------
-        public void ExecuteNextPlayerAction(Action onComplete)
+        protected void ExecuteNextPlayerAction(Action onComplete)
         {
             _actionIndex++;
 
@@ -128,6 +139,8 @@ namespace Tofunaut.GridStrategy.Game
         public void CleanUp()
         {
             _unitPathSelectionManager.OnPathSelected -= OnPathSelected;
+            _unitPathSelectionManager.OnBoardTileSelected -= OnBoardTileSelected;
+            _unitPathSelectionManager.OnUnitSelected -= OnUnitSelected;
             UIWorldInteractionPanel.RemoveListener(_unitPathSelectionManager);
 
             gameCamera.Destroy();
@@ -140,10 +153,24 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void EndTurn()
         {
-            PlayerTurnEnded?.Invoke(this, EventArgs.Empty);
+            if(!HasBegun)
+            {
+                Debug.LogError("Can't end turn, the game has not yet begun.");
+                return;
+            }
+
+            if(HasFinished)
+            {
+                Debug.Log("Can't end turn, the game is over");
+                return;
+            }
+
+            CurrentPlayer.EndTurn();
+
             _currentPlayerIndex += 1;
             _currentPlayerIndex %= _players.Count;
-            PlayerTurnStarted?.Invoke(this, EventArgs.Empty);
+
+            CurrentPlayer.StartTurn();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -152,9 +179,7 @@ namespace Tofunaut.GridStrategy.Game
             _hudManager.ShowConfirmationDialog(() =>
             {
                 _unitPathSelectionManager.Enabled = false;
-                QueueAction(new MoveAction(_currentPlayerIndex, e.unitView.Unit.id, e.path));
-
-                ExecuteNextPlayerAction(() =>
+                QueueAction(new MoveAction(_currentPlayerIndex, e.unitView.Unit.id, e.path), () =>
                 {
                     _unitPathSelectionManager.Enabled = true;
                 });
@@ -162,6 +187,30 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _unitPathSelectionManager.ClearSelection();
             });
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnBoardTileSelected(object sender, UnitPathSelectionManager.BoardTileEventArgs e)
+        {
+            Debug.Log("selected tile: " + e.boardTileView.BoardTile.Coord.ToString());
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnUnitSelected(object sender, UnitPathSelectionManager.UnitEventArgs e)
+        {
+            Debug.Log("selected unit: " + e.unitView.Unit.id);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public class PlayerActionEventArgs : EventArgs
+        {
+            public readonly PlayerAction playerAction;
+
+            // --------------------------------------------------------------------------------------------
+            public PlayerActionEventArgs(PlayerAction playerAction)
+            {
+                this.playerAction = playerAction;
+            }
         }
     }
 }

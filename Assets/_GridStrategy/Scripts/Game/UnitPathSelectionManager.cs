@@ -21,8 +21,11 @@ namespace Tofunaut.GridStrategy.Game
     public class UnitPathSelectionManager : UIWorldInteractionPanel.IListener
     {
         private const float PathViewHeight = 1.5f;
+        private const float SelectBoardTileMaxDrag = 40f;
 
         public event EventHandler<PathEventArgs> OnPathSelected;
+        public event EventHandler<BoardTileEventArgs> OnBoardTileSelected;
+        public event EventHandler<UnitEventArgs> OnUnitSelected;
 
         public bool Enabled
         {
@@ -43,8 +46,8 @@ namespace Tofunaut.GridStrategy.Game
         private IntVector2[] _currentPath;
         private SharpLineRenderer _pathView;
         private bool _enabled;
-        private bool _hitEnemy;
         private BoardTile _endTile;
+        private Vector2 _dragBoardDelta;
 
         // --------------------------------------------------------------------------------------------
         public UnitPathSelectionManager(Game game)
@@ -59,6 +62,7 @@ namespace Tofunaut.GridStrategy.Game
             _enabled = true;
         }
 
+        // --------------------------------------------------------------------------------------------
         public void ClearSelection()
         {
             if (_pathView.IsBuilt)
@@ -66,14 +70,15 @@ namespace Tofunaut.GridStrategy.Game
                 _pathView.Destroy();
             }
             _currentPath = null;
-            _hitEnemy = false;
             _endTile = null;
+            _dragBoardDelta = Vector2.zero;
         }
 
+        // --------------------------------------------------------------------------------------------
         private void UpdatePathColor()
         {
             bool isEnemy = false;
-            foreach(Unit occupant in _endTile.Occupants)
+            foreach (Unit occupant in _endTile.Occupants)
             {
                 if (!_draggingFrom.Unit.IsAllyOf(occupant))
                 {
@@ -94,56 +99,86 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        // --------------------------------------------------------------------------------------------
+        private BoardTileView RaycastForBoardTileView(Vector2 screenPosition)
+        {
+            BoardTileView toReturn = null;
+
+            Ray ray = _game.gameCamera.ScreenPointToRay(screenPosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                UnitView hitUnitView = hit.collider.GetComponentInParent<UnitView>();
+                if (hitUnitView != null)
+                {
+                    BoardTileView.TryGetView(hitUnitView.Unit.BoardTile, out toReturn);
+                }
+                else
+                {
+                    toReturn = hit.collider.GetComponentInParent<BoardTileView>();
+                }
+            }
+
+            return toReturn;
+        }
+
         #region UIWorldInteractionPanel.IListener
 
         // --------------------------------------------------------------------------------------------
-        public void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta) { }
-
-        // --------------------------------------------------------------------------------------------
-        public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta)
+        public void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta)
         {
-            if(!_enabled)
+            if (!_enabled)
             {
                 return;
             }
 
-            if(_currentPath == null)
+            _dragBoardDelta += dragDelta;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta)
+        {
+            if (!_enabled)
+            {
+                return;
+            }
+
+            _draggingFrom = unitView;
+            if (_draggingFrom.Unit.HasMoved)
+            {
+                // don't show if the unit has already moved
+                return;
+            }
+
+            if(_draggingFrom.Unit.Owner.playerIndex != _game.CurrentPlayer.playerIndex)
+            {
+                // don't show when the unit is not owned by the current player
+                return;
+            }
+
+            if (_currentPath == null)
             {
                 _currentPath = new[] { unitView.Unit.BoardTile.Coord };
             }
 
-            _draggingFrom = unitView;
-
-            Ray ray = _game.gameCamera.ScreenPointToRay(prevDragPosition + dragDelta);
-            IntVector2 hitCoord = null;
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            BoardTileView boardTileView = RaycastForBoardTileView(prevDragPosition + dragDelta);
+            if (boardTileView == null)
             {
-                UnitView hitUnitView = hit.collider.GetComponentInParent<UnitView>();
-                if(hitUnitView != null)
-                {
-                    hitCoord = hitUnitView.Unit.BoardTile.Coord;
-                }
-                else
-                {
-                    BoardTileView hitBoardTileView = hit.collider.GetComponentInParent<BoardTileView>();
-                    if(hitBoardTileView != null)
-                    {
-                        hitCoord = hitBoardTileView.BoardTile.Coord;
-                    }
-                }
+                return;
             }
+
+            IntVector2 hitCoord = boardTileView.BoardTile.Coord;
 
             // check:
             // 1) the hitCoord is not null
             // 2) the hitCoord is different from the last coord on the current path
-            if(hitCoord != null && hitCoord != _currentPath[_currentPath.Length - 1])
+            if (hitCoord != null && hitCoord != _currentPath[_currentPath.Length - 1])
             {
                 int pathCost = _game.board.CalculatePathCost(_currentPath, _draggingFrom.Unit);
                 int costOfHitTile = _game.board[hitCoord.x, hitCoord.y].GetMoveCostForUnit(_draggingFrom.Unit);
 
                 if (_currentPath.Length == 1)
                 {
-                    if(pathCost + costOfHitTile > _draggingFrom.Unit.MoveRange)
+                    if (pathCost + costOfHitTile > _draggingFrom.Unit.MoveRange)
                     {
                         // return immediately if this would create a path that is too expensive
                         return;
@@ -160,7 +195,7 @@ namespace Tofunaut.GridStrategy.Game
                     // always add the hitCoord when it is only the second coord in the path
                     _currentPath = new[] { _currentPath[0], hitCoord };
                 }
-                else if(!Board.DoesPathContainCoord(_currentPath, hitCoord))
+                else if (!Board.DoesPathContainCoord(_currentPath, hitCoord))
                 {
                     //if the hitCoord is not covered by the current path
 
@@ -191,9 +226,9 @@ namespace Tofunaut.GridStrategy.Game
 
             _currentPath = Board.SimplifyPath(_currentPath);
 
-            if(_currentPath.Length > 1)
+            if (_currentPath.Length > 1)
             {
-                if(!_pathView.IsBuilt)
+                if (!_pathView.IsBuilt)
                 {
                     _pathView.Render(AppManager.Transform);
                 }
@@ -206,17 +241,25 @@ namespace Tofunaut.GridStrategy.Game
 
                 _pathView.Positions = positions;
             }
-            else 
+            else
             {
-                if(_pathView.IsBuilt) 
+                if (_pathView.IsBuilt)
                 {
                     _pathView.Destroy();
-                } 
+                }
             }
         }
 
         // --------------------------------------------------------------------------------------------
-        public void OnSelectedUnitView(UnitView unitView) { }
+        public void OnSelectedUnitView(UnitView unitView)
+        {
+            if (!_enabled)
+            {
+                return;
+            }
+
+            OnUnitSelected.Invoke(this, new UnitEventArgs(unitView));
+        }
 
         // --------------------------------------------------------------------------------------------
         public void OnReleasedBoard(Vector2 releasePosition)
@@ -225,19 +268,45 @@ namespace Tofunaut.GridStrategy.Game
             {
                 return;
             }
-            
-            if (_currentPath == null)
+
+            _endTile = RaycastForBoardTileView(releasePosition)?.BoardTile;
+            if(_endTile == null)
             {
                 return;
             }
 
-            if (_currentPath.Length <= 1)
+            if(_currentPath != null && _currentPath.Length > 1)
             {
+
+                OnPathSelected?.Invoke(this, new PathEventArgs(_draggingFrom, _currentPath));
+            }
+            else if ((_currentPath == null || _currentPath.Length <= 1) && _dragBoardDelta.magnitude < SelectBoardTileMaxDrag)
+            {
+                if (BoardTileView.TryGetView(_endTile, out BoardTileView boardTileView))
+                {
+                    OnBoardTileSelected?.Invoke(this, new BoardTileEventArgs(boardTileView));
+                }
+                else
+                {
+                    Debug.LogWarning($"the coord {_currentPath[0].ToString()} isn't associated with a BoardTileView");
+                }
+
                 ClearSelection();
                 return;
             }
 
-            OnPathSelected?.Invoke(this, new PathEventArgs(_draggingFrom, _currentPath));
+            _dragBoardDelta = Vector2.zero;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void OnPointerDownOverBoard(BoardTileView boardTileView)
+        {
+            if (!_enabled)
+            {
+                return;
+            }
+
+            _dragBoardDelta = Vector2.zero;
         }
 
         #endregion
@@ -253,6 +322,29 @@ namespace Tofunaut.GridStrategy.Game
             {
                 this.unitView = unitView;
                 this.path = path;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public class BoardTileEventArgs : EventArgs
+        {
+            public readonly BoardTileView boardTileView;
+
+            // --------------------------------------------------------------------------------------------
+            public BoardTileEventArgs(BoardTileView boardTileView)
+            {
+                this.boardTileView = boardTileView;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public class UnitEventArgs : EventArgs
+        {
+            public readonly UnitView unitView;
+
+            public UnitEventArgs(UnitView unitView)
+            {
+                this.unitView = unitView;
             }
         }
     }

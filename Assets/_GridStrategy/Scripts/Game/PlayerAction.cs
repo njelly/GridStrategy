@@ -138,6 +138,12 @@ namespace Tofunaut.GridStrategy.Game
         public EndTurnAction(int playerIndex) : base(EType.EndTurn, playerIndex) { }
 
         // --------------------------------------------------------------------------------------------
+        public override bool IsValid(Game game)
+        {
+            return game.CurrentPlayer.playerIndex == playerIndex;
+        }
+
+        // --------------------------------------------------------------------------------------------
         public override void Execute(Game game, Action OnComplete)
         {
             game.EndTurn();

@@ -12,26 +12,32 @@ using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
 
+// --------------------------------------------------------------------------------------------
 namespace Tofunaut.GridStrategy.Game.UI
 {
-    public class HUDManager : SharpGameObject
+    // --------------------------------------------------------------------------------------------
+    public class HUDManager : SharpGameObject, UIContextMenuView.IListener
     {
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
         private UILeftPlayerPanel _localPlayerPanel;
         private UIConfirmationDialogView _confirmationDialog;
+        private UIContextMenuView _contextMenuView;
         private List<UIRightPlayerPanel> _opponentPlayerPanels;
 
+        // --------------------------------------------------------------------------------------------
         private HUDManager(Game game) : base("UIHUDManager")
         {
             _game = game;
         }
 
+        // --------------------------------------------------------------------------------------------
         protected override void Build()
         {
             _beginTurnBanner = new UIBeginTurnBanner();
             _localPlayerPanel = new UILeftPlayerPanel(_game.LocalPlayer);
             _confirmationDialog = new UIConfirmationDialogView();
+            _contextMenuView = new UIContextMenuView(this);
 
             //TODO: Put this in a vertical layout group for all opponent players
             _opponentPlayerPanels = new List<UIRightPlayerPanel>
@@ -41,17 +47,20 @@ namespace Tofunaut.GridStrategy.Game.UI
             };
         }
 
+        // --------------------------------------------------------------------------------------------
         protected override void PostRender()
         {
             base.PostRender();
-            _game.PlayerTurnStarted += OnPlayerTurnStart;
+            Player.PlayerTurnStarted += OnPlayerTurnStarted;
             _game.GameBegan += OnGameBegan;
         }
 
+        // --------------------------------------------------------------------------------------------
         public override void Destroy()
         {
             base.Destroy();
 
+            _contextMenuView.Hide();
             _localPlayerPanel.Hide();
 
             foreach (UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
@@ -59,10 +68,11 @@ namespace Tofunaut.GridStrategy.Game.UI
                 opponentPanel.Hide();
             }
 
-            _game.PlayerTurnStarted -= OnPlayerTurnStart;
+            Player.PlayerTurnStarted -= OnPlayerTurnStarted;
             _game.GameBegan -= OnGameBegan;
         }
 
+        // --------------------------------------------------------------------------------------------
         public void ShowConfirmationDialog(Action onConfirm, Action onCancel)
         {
             _confirmationDialog.OnOKClicked = () =>
@@ -79,17 +89,20 @@ namespace Tofunaut.GridStrategy.Game.UI
             _confirmationDialog.Show();
         }
 
+        // --------------------------------------------------------------------------------------------
         private void OnGameBegan(object sender, EventArgs e)
         {
             _localPlayerPanel.Show();
+            _contextMenuView.Show();
 
-            foreach(UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
+            foreach (UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
             {
                 opponentPanel.Show();
             }
         }
 
-        private void OnPlayerTurnStart(object sender, EventArgs e)
+        // --------------------------------------------------------------------------------------------
+        private void OnPlayerTurnStarted(object sender, Player.PlayerEventArgs e)
         {
             if (_beginTurnBanner.IsShowing)
             {
@@ -100,6 +113,17 @@ namespace Tofunaut.GridStrategy.Game.UI
             _beginTurnBanner.Show();
         }
 
+        #region UIContextMenuView.IListener
+
+        // --------------------------------------------------------------------------------------------
+        public void OnEndTurnClicked()
+        {
+            _game.QueueAction(new EndTurnAction(_game.CurrentPlayer.playerIndex), () => { });
+        }
+
+        #endregion UIContextMenuView.IListener
+
+        // --------------------------------------------------------------------------------------------
         public static HUDManager Create(Game game)
         {
             HUDManager toReturn = new HUDManager(game);

@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TofuCore;
@@ -127,6 +128,31 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             return toReturn;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void HighlightBoardTilesForUnit(Unit unit)
+        {
+            if(unit.HasMoved)
+            {
+                ClearAllBoardTileHighlights();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void ClearAllBoardTileHighlights()
+        {
+            foreach(BoardTile boardTile in _tiles)
+            {
+                if(BoardTileView.TryGetView(boardTile, out BoardTileView boardTileView))
+                {
+                    boardTileView.SetHighlight(BoardTileView.EHighlight.None);
+                }
+            }
         }
 
 

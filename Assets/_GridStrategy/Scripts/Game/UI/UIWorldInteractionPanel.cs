@@ -26,6 +26,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         public interface IListener
         {
             void OnSelectedUnitView(UnitView unitView);
+            void OnPointerDownOverBoard(BoardTileView boardTileView);
             void OnReleasedBoard(Vector2 releasePosition);
             void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta);
             void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta);
@@ -104,22 +105,35 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         private void OnPointerDown(object sender, EventSystemEventArgs e)
         {
-            // if we have no potential selected unit yet, try to find one
+            PointerEventData pointerEventData = e.eventData as PointerEventData;
+            Ray ray = _game.gameCamera.ScreenPointToRay(pointerEventData.position);
             if (_potentialSelectedUnitView == null)
             {
-                PointerEventData pointerEventData = e.eventData as PointerEventData;
-                Ray ray = _game.gameCamera.ScreenPointToRay(pointerEventData.position);
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                // if we have no potential selected unit yet, try to find one
+                if (Physics.Raycast(ray, out RaycastHit unitViewHit))
                 {
                     // this could be null
-                    _potentialSelectedUnitView = hit.collider.GetComponentInParent<UnitView>();
+                    _potentialSelectedUnitView = unitViewHit.collider.GetComponentInParent<UnitView>();
                     _potentialSelectedUnitTime = Time.time;
                 }
 
-                // if the potential slected unit view is still null, lets raycast to our plane
                 if (_potentialSelectedUnitView == null)
                 {
+                    // if the potential slected unit view is still null, lets raycast to our plane
                     _previousDragPoint = pointerEventData.position;
+                }
+            }
+
+            // see if we hit a board tile view
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                BoardTileView boardTileView = hit.collider.GetComponentInParent<BoardTileView>();
+                if (boardTileView != null)
+                {
+                    foreach (IListener listener in _listeners)
+                    {
+                        listener.OnPointerDownOverBoard(boardTileView);
+                    }
                 }
             }
         }

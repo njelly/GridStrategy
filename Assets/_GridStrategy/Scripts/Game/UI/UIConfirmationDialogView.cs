@@ -36,6 +36,11 @@ namespace Tofunaut.GridStrategy.Game.UI
             SharpUINonDrawingGraphic toReturn = new SharpUINonDrawingGraphic("UIConfirmationDialog");
             toReturn.SetFillSize();
 
+            toReturn.SubscribeToEvent(EEventType.PointerClick, (object sender, EventSystemEventArgs e) =>
+            {
+                OnCancelClicked?.Invoke();
+            });
+
             _background = new SharpUIImage($"{toReturn.name}_bg", null);
             _background.SetFixedSize(Size);
             _background.alignment = EAlignment.MiddleCenter;

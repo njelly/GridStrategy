@@ -90,56 +90,62 @@
         {
             "id": "default_hero",
             "prefab": "DefaultHeroView",
-            "attribute": "None",
+            "aspect": "None",
             "health": 60,
-            "power": 30,
             "moverange": 4,
-            "travelspeed": 10
+            "travelspeed": 10,
+            "skill": "default_hero_attack"
         },
         {
             "id": "enforcer",
             "prefab": "EnforcerView",
-            "attribute": "None",
+            "aspect": "None",
             "health": 30,
-            "power": 20,
             "moverange": 2,
             "travelspeed": 10
         },
         {
             "id": "fire_sprite",
             "prefab": "FireSpriteView",
-            "attribute": "Fire",
+            "aspect": "Fire",
             "health": 20,
-            "power": 20,
             "moverange": 3,
             "travelspeed": 10
         },
         {
             "id": "water_sprite",
             "prefab": "WaterSpriteView",
-            "attribute": "Water",
+            "aspect": "Water",
             "health": 20,
-            "power": 20,
             "moverange": 3,
             "travelspeed": 10
         },
         {
             "id": "air_sprite",
             "prefab": "AirSpriteView",
-            "attribute": "Air",
+            "aspect": "Air",
             "health": 20,
-            "power": 20,
             "moverange": 3,
             "travelspeed": 10
         },
         {
             "id": "earth_sprite",
             "prefab": "EarthSpriteView",
-            "attribute": "Earth",
+            "aspect": "Earth",
             "health": 20,
-            "power": 20,
             "moverange": 3,
             "travelspeed": 10
+        }
+    ],
+    "Skills": [
+        {
+            "id": "default_hero_attack",
+            "aspect": "None",
+            "target": "Enemy",
+            "areasize": 1,
+            "areatype": "single",
+            "areaoffset": "1,0",
+            "damagedealt": 60
         }
     ],
     "Opponents": [

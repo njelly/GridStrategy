@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Player
     {
+        public static event EventHandler<PlayerEventArgs> PlayerTurnStarted;
+        public static event EventHandler<PlayerEventArgs> PlayerTurnEnded;
+
         public IReadOnlyCollection<Card> Deck { get { return _deck.AsReadOnly(); } }
         public IReadOnlyCollection<Card> Hand { get { return _hand.AsReadOnly(); } }
         public IReadOnlyCollection<Card> DiscardPile { get { return _discardPile.AsReadOnly(); } }
@@ -76,12 +80,15 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void BeginTurn()
+        public void StartTurn()
         {
-            foreach (Unit gameEntity in _units)
-            {
-                gameEntity.OnPlayerTurnBegan();
-            }
+            PlayerTurnStarted?.Invoke(this, new PlayerEventArgs(this));
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void EndTurn()
+        {
+            PlayerTurnEnded?.Invoke(this, new PlayerEventArgs(this));
         }
 
         // --------------------------------------------------------------------------------------------
@@ -114,7 +121,7 @@ namespace Tofunaut.GridStrategy.Game
             // TODO: might want to make this guaranteed to be deterministic
             for (int i = 0; i < _deck.Count; i++)
             {
-                int randomIndex = Random.Range(0, _deck.Count - 1);
+                int randomIndex = UnityEngine.Random.Range(0, _deck.Count - 1);
                 Card temp = _deck[randomIndex];
                 _deck[randomIndex] = _deck[i];
                 _deck[i] = temp;
@@ -134,6 +141,18 @@ namespace Tofunaut.GridStrategy.Game
             _units.Add(unit);
 
             return unit;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public class PlayerEventArgs : EventArgs
+        {
+            public readonly Player player;
+
+            // --------------------------------------------------------------------------------------------
+            public PlayerEventArgs(Player player)
+            {
+                this.player = player;
+            }
         }
     }
 }

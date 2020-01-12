@@ -14,6 +14,14 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class BoardTileView : MonoBehaviour
     {
+        public enum EHighlight
+        {
+            None = 0,
+            Move = 1,
+            Attack = 2,
+            Neutral = 3,
+        }
+
         private static Dictionary<BoardTile, BoardTileView> _boardTileToView = new Dictionary<BoardTile, BoardTileView>();
 
         public const float Size = 5f;
@@ -26,9 +34,25 @@ namespace Tofunaut.GridStrategy.Game
         public Material evenMaterial;
         public Material oddMaterial;
 
+        [Header("Highlight")]
+        public MeshRenderer highlightMeshRenderer;
+        public Material highlightMoveMaterial;
+        public Material highlightAttackMaterial;
+        public Material highlightNeutralMaterial;
+
+        private EHighlight _highlight;
+
+        // --------------------------------------------------------------------------------------------
         private void OnDestroy()
         {
             _boardTileToView.Remove(BoardTile);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void SetHighlight(EHighlight highlight)
+        {
+            _highlight = highlight;
+            SetMaterial();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -61,6 +85,28 @@ namespace Tofunaut.GridStrategy.Game
             Material[] sharedMaterials = meshRenderer.sharedMaterials;
             sharedMaterials[0] = Instantiate(toUse);
             meshRenderer.sharedMaterials = sharedMaterials;
+
+            // take care of highlight
+            Material[] highlightSharedMaterials = highlightMeshRenderer.sharedMaterials;
+            switch(_highlight)
+            {
+                case EHighlight.None:
+                    highlightMeshRenderer.gameObject.SetActive(false);
+                    break;
+                case EHighlight.Move:
+                    highlightMeshRenderer.gameObject.SetActive(true);
+                    highlightSharedMaterials[0] = Instantiate(highlightMoveMaterial);
+                    break;
+                case EHighlight.Attack:
+                    highlightMeshRenderer.gameObject.SetActive(true);
+                    highlightSharedMaterials[0] = Instantiate(highlightMoveMaterial);
+                    break;
+                case EHighlight.Neutral:
+                    highlightMeshRenderer.gameObject.SetActive(true);
+                    highlightSharedMaterials[0] = Instantiate(highlightNeutralMaterial);
+                    break;
+            }
+            highlightMeshRenderer.sharedMaterials = highlightSharedMaterials;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -74,6 +120,8 @@ namespace Tofunaut.GridStrategy.Game
 
                     BoardTileView view = viewGo.GetComponent<BoardTileView>();
                     view.BoardTile = boardTile;
+                    view._highlight = EHighlight.None;
+
                     view.SetMaterial();
 
                     _boardTileToView.Add(boardTile, view);

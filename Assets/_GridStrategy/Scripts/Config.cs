@@ -1,8 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Config (c) 2020 Tofunaut
+//
+//  Created by Nathaniel Ellingson for TofuUnity on 01/09/2020
+//
+////////////////////////////////////////////////////////////////////////////////
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using TofuCore;
 using Tofunaut.GridStrategy.Game;
+using Tofunaut.TofuCore;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
@@ -298,7 +307,7 @@ namespace Tofunaut.GridStrategy
         private bool BuildUnitDatas(object[] rawUnitsDatas)
         {
             _idToUnitData = new Dictionary<string, UnitData>();
-            bool hasErrors = false;
+            bool hasError = false;
 
             for (int i = 0; i < rawUnitsDatas.Length; i++)
             {
@@ -313,7 +322,25 @@ namespace Tofunaut.GridStrategy
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing an id");
-                    hasErrors = true;
+                    hasError = true;
+                }
+
+                // aspect
+                if (rawUnitData.TryGetValue("aspect", out object aspectObj))
+                {
+                    if (Enum.TryParse(aspectObj.ToString(), out EAspect aspect))
+                    {
+                        unitData.aspect = aspect;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {aspectObj.ToString()} as EAspect");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing an id");
+                    hasError = true;
                 }
 
                 // prefabPath
@@ -324,7 +351,7 @@ namespace Tofunaut.GridStrategy
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a prefab");
-                    hasErrors = true;
+                    hasError = true;
                 }
 
                 // health
@@ -337,13 +364,13 @@ namespace Tofunaut.GridStrategy
                     else
                     {
                         Debug.LogError($"Could not parse {healthObj.ToString()} as int, index {i}");
-                        hasErrors = true;
+                        hasError = true;
                     }
                 }
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a value for health");
-                    hasErrors = true;
+                    hasError = true;
                 }
 
                 // moveSpeed
@@ -356,13 +383,13 @@ namespace Tofunaut.GridStrategy
                     else
                     {
                         Debug.LogError($"Could not parse {moveRangeObj.ToString()} as int, index {i}");
-                        hasErrors = true;
+                        hasError = true;
                     }
                 }
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a value for moverange");
-                    hasErrors = true;
+                    hasError = true;
                 }
 
                 // travelSpeed
@@ -375,19 +402,19 @@ namespace Tofunaut.GridStrategy
                     else
                     {
                         Debug.LogError($"Could not parse {travelSpeedObj.ToString()} as float, index {i}");
-                        hasErrors = true;
+                        hasError = true;
                     }
                 }
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a value for travelspeed");
-                    hasErrors = true;
+                    hasError = true;
                 }
 
                 _idToUnitData.Add(unitData.id, unitData);
             }
 
-            return !hasErrors;
+            return !hasError;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -475,18 +502,112 @@ namespace Tofunaut.GridStrategy
                     break;
                 }
 
-                // as
-                if (rawSkillData.TryGetValue("id", out object idObj))
+                // target
+                if (rawSkillData.TryGetValue("target", out object targetObj))
                 {
-                    skillData.id = idObj.ToString();
+                    if (Enum.TryParse(targetObj.ToString(), out SkillData.ETarget target))
+                    {
+                        skillData.target = target;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {targetObj.ToString()} as ETarget for target");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing a damage allies");
+                    hasError = true;
+                }
+
+                // aspect
+                if (rawSkillData.TryGetValue("aspect", out object aspectObj))
+                {
+                    if (Enum.TryParse(aspectObj.ToString(), out EAspect aspect))
+                    {
+                        skillData.aspect = aspect;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {aspectObj.ToString()} as EAspect");
+                    }
                 }
                 else
                 {
                     Debug.LogError($"skill data index {i} is missing an id");
                     hasError = true;
+                }
 
-                    // break so this isn't added to the dictionary
-                    break;
+                // areaSize
+                if (rawSkillData.TryGetValue("areasize", out object areaSizeObj))
+                {
+                    if (int.TryParse(areaSizeObj.ToString(), out int areaSize))
+                    {
+                        skillData.areaSize = areaSize;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {areaSizeObj.ToString()} as int for areaSize");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing an area size");
+                    hasError = true;
+                }
+
+                // area type
+                if (rawSkillData.TryGetValue("areatype", out object areaTypeObj))
+                {
+                    if (Enum.TryParse(areaTypeObj.ToString(), out SkillData.EAreaType areaType))
+                    {
+                        skillData.areaType = areaType;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {areaTypeObj.ToString()} as EAreaType");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing an area type");
+                    hasError = true;
+                }
+
+                // area offset
+                if (rawSkillData.TryGetValue("areaoffset", out object areaOffsetObj))
+                {
+                    if (IntVector2.TryParse(areaOffsetObj.ToString(), out IntVector2 areaOffset))
+                    {
+                        skillData.areaOffset = areaOffset;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {areaOffsetObj.ToString()} as IntVector2 for area offset");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing an area offset");
+                    hasError = true;
+                }
+
+                // damage dealt
+                if (rawSkillData.TryGetValue("damagedealt", out object damageDealtObj))
+                {
+                    if (int.TryParse(damageDealtObj.ToString(), out int damageDealt))
+                    {
+                        skillData.damageDealt = damageDealt;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {damageDealtObj.ToString()} as int for damage dealt");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing a damage dealt");
+                    hasError = true;
                 }
 
                 _idToSkillData.Add(skillData.id, skillData);
@@ -554,13 +675,22 @@ namespace Tofunaut.GridStrategy
             Square = 6,
         }
 
+        public enum ETarget
+        {
+            None = 0,
+            Self = 1,
+            Ally = 2,
+            Enemy = 3,
+            Tile = 4,
+        }
+
         public string id;
+        public ETarget target;
         public EAspect aspect;
         public int areaSize;
         public EAreaType areaType;
         public IntVector2 areaOffset;
         public int damageDealt;
-        public bool damageAllies;
     }
 
     // --------------------------------------------------------------------------------------------

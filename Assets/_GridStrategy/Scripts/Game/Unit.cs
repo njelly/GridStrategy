@@ -65,6 +65,9 @@ namespace Tofunaut.GridStrategy.Game
 
             Health = _data.health;
             MoveRange = _data.moveRange;
+
+            Player.PlayerTurnStarted += Player_PlayerTurnStarted;
+            Player.PlayerTurnEnded += Player_PlayerTurnEnded;
         }
 
         #region SharpGameObject
@@ -76,6 +79,15 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _view = view;
             });
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override void Destroy()
+        {
+            base.Destroy();
+
+            Player.PlayerTurnStarted -= Player_PlayerTurnStarted;
+            Player.PlayerTurnEnded -= Player_PlayerTurnEnded;
         }
 
         #endregion SharpGameObject
@@ -175,6 +187,8 @@ namespace Tofunaut.GridStrategy.Game
                 Debug.LogError($"Unit {id} has already used its skill this turn");
                 return;
             }
+
+            throw new NotImplementedException();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -184,6 +198,7 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _moveAnim.Stop();
                 _onMoveComplete?.Invoke();
+                _moveAnim = null;
             }
 
             OccupyBoardTile(BoardTile, true);
@@ -191,23 +206,23 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void OccupyBoardTile(BoardTile boardTile, bool asChild)
+        public void OccupyBoardTile(BoardTile newTile, bool asChild)
         {           
             // do this check so that OccupyBoardTile can be called arbitrarily without re-occupying the same boardtile
-            if(BoardTile != boardTile)
+            if(BoardTile != newTile)
             {
                 // leave the current tile, if it exists
-                boardTile?.RemoveOccupant(this);
+                BoardTile?.RemoveOccupant(this);
 
                 // set the new tile, then add this unit as an occupant
-                BoardTile = boardTile;
-                boardTile.AddOccupant(this);
+                BoardTile = newTile;
+                newTile.AddOccupant(this);
             }
 
             if (asChild)
             {
                 // parent the unit to the tile and zero out its local position
-                boardTile.AddChild(this);
+                newTile.AddChild(this);
                 LocalPosition = Vector3.zero;
             }
         }
@@ -254,18 +269,6 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public virtual void OnPlayerTurnBegan() 
-        {
-            HasMoved = false;
-            HasUsedSkill = false;
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public virtual void OnPlayerTurnEnded()
-        {
-        }
-
-        // --------------------------------------------------------------------------------------------
         public bool IsAllyOf(Unit other)
         {
             return other.Owner == _owner;
@@ -275,6 +278,29 @@ namespace Tofunaut.GridStrategy.Game
         public bool IsEnemyOf(Unit other)
         {
             return other.Owner != _owner;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void Player_PlayerTurnStarted(object sender, Player.PlayerEventArgs e)
+        {
+            if (e.player != Owner)
+            {
+                return;
+            }
+
+            HasMoved = false;
+            HasUsedSkill = false;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void Player_PlayerTurnEnded(object sender, Player.PlayerEventArgs e)
+        {
+            if (e.player != Owner)
+            {
+                return;
+            }
+
+            // TODO: something when the player turn ends
         }
 
         // --------------------------------------------------------------------------------------------

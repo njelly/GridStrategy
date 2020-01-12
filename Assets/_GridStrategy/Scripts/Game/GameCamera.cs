@@ -117,6 +117,9 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void OnReleasedBoard(Vector2 releasePosition) { }
 
+        // --------------------------------------------------------------------------------------------
+        public void OnPointerDownOverBoard(BoardTileView boardTileView) { }
+
         #endregion UIWorldInteractionPanel.IListener
     }
 }
