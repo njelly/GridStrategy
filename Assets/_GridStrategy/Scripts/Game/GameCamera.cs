@@ -100,10 +100,10 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            Ray prevRay = _unityCamera.ScreenPointToRay(prevDragPosition);
+            Ray prevRay = UnityCamera.ScreenPointToRay(prevDragPosition);
             if (_groundPlane.Raycast(prevRay, out float prevDistance))
             {
-                Ray nextRay = _unityCamera.ScreenPointToRay(prevDragPosition + dragDelta);
+                Ray nextRay = UnityCamera.ScreenPointToRay(prevDragPosition + dragDelta);
                 if (_groundPlane.Raycast(nextRay, out float nextDistance))
                 {
                     LookAt(LookingAt + (prevRay.GetPoint(prevDistance) - nextRay.GetPoint(nextDistance)));

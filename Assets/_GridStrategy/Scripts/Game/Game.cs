@@ -198,7 +198,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void OnUnitSelected(object sender, UnitPathSelectionManager.UnitEventArgs e)
         {
-            Debug.Log("selected unit: " + e.unitView.Unit.id);
+            _hudManager.ShowUnitOptions(e.unitView.Unit);
         }
 
         // --------------------------------------------------------------------------------------------

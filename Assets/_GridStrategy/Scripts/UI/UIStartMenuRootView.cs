@@ -16,7 +16,7 @@ namespace Tofunaut.GridStrategy.UI
 {
 
     // --------------------------------------------------------------------------------------------
-    public class UIStartMenuRootView : GridStrategyUIView
+    public class UIStartMenuRootView : UIGridStrategyView
     {
         public interface IUIStartMenuRootViewListener
         {

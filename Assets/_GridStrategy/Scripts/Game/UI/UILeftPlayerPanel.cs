@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class UILeftPlayerPanel : GridStrategyUIView
+    public class UILeftPlayerPanel : UIGridStrategyView
     {
         protected Vector2 Size => new Vector2(500, 200);
 

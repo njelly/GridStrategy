@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Tofunaut.GridStrategy.UI
 {
-    public class UIBeginTurnBanner : GridStrategyUIView
+    public class UIBeginTurnBanner : UIGridStrategyView
     {
         private const int BannerHeight = 300;
         private Color BackgroundStartColor => new Color(1f, 1f, 1f, 0f);

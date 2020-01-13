@@ -16,12 +16,13 @@ using Tofunaut.SharpUnity.UI;
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class HUDManager : SharpGameObject, UIContextMenuView.IListener
+    public class HUDManager : SharpGameObject, UIContextMenuView.IListener, UIUnitOptionsView.IListener
     {
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
         private UIConfirmationDialogView _confirmationDialog;
         private UIContextMenuView _contextMenuView;
+        private UIUnitOptionsView _unitOptionsView;
         private Dictionary<Player, UILeftPlayerPanel> _playerToPlayerPanels;
 
         // --------------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _beginTurnBanner = new UIBeginTurnBanner();
             _confirmationDialog = new UIConfirmationDialogView();
             _contextMenuView = new UIContextMenuView(this);
-
+            _unitOptionsView = new UIUnitOptionsView(this, _game.gameCamera);
             _playerToPlayerPanels = new Dictionary<Player, UILeftPlayerPanel>();
             _playerToPlayerPanels.Add(_game.LocalPlayer, new UILeftPlayerPanel(_game.LocalPlayer));
 
@@ -88,6 +89,18 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         // --------------------------------------------------------------------------------------------
+        public void ShowUnitOptions(Unit unit)
+        {
+            if(_unitOptionsView.IsShowing)
+            {
+                _unitOptionsView.Hide();
+            }
+
+            _unitOptionsView.FollowUnit(unit);
+            _unitOptionsView.Show();
+        }
+
+        // --------------------------------------------------------------------------------------------
         private void OnGameBegan(object sender, EventArgs e)
         {
             _contextMenuView.Show();
@@ -105,9 +118,13 @@ namespace Tofunaut.GridStrategy.Game.UI
             {
                 _beginTurnBanner.Hide();
             }
-
             _beginTurnBanner.SetPlayerName(_game.CurrentPlayer.name);
             _beginTurnBanner.Show();
+
+            if(_unitOptionsView.IsShowing)
+            {
+                _unitOptionsView.Hide();
+            }
 
             foreach (Player player in _playerToPlayerPanels.Keys)
             {
@@ -124,6 +141,16 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         #endregion UIContextMenuView.IListener
+
+        #region UIUnitOptionsView.IListener
+
+        public void OnUseSkillClicked(Unit unit)
+        {
+            _unitOptionsView.Hide();
+            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id), () => { });
+        }
+
+        #endregion UIUnitOptionsVIew.IListener
 
         // --------------------------------------------------------------------------------------------
         public static HUDManager Create(Game game)

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class UIContextMenuView : GridStrategyUIView
+    public class UIContextMenuView : UIGridStrategyView
     {
         // --------------------------------------------------------------------------------------------
         public interface IListener

@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game.UI
 {
-    public class UIConfirmationDialogView : GridStrategyUIView
+    public class UIConfirmationDialogView : UIGridStrategyView
     {
         private Vector2 Size => new Vector2(500, 300);
 
@@ -67,12 +67,8 @@ namespace Tofunaut.GridStrategy.Game.UI
         {
             public Vector2 Size => new Vector2(200, 80);
 
-            private Action _onClick;
-
             public ChoiceButton(Action onClick, string name, string caption) : base(name, null)
             {
-                _onClick = onClick;
-
                 SetFixedSize(Size);
                 Color = new Color(0.25f, 0.25f, 0.25f, 1f);
 
@@ -84,18 +80,16 @@ namespace Tofunaut.GridStrategy.Game.UI
                 label.TextAlignment = TMPro.TextAlignmentOptions.Center;
                 label.Color = Color.white;
                 AddChild(label);
+
+                SubscribeToEvent(EEventType.PointerClick, (object sender, EventSystemEventArgs e) =>
+                {
+                    onClick?.Invoke();
+                });
             }
 
             protected override void PostRender()
             {
                 base.PostRender();
-
-                SubscribeToEvent(EEventType.PointerClick, OnPointerClick);
-            }
-
-            private void OnPointerClick(object sender, EventSystemEventArgs e)
-            {
-                _onClick?.Invoke();
             }
         }
     }
