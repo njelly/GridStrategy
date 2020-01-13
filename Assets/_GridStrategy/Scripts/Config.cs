@@ -166,8 +166,6 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public bool TryParseGlobals(Dictionary<string, object> globalData)
         {
-            bool hasErrors = false;
-
             if(globalData.TryGetValue("maxplayerenergy", out object maxPlayerEnergyObj))
             {
                 if(int.TryParse(maxPlayerEnergyObj.ToString(), out int maxPlayerEnergy))
@@ -177,16 +175,16 @@ namespace Tofunaut.GridStrategy
                 else
                 {
                     Debug.LogError($"Could not parse {maxPlayerEnergyObj.ToString()} as int for MaxPlayerEnergy");
-                    hasErrors = true;
+                    return false;
                 }
             }
             else
             {
                 Debug.LogError("the config data is missing a value for MaxPlayerEnergy");
-                hasErrors = true;
+                return false;
             }
 
-            return hasErrors;
+            return true;
         }
 
         // --------------------------------------------------------------------------------------------
