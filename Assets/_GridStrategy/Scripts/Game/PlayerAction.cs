@@ -113,17 +113,32 @@ namespace Tofunaut.GridStrategy.Game
     public class UseSkillAction : PlayerAction
     {
         public int unitId;
+        public int facingDir;
 
         // --------------------------------------------------------------------------------------------
-        public UseSkillAction(int playerIndex, int unitId) : base(EType.UseSkill, playerIndex)
+        public UseSkillAction(int playerIndex, int unitId, Unit.EFacing facingDir) : base(EType.UseSkill, playerIndex)
         {
             this.unitId = unitId;
+            this.facingDir = (int)facingDir;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override bool IsValid(Game game)
+        {
+            Unit unit = Unit.GetUnit(unitId);
+            if(unit.HasUsedSkill)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         // --------------------------------------------------------------------------------------------
         public override void Execute(Game game, Action OnComplete)
         {
-            throw new NotImplementedException();
+            Unit unit = Unit.GetUnit(unitId);
+            unit.UseSkill((Unit.EFacing)facingDir, OnComplete);
         }
     }
 

@@ -147,7 +147,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         public void OnUseSkillClicked(Unit unit)
         {
             _unitOptionsView.Hide();
-            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id), () => { });
+            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id, unit.Facing), () => { });
         }
 
         #endregion UIUnitOptionsVIew.IListener

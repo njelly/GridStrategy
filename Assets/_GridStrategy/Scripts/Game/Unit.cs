@@ -181,7 +181,7 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void UseSkill(Action onComplete)
+        public void UseSkill(EFacing faceTowards, Action onComplete)
         {
             if (HasUsedSkill)
             {
@@ -189,7 +189,16 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            throw new NotImplementedException();
+            if(faceTowards != Facing)
+            {
+                SetFacing(faceTowards, false);
+            }
+
+            Debug.Log($"unit {id} used skill");
+
+            HasUsedSkill = true;
+
+            onComplete?.Invoke();
         }
 
         // --------------------------------------------------------------------------------------------
