@@ -20,10 +20,9 @@ namespace Tofunaut.GridStrategy.Game.UI
     {
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
-        private UILeftPlayerPanel _localPlayerPanel;
         private UIConfirmationDialogView _confirmationDialog;
         private UIContextMenuView _contextMenuView;
-        private List<UIRightPlayerPanel> _opponentPlayerPanels;
+        private Dictionary<Player, UILeftPlayerPanel> _playerToPlayerPanels;
 
         // --------------------------------------------------------------------------------------------
         private HUDManager(Game game) : base("UIHUDManager")
@@ -35,16 +34,16 @@ namespace Tofunaut.GridStrategy.Game.UI
         protected override void Build()
         {
             _beginTurnBanner = new UIBeginTurnBanner();
-            _localPlayerPanel = new UILeftPlayerPanel(_game.LocalPlayer);
             _confirmationDialog = new UIConfirmationDialogView();
             _contextMenuView = new UIContextMenuView(this);
 
+            _playerToPlayerPanels = new Dictionary<Player, UILeftPlayerPanel>();
+            _playerToPlayerPanels.Add(_game.LocalPlayer, new UILeftPlayerPanel(_game.LocalPlayer));
+
+
             //TODO: Put this in a vertical layout group for all opponent players
-            _opponentPlayerPanels = new List<UIRightPlayerPanel>
-            {
-                // TODO: 1 is not guranteed to be an opponent player
-                new UIRightPlayerPanel(_game.GetPlayer(1)),
-            };
+            // TODO: 1 is not guranteed to be an opponent player
+            _playerToPlayerPanels.Add(_game.GetPlayer(1), new UIRightPlayerPanel(_game.GetPlayer(1)));
         }
 
         // --------------------------------------------------------------------------------------------
@@ -61,11 +60,10 @@ namespace Tofunaut.GridStrategy.Game.UI
             base.Destroy();
 
             _contextMenuView.Hide();
-            _localPlayerPanel.Hide();
 
-            foreach (UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
+            foreach (UILeftPlayerPanel playerPanel in _playerToPlayerPanels.Values)
             {
-                opponentPanel.Hide();
+                playerPanel.Hide();
             }
 
             Player.PlayerTurnStarted -= OnPlayerTurnStarted;
@@ -92,12 +90,11 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         private void OnGameBegan(object sender, EventArgs e)
         {
-            _localPlayerPanel.Show();
             _contextMenuView.Show();
 
-            foreach (UIRightPlayerPanel opponentPanel in _opponentPlayerPanels)
+            foreach (UILeftPlayerPanel playerPanel in _playerToPlayerPanels.Values)
             {
-                opponentPanel.Show();
+                playerPanel.Show();
             }
         }
 
@@ -111,6 +108,12 @@ namespace Tofunaut.GridStrategy.Game.UI
 
             _beginTurnBanner.SetPlayerName(_game.CurrentPlayer.name);
             _beginTurnBanner.Show();
+
+            foreach (Player player in _playerToPlayerPanels.Keys)
+            {
+                _playerToPlayerPanels[player].SetEnergy(player.Energy, player.EnergyCap);
+            }
+
         }
 
         #region UIContextMenuView.IListener

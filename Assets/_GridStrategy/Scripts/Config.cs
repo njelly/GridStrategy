@@ -29,6 +29,8 @@ namespace Tofunaut.GridStrategy
 
         private delegate bool ParseRawDataDelegate(object[] rawData);
 
+        public int MaxPlayerEnergy { get; private set; }
+
         private Dictionary<string, CardData> _idToCardData;
         private Dictionary<string, DeckData> _idToDeckData;
         private Dictionary<string, UnitData> _idToUnitData;
@@ -41,6 +43,25 @@ namespace Tofunaut.GridStrategy
             Dictionary<string, object[]> sheetData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object[]>>(serializedData);
 
             bool parsedWithErrors = false;
+
+            // get global data
+            if (sheetData.TryGetValue("Global", out object[] globalDatas))
+            {
+                if(globalDatas.Length <= 0)
+                {
+                    Debug.LogError("global datas array is empty");
+                }
+                else
+                {
+                    if (globalDatas.Length > 1)
+                    {
+                        Debug.LogWarning("global data array is longer than 1, other entries will be ignored");
+                    }
+
+                    parsedWithErrors |= !TryParseGlobals(Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(globalDatas[0].ToString()));
+                }
+            }
+
             parsedWithErrors |= !TryParseRawData(CardsKey, sheetData, BuildCardDatas);
             parsedWithErrors |= !TryParseRawData(DecksKey, sheetData, BuildDeckDatas);
             parsedWithErrors |= !TryParseRawData(UnitsKey, sheetData, BuildUnitDatas);
@@ -60,7 +81,6 @@ namespace Tofunaut.GridStrategy
                     File.WriteAllLines(DefaultConfigPath, new[] { serializedData });
                 }
             }
-
         }
 
         // --------------------------------------------------------------------------------------------
@@ -141,6 +161,32 @@ namespace Tofunaut.GridStrategy
         public List<string> GetCardIdsInDeck(string deckId)
         {
             return new List<string>(GetDeckData(deckId).cardIdToCount.Keys);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool TryParseGlobals(Dictionary<string, object> globalData)
+        {
+            bool hasErrors = false;
+
+            if(globalData.TryGetValue("maxplayerenergy", out object maxPlayerEnergyObj))
+            {
+                if(int.TryParse(maxPlayerEnergyObj.ToString(), out int maxPlayerEnergy))
+                {
+                    MaxPlayerEnergy = maxPlayerEnergy;
+                }
+                else
+                {
+                    Debug.LogError($"Could not parse {maxPlayerEnergyObj.ToString()} as int for MaxPlayerEnergy");
+                    hasErrors = true;
+                }
+            }
+            else
+            {
+                Debug.LogError("the config data is missing a value for MaxPlayerEnergy");
+                hasErrors = true;
+            }
+
+            return hasErrors;
         }
 
         // --------------------------------------------------------------------------------------------

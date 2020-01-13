@@ -211,7 +211,7 @@ namespace Tofunaut.GridStrategy.Game
             // do this check so that OccupyBoardTile can be called arbitrarily without re-occupying the same boardtile
             if(BoardTile != newTile)
             {
-                // leave the current tile, if it exists
+                // leave the current tile, if it exists 
                 BoardTile?.RemoveOccupant(this);
 
                 // set the new tile, then add this unit as an occupant

@@ -10,7 +10,7 @@ namespace Tofunaut.GridStrategy.Game.UI
     // --------------------------------------------------------------------------------------------
     public class UILeftPlayerPanel : GridStrategyUIView
     {
-        private Vector2 Size => new Vector2(500, 200);
+        protected Vector2 Size => new Vector2(500, 200);
 
         protected readonly Player _player;
 
@@ -18,6 +18,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         protected SharpUIMask _headBackground;
         protected SharpUIImage _headSprite;
         protected SharpUIProgressBar _heroHealthBar;
+        protected UIEnergyMeter _energyMeter;
 
         // --------------------------------------------------------------------------------------------
         // always render on top so this blocks input
@@ -53,7 +54,112 @@ namespace Tofunaut.GridStrategy.Game.UI
             _headSprite.SetFillSize();
             _headBackground.AddChild(_headSprite);
 
+            _energyMeter = new UIEnergyMeter($"{_player.name}_energy_meter");
+            _energyMeter.SetEnergy(_player.Energy, _player.EnergyCap);
+            _energyMeter.alignment = EAlignment.TopLeft;
+            _energyMeter.margin = new RectOffset((int)Size.y, 0, 60, 0);
+            _background.AddChild(_energyMeter);
+
             return _background;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void SetEnergy(int currentEnergy, int maxEnergy)
+        {
+            _energyMeter.SetEnergy(currentEnergy, maxEnergy);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public class UIEnergyMeter : SharpUIHorizontalLayout
+        {
+            private int _maxEnergy;
+            private int _currentEnergy;
+            private List<UIEnergyIncrement> _energyIncrements;
+
+            // --------------------------------------------------------------------------------------------
+            public UIEnergyMeter(string name) : base(name)
+            {
+                SetFixedSize(0, 0); // no size
+                spacing = 10;
+                _energyIncrements = new List<UIEnergyIncrement>();
+            }
+
+            // --------------------------------------------------------------------------------------------
+            public void SetEnergy(int currentEnergy, int maxEnergy)
+            {
+                _currentEnergy = currentEnergy;
+                _maxEnergy = maxEnergy;
+
+                while (_energyIncrements.Count > _maxEnergy)
+                {
+                    RemoveChild(_energyIncrements[_energyIncrements.Count - 1]);
+                    _energyIncrements.RemoveAt(_energyIncrements.Count - 1);
+                }
+
+                while (_energyIncrements.Count < _maxEnergy)
+                {
+                    UIEnergyIncrement newIncrement = new UIEnergyIncrement();
+                    AddChild(newIncrement, false);
+                    _energyIncrements.Add(newIncrement);
+                }
+
+                for(int i = 0; i < _energyIncrements.Count; i++)
+                {
+                    _energyIncrements[i].IsAvailable = i < _currentEnergy;
+                }
+            }
+
+            // --------------------------------------------------------------------------------------------
+            protected class UIEnergyIncrement : SharpUIImage
+            {
+                public Vector2 Size => new Vector2(30, 40);
+
+                private Color InactiveColor => new Color32(0x0c, 0x7c, 0x90, 0xff);
+                private Color ActiveColor => new Color32(0x79, 0xe7, 0xfb, 0xff);
+
+                public bool IsAvailable
+                {
+                    get { return _isAvailable; }
+                    set
+                    {
+                        _isAvailable = value;
+                        if(IsBuilt)
+                        {
+                            UpdateVisuals();
+                        }
+                    }
+                }
+
+                private bool _isAvailable;
+
+                // --------------------------------------------------------------------------------------------
+                public UIEnergyIncrement() : base("UIEnergyIncrement", null)
+                {
+                    SetFixedSize(Size);
+                    _isAvailable = false;
+                }
+
+                // --------------------------------------------------------------------------------------------
+                protected override void PostRender()
+                {
+                    base.PostRender();
+
+                    UpdateVisuals();
+                }
+
+                // --------------------------------------------------------------------------------------------
+                private void UpdateVisuals()
+                {
+                    if(_isAvailable)
+                    {
+                        Color = ActiveColor;
+                    }
+                    else
+                    {
+                        Color = InactiveColor;
+                    }
+                }
+            }
         }
     }
 
@@ -74,6 +180,9 @@ namespace Tofunaut.GridStrategy.Game.UI
             _headBackground.alignment = EAlignment.MiddleRight;
 
             _headSprite.LocalScale = new Vector3(-1f, 1f, 1f);
+
+            _energyMeter.alignment = EAlignment.TopRight;
+            _energyMeter.margin = new RectOffset(0, (int)Size.y, 60, 0);
 
             return toReturn;
         }

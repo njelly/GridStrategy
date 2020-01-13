@@ -25,6 +25,16 @@ namespace Tofunaut.GridStrategy.Game
         public Unit Hero { get { return _hero; } }
         public PlayerData PlayerData { get { return _playerData; } }
 
+        /// <summary>
+        /// The current energy a player has left this turn.
+        /// </summary>
+        public int Energy => _energy;
+
+        /// <summary>
+        /// The maximum energy the player can have this turn.
+        /// </summary>
+        public int EnergyCap => _energyCap;
+
         public readonly int playerIndex;
         public readonly string name;
 
@@ -42,6 +52,9 @@ namespace Tofunaut.GridStrategy.Game
 
         // The player's hero is the unit the player starts with. When it is defeated, the player loses.
         private Unit _hero;
+
+        private int _energy;
+        private int _energyCap;
 
         private readonly Game _game;
         private readonly PlayerData _playerData;
@@ -82,6 +95,11 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void StartTurn()
         {
+            _energyCap++;
+            _energyCap = Mathf.Min(_energyCap, AppManager.Config.MaxPlayerEnergy);
+
+            _energy = _energyCap;
+
             PlayerTurnStarted?.Invoke(this, new PlayerEventArgs(this));
         }
 
