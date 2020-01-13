@@ -37,7 +37,7 @@ namespace Tofunaut.GridStrategy.UI
             _bannerBackground.Color = new Color(1f, 1f, 1f, 0.3f);
             _bannerBackground.alignment = EAlignment.MiddleCenter;
 
-            _bannerLabel = new SharpUITextMeshPro($"{_bannerBackground.name}_Label", _playerName);
+            _bannerLabel = new SharpUITextMeshPro($"{_bannerBackground.Name}_Label", _playerName);
             _bannerLabel.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityLightItalic);
             _bannerLabel.SetFillSize();
             _bannerLabel.TextAlignment = TMPro.TextAlignmentOptions.Center;

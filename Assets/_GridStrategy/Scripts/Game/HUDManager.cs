@@ -113,7 +113,6 @@ namespace Tofunaut.GridStrategy.Game.UI
             {
                 _playerToPlayerPanels[player].SetEnergy(player.Energy, player.EnergyCap);
             }
-
         }
 
         #region UIContextMenuView.IListener

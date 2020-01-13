@@ -17,7 +17,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             SetFixedSize(Size);
             alignment = EAlignment.BottomRight;
 
-            SharpUITextMeshPro label = new SharpUITextMeshPro($"{name}_label", "End Turn");
+            SharpUITextMeshPro label = new SharpUITextMeshPro($"{Name}_label", "End Turn");
             label.SetFillSize();
             label.AutoSizeFont();
             label.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityBold);

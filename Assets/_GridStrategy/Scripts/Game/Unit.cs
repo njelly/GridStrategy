@@ -22,11 +22,12 @@ namespace Tofunaut.GridStrategy.Game
     {
         public enum EFacing
         {
+            // DO NOT RE-ORDER
             // counter-clockwise
-            East = 1,
-            North = 2,
-            West = 3,
-            South = 4,
+            South = 1,
+            West = 2,
+            North = 3,
+            East = 4,
         }
 
         private static int _idCounter;
@@ -135,7 +136,7 @@ namespace Tofunaut.GridStrategy.Game
 
                     _moveAnim.Execute(() =>
                     {
-                        SetFacing(VectorToFacing(fromPos - toPos), false);
+                        SetFacing(VectorToFacing(toPos - fromPos), false);
                     })
                     .Value01(time, EEaseType.Linear, (float newValue) =>
                     {
@@ -231,25 +232,25 @@ namespace Tofunaut.GridStrategy.Game
         public void SetFacing(EFacing facing, bool animate)
         {
             _facing = facing;
+            _facingAnim?.Stop();
 
             float targetRot = 0f;
             switch(facing)
             {
                 case EFacing.North:
-                    targetRot = 90;
-                    break;
-                case EFacing.South:
                     targetRot = 270;
                     break;
+                case EFacing.South:
+                    targetRot = 90;
+                    break;
                 case EFacing.East:
-                    targetRot = 0;
+                    targetRot = 180;
                     break;
                 case EFacing.West:
-                    targetRot = 180;
+                    targetRot = 0;
                     break;
             }
 
-            _facingAnim?.Stop();
             Quaternion endRot = Quaternion.Euler(0f, targetRot, 0f);
 
             if(animate)

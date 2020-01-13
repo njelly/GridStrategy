@@ -30,10 +30,8 @@ namespace Tofunaut.GridStrategy.Game
         {
             get
             {
-                return new Vector3(
-                    BoardTileView.Size * width / 2f,
-                    LocalPosition.y,
-                    BoardTileView.Size * height / 2f);
+                return new Vector3(BoardTileView.Size * width / 2f, LocalPosition.y, BoardTileView.Size * height / 2f) 
+                    - new Vector3(BoardTileView.Size / 2f, 0, BoardTileView.Size / 2f);
             }
         }
 

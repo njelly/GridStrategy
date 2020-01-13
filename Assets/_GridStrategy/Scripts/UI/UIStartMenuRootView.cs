@@ -236,7 +236,7 @@ namespace Tofunaut.GridStrategy.UI
 
                 _onClicked = onClicked;
 
-                _background = new SharpUIImage($"{name}_Background", null);
+                _background = new SharpUIImage($"{Name}_Background", null);
                 _background.SetFillSize(EAxis.X);
                 _background.SetFixedSize(EAxis.Y, 0);
                 _background.alignment = EAlignment.MiddleCenter;
