@@ -53,7 +53,7 @@ namespace Tofunaut.GridStrategy.Game
             _currentPlayerIndex = 0;
             _localPlayerIndex = localPlayerIndex;
 
-            board = new Board(8, 8);
+            board = new Board(this, 8, 8);
             board.Render(AppManager.Transform);
 
             sun = SharpLight.Sun();
@@ -165,6 +165,8 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
+            board.ClearAllBoardTileHighlights();
+
             CurrentPlayer.EndTurn();
 
             _currentPlayerIndex += 1;
@@ -192,7 +194,21 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void OnBoardTileSelected(object sender, UnitPathSelectionManager.BoardTileEventArgs e)
         {
-            Debug.Log("selected tile: " + e.boardTileView.BoardTile.Coord.ToString());
+            if(e.boardTileView != null)
+            {
+                if(e.boardTileView.BoardTile == board.HighlightedTile)
+                {
+                    board.ClearAllBoardTileHighlights();
+                }
+                else
+                {
+                    board.HighlightBoardTile(e.boardTileView.BoardTile.Coord);
+                }
+            }
+            else
+            {
+                board.ClearAllBoardTileHighlights();
+            }
         }
 
         // --------------------------------------------------------------------------------------------

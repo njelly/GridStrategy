@@ -41,6 +41,10 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-UltraLight SDF.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 70050168175e344acaa44bc15c262185
+    m_Address: facing_arrow
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 73607c6172a092c43b005aedb80bad4f
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-UltraLightItalic SDF.asset
     m_ReadOnly: 0

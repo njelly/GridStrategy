@@ -35,6 +35,7 @@ namespace Tofunaut.GridStrategy
             public const string DefaultEnemyHead = "default_enemy_head";
             public const string DefaultHeroHead = "default_hero_head";
             public const string CircleWhite2048 = "circle_white_2048";
+            public const string FacingArrow = "facing_arrow";
         }
 
 

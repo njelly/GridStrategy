@@ -35,14 +35,19 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        public BoardTile HighlightedTile { get; private set; }
+
         public readonly int width;
         public readonly int height;
 
         private readonly BoardTile[,] _tiles;
+        private readonly Game _game;
+        private readonly Plane _groundPlane;
 
         // --------------------------------------------------------------------------------------------
-        public Board(int width, int height) : base("Board")
+        public Board(Game game, int width, int height) : base("Board")
         {
+            _game = game;
             this.width = width;
             this.height = height;
 
@@ -56,6 +61,8 @@ namespace Tofunaut.GridStrategy.Game
                     _tiles[x, y] = boardTile;
                 }
             }
+
+            _groundPlane = new Plane(Vector3.up, Vector3.zero);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -74,7 +81,19 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public BoardTile GetTile(IntVector2 coord) => this[coord.x, coord.y];
+        public BoardTile GetTile(IntVector2 coord)
+        {
+            if(coord.x < 0 || coord.x >= width)
+            {
+                return null;
+            }
+            if(coord.y < 0 || coord.y >= height)
+            {
+                return null;
+            }
+
+            return this[coord.x, coord.y];
+        }
 
         // --------------------------------------------------------------------------------------------
         protected override void Build() { }
@@ -142,6 +161,18 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
+        public void HighlightBoardTile(IntVector2 coord)
+        {
+            ClearAllBoardTileHighlights();
+
+            if(BoardTileView.TryGetView(this.GetTile(coord), out BoardTileView view))
+            {
+                view.SetHighlight(BoardTileView.EHighlight.Neutral);
+                HighlightedTile = view.BoardTile;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
         public void ClearAllBoardTileHighlights()
         {
             foreach(BoardTile boardTile in _tiles)
@@ -151,6 +182,28 @@ namespace Tofunaut.GridStrategy.Game
                     boardTileView.SetHighlight(BoardTileView.EHighlight.None);
                 }
             }
+
+            HighlightedTile = null;
+        }
+
+        public BoardTile GetBoardTileAtPosition(Vector3 worldPosition)
+        {
+            IntVector2 coord = new IntVector2(Mathf.RoundToInt(worldPosition.x / BoardTileView.Size), Mathf.RoundToInt(worldPosition.y / BoardTileView.Size));
+            return GetTile(coord);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool RaycastToPlane(Vector2 mousePos, out Vector3 worldPos) => RaycastToPlane(_game.gameCamera.ScreenPointToRay(mousePos), out worldPos);
+        public bool RaycastToPlane(Ray ray, out Vector3 worldPos)
+        {
+            if (_groundPlane.Raycast(ray, out float distance))
+            {
+                worldPos = ray.GetPoint(distance);
+                return true;
+            }
+
+            worldPos = Vector3.zero;
+            return false;
         }
 
 

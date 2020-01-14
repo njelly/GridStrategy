@@ -87,6 +87,7 @@ namespace Tofunaut.GridStrategy
         private void Loading_Enter()
         {
             AppManager.AssetManager.Load<Material>(AssetPaths.Materials.WaypointPath);
+            AppManager.AssetManager.Load<Sprite>(AssetPaths.Sprites.FacingArrow);
 
             // load all necessary assets based on the playerdatas
             foreach (PlayerData playerData in _playerDatas)
@@ -116,7 +117,7 @@ namespace Tofunaut.GridStrategy
         {
             if (_game.HasFinished)
             {
-                this.Complete(new ControllerCompletedEventArgs(true));
+                Complete(new ControllerCompletedEventArgs(true));
                 return;
             }
 
@@ -141,6 +142,7 @@ namespace Tofunaut.GridStrategy
             base.Complete(e);
 
             AppManager.AssetManager.Release<Material>(AssetPaths.Materials.WaypointPath);
+            AppManager.AssetManager.Release<Sprite>(AssetPaths.Sprites.FacingArrow);
 
             // release assets now that we don't need them anymore
             foreach (PlayerData playerData in _playerDatas)

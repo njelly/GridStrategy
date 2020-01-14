@@ -25,7 +25,6 @@ namespace Tofunaut.GridStrategy.Game
         private float _distanceFromLookTarget;
         private float _horizonAngle;
         private float _orbitAngle;
-        private Plane _groundPlane;
 
         // --------------------------------------------------------------------------------------------
         protected GameCamera(Game game) : base("GameCamera")
@@ -71,7 +70,6 @@ namespace Tofunaut.GridStrategy.Game
             toReturn._orbitAngle = initOribitAngle;
             toReturn._distanceFromLookTarget = 34f;
             toReturn._horizonAngle = 45f;
-            toReturn._groundPlane = new Plane(Vector3.up, initLookAt);
 
             toReturn.LookingAt = initLookAt;
 
@@ -100,15 +98,16 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            Ray prevRay = UnityCamera.ScreenPointToRay(prevDragPosition);
-            if (_groundPlane.Raycast(prevRay, out float prevDistance))
-            {
-                Ray nextRay = UnityCamera.ScreenPointToRay(prevDragPosition + dragDelta);
-                if (_groundPlane.Raycast(nextRay, out float nextDistance))
-                {
-                    LookAt(LookingAt + (prevRay.GetPoint(prevDistance) - nextRay.GetPoint(nextDistance)));
-                }
-            }
+
+
+            //if (_groundPlane.Raycast(prevRay, out float prevDistance))
+            //{
+            //    Ray nextRay = UnityCamera.ScreenPointToRay(prevDragPosition + dragDelta);
+            //    if (_groundPlane.Raycast(nextRay, out float nextDistance))
+            //    {
+            //        LookAt(LookingAt + (prevRay.GetPoint(prevDistance) - nextRay.GetPoint(nextDistance)));
+            //    }
+            //}
         }
 
         // --------------------------------------------------------------------------------------------

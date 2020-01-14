@@ -16,13 +16,13 @@ using Tofunaut.SharpUnity.UI;
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class HUDManager : SharpGameObject, UIContextMenuView.IListener, UIUnitOptionsView.IListener
+    public class HUDManager : SharpGameObject, UIContextMenuView.IListener, UIUseSkillView.IListener
     {
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
         private UIConfirmationDialogView _confirmationDialog;
         private UIContextMenuView _contextMenuView;
-        private UIUnitOptionsView _unitOptionsView;
+        private UIUseSkillView _unitOptionsView;
         private Dictionary<Player, UILeftPlayerPanel> _playerToPlayerPanels;
 
         // --------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _beginTurnBanner = new UIBeginTurnBanner();
             _confirmationDialog = new UIConfirmationDialogView();
             _contextMenuView = new UIContextMenuView(this);
-            _unitOptionsView = new UIUnitOptionsView(this, _game.gameCamera);
+            _unitOptionsView = new UIUseSkillView(this, _game);
             _playerToPlayerPanels = new Dictionary<Player, UILeftPlayerPanel>();
             _playerToPlayerPanels.Add(_game.LocalPlayer, new UILeftPlayerPanel(_game.LocalPlayer));
 
@@ -91,7 +91,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         public void ShowUnitOptions(Unit unit)
         {
-            if(_unitOptionsView.IsShowing)
+            if (_unitOptionsView.IsShowing)
             {
                 _unitOptionsView.Hide();
             }
@@ -121,7 +121,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _beginTurnBanner.SetPlayerName(_game.CurrentPlayer.name);
             _beginTurnBanner.Show();
 
-            if(_unitOptionsView.IsShowing)
+            if (_unitOptionsView.IsShowing)
             {
                 _unitOptionsView.Hide();
             }
@@ -144,10 +144,10 @@ namespace Tofunaut.GridStrategy.Game.UI
 
         #region UIUnitOptionsView.IListener
 
-        public void OnUseSkillClicked(Unit unit)
+        public void OnUseSkillConfirmed(Unit unit, Unit.EFacing facing)
         {
             _unitOptionsView.Hide();
-            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id, unit.Facing), () => { });
+            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id, facing), () => { });
         }
 
         #endregion UIUnitOptionsVIew.IListener

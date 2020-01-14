@@ -243,24 +243,7 @@ namespace Tofunaut.GridStrategy.Game
             _facing = facing;
             _facingAnim?.Stop();
 
-            float targetRot = 0f;
-            switch(facing)
-            {
-                case EFacing.North:
-                    targetRot = 270;
-                    break;
-                case EFacing.South:
-                    targetRot = 90;
-                    break;
-                case EFacing.East:
-                    targetRot = 180;
-                    break;
-                case EFacing.West:
-                    targetRot = 0;
-                    break;
-            }
-
-            Quaternion endRot = Quaternion.Euler(0f, targetRot, 0f);
+            Quaternion rot = FacingToRotation(facing);
 
             if(animate)
             {
@@ -268,13 +251,13 @@ namespace Tofunaut.GridStrategy.Game
                 _facingAnim = new TofuAnimation()
                     .Value01(0.5f, EEaseType.EaseOutExpo, (float newValue) =>
                     {
-                        LocalRotation = Quaternion.SlerpUnclamped(startRot, endRot, newValue);
+                        LocalRotation = Quaternion.SlerpUnclamped(startRot, rot, newValue);
                     })
                     .Play();
             }
             else
             {
-                LocalRotation = endRot;
+                LocalRotation = rot;
             }
         }
 
@@ -334,6 +317,29 @@ namespace Tofunaut.GridStrategy.Game
             int halfQuarter = Convert.ToInt32(angle);
             halfQuarter %= 4;
             return (EFacing)(halfQuarter + 1);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static Quaternion FacingToRotation(EFacing facing)
+        {
+            float rot = 0f;
+            switch (facing)
+            {
+                case EFacing.North:
+                    rot = 270;
+                    break;
+                case EFacing.South:
+                    rot = 90;
+                    break;
+                case EFacing.East:
+                    rot = 180;
+                    break;
+                case EFacing.West:
+                    rot = 0;
+                    break;
+            }
+
+            return Quaternion.Euler(0f, rot, 0f);
         }
 
         // --------------------------------------------------------------------------------------------

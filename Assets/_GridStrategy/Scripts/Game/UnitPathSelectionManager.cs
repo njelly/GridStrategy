@@ -288,6 +288,7 @@ namespace Tofunaut.GridStrategy.Game
                 }
                 else
                 {
+                    OnBoardTileSelected?.Invoke(this, null);
                     Debug.LogWarning($"the coord {_currentPath[0].ToString()} isn't associated with a BoardTileView");
                 }
 
