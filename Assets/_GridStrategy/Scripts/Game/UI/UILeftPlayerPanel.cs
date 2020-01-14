@@ -1,16 +1,24 @@
-using System;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UILeftPlayerPanel (c) 2020 Tofunaut
+//
+//  Created by Nathaniel Ellingson for GridStrategy on 01/03/2020
+//
+////////////////////////////////////////////////////////////////////////////////
+
 using System.Collections.Generic;
+using Tofunaut.Animation;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
     public class UILeftPlayerPanel : UIGridStrategyView
     {
-        protected Vector2 Size => new Vector2(500, 200);
+        protected static Vector2 Size => new Vector2(500, 200);
+        protected const float HealthBarAnimTime = 1f;
 
         protected readonly Player _player;
 
@@ -19,6 +27,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         protected SharpUIImage _headSprite;
         protected SharpUIProgressBar _heroHealthBar;
         protected UIEnergyMeter _energyMeter;
+        protected TofuAnimation _healthBarAnim;
 
         // --------------------------------------------------------------------------------------------
         // always render on top so this blocks input
@@ -67,6 +76,27 @@ namespace Tofunaut.GridStrategy.Game.UI
         public void SetEnergy(int currentEnergy, int maxEnergy)
         {
             _energyMeter.SetEnergy(currentEnergy, maxEnergy);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void SetHealth(int currentHealth, int maxHealth)
+        {
+            _healthBarAnim?.Stop();
+
+            float startPercent = _heroHealthBar.Percent;
+            float endPercent = (float)currentHealth / (float)maxHealth;
+
+            _healthBarAnim = new TofuAnimation()
+                .Value01(HealthBarAnimTime, EEaseType.Linear, (float newValue) =>
+                {
+                    _heroHealthBar.Percent = Mathf.Lerp(startPercent, endPercent, newValue);
+                })
+                .Then()
+                .Execute(() =>
+                {
+                    _healthBarAnim = null;
+                })
+                .Play();
         }
 
         // --------------------------------------------------------------------------------------------

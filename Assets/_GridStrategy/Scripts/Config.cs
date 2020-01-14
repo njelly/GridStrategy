@@ -26,6 +26,7 @@ namespace Tofunaut.GridStrategy
         private const string DecksKey = "Decks";
         private const string UnitsKey = "Units";
         private const string OpponentsKey = "Opponents";
+        private const string SkillsKey = "Skills";
 
         private delegate bool ParseRawDataDelegate(object[] rawData);
 
@@ -66,6 +67,7 @@ namespace Tofunaut.GridStrategy
             parsedWithErrors |= !TryParseRawData(DecksKey, sheetData, BuildDeckDatas);
             parsedWithErrors |= !TryParseRawData(UnitsKey, sheetData, BuildUnitDatas);
             parsedWithErrors |= !TryParseRawData(OpponentsKey, sheetData, BuildOpponentDatas);
+            parsedWithErrors |= !TryParseRawData(SkillsKey, sheetData, BuildSkillDatas);
 
             if (parsedWithErrors)
             {
@@ -401,7 +403,7 @@ namespace Tofunaut.GridStrategy
                 // health
                 if (rawUnitData.TryGetValue("health", out object healthObj))
                 {
-                    if (Int32.TryParse(healthObj.ToString(), out int health))
+                    if (int.TryParse(healthObj.ToString(), out int health))
                     {
                         unitData.health = health;
                     }
@@ -452,6 +454,17 @@ namespace Tofunaut.GridStrategy
                 else
                 {
                     Debug.LogError($"unit data index {i} is missing a value for travelspeed");
+                    hasError = true;
+                }
+
+                // skillid
+                if (rawUnitData.TryGetValue("skillid", out object skillIdObj))
+                {
+                    unitData.skillId = skillIdObj.ToString();
+                }
+                else
+                {
+                    Debug.LogError($"unit data index {i} is missing a value for skillid");
                     hasError = true;
                 }
 
@@ -603,7 +616,11 @@ namespace Tofunaut.GridStrategy
                 // area type
                 if (rawSkillData.TryGetValue("areatype", out object areaTypeObj))
                 {
-                    if (Enum.TryParse(areaTypeObj.ToString(), out SkillData.EAreaType areaType))
+                    // make sure first character is uppper case
+                    char[] chars = areaTypeObj.ToString().ToCharArray();
+                    chars[0] = chars[0].ToString().ToUpper().ToCharArray()[0];
+                    string areaTypeObjString = new string(chars);
+                    if (Enum.TryParse(areaTypeObjString, out SkillData.EAreaType areaType))
                     {
                         skillData.areaType = areaType;
                     }
@@ -698,7 +715,7 @@ namespace Tofunaut.GridStrategy
         public string id;
         public EAspect aspect;
         public string prefabPath;
-        public float health;
+        public int health;
         public int moveRange;
         public float travelSpeed;
         public string skillId;

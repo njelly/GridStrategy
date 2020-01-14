@@ -22,6 +22,7 @@ namespace Tofunaut.GridStrategy.Game
     public class Game
     {
         public event EventHandler GameBegan;
+        public event EventHandler GameFinished;
         public event EventHandler<PlayerActionEventArgs> PlayerActionCompleted;
 
         public bool HasBegun { get; private set; }
@@ -63,7 +64,9 @@ namespace Tofunaut.GridStrategy.Game
             _players = new List<Player>();
             for (int i = 0; i < playerDatas.Count; i++)
             {
-                _players.Add(new Player(playerDatas[i], this, i));
+                Player player = new Player(playerDatas[i], this, i);
+                player.PlayerLost += OnPlayerLost;
+                _players.Add(player);
             }
 
             // This needs to happen before gameCamera, since it needs to register itself as a listener to UIWorldIteractionPanel
@@ -169,8 +172,19 @@ namespace Tofunaut.GridStrategy.Game
 
             CurrentPlayer.EndTurn();
 
-            _currentPlayerIndex += 1;
-            _currentPlayerIndex %= _players.Count;
+            // go through the players, skipping players that have lost
+            int cycleCounter = 0;
+            do
+            {
+                _currentPlayerIndex += 1;
+                _currentPlayerIndex %= _players.Count;
+                cycleCounter++;
+            } while (CurrentPlayer.HasLost && cycleCounter <= _players.Count);
+            if(cycleCounter >= _players.Count)
+            {
+                Debug.LogError("all players have lost, this shouldn't happen");
+                return;
+            }
 
             CurrentPlayer.StartTurn();
         }
@@ -215,6 +229,31 @@ namespace Tofunaut.GridStrategy.Game
         private void OnUnitSelected(object sender, UnitPathSelectionManager.UnitEventArgs e)
         {
             _hudManager.ShowUnitOptions(e.unitView.Unit);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnPlayerLost(object sender, Player.PlayerEventArgs e)
+        {
+            int numPlayersLeft = 0;
+            foreach(Player player in _players)
+            {
+                if(!player.HasLost)
+                {
+                    numPlayersLeft++;
+                }
+            }
+
+            if(numPlayersLeft <= 1)
+            {
+                EndGame();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void EndGame()
+        {
+            HasFinished = true;
+            GameFinished?.Invoke(this, EventArgs.Empty);
         }
 
         // --------------------------------------------------------------------------------------------

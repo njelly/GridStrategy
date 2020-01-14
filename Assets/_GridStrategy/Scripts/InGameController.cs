@@ -22,6 +22,7 @@ namespace Tofunaut.GridStrategy
         {
             public const string Loading = "loading";
             public const string InGame = "InGame";
+            public const string PostGame = "PostGame";
         }
 
         public static Game.Game Game => _instance._game;
@@ -46,6 +47,7 @@ namespace Tofunaut.GridStrategy
             _stateMachine = new TofuStateMachine();
             _stateMachine.Register(State.Loading, Loading_Enter, Loading_Update, null);
             _stateMachine.Register(State.InGame, InGame_Enter, InGame_Update, null);
+            _stateMachine.Register(State.PostGame, PostGame_Enter, null, null);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -117,7 +119,7 @@ namespace Tofunaut.GridStrategy
         {
             if (_game.HasFinished)
             {
-                Complete(new ControllerCompletedEventArgs(true));
+                _stateMachine.ChangeState(State.PostGame);
                 return;
             }
 
@@ -135,8 +137,15 @@ namespace Tofunaut.GridStrategy
             }
         }
 
+        // --------------------------------------------------------------------------------------------
+        private void PostGame_Enter()
+        {
+            Complete(new ControllerCompletedEventArgs(true));
+        }
+
         #endregion State Machine
 
+        // --------------------------------------------------------------------------------------------
         protected override void Complete(ControllerCompletedEventArgs e)
         {
             base.Complete(e);

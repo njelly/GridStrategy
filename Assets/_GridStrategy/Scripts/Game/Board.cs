@@ -81,6 +81,7 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
+        public BoardTile GetTile(int x, int y) => GetTile(new IntVector2(x, y));
         public BoardTile GetTile(IntVector2 coord)
         {
             if(coord.x < 0 || coord.x >= width)
@@ -186,9 +187,10 @@ namespace Tofunaut.GridStrategy.Game
             HighlightedTile = null;
         }
 
+        // --------------------------------------------------------------------------------------------
         public BoardTile GetBoardTileAtPosition(Vector3 worldPosition)
         {
-            IntVector2 coord = new IntVector2(Mathf.RoundToInt(worldPosition.x / BoardTileView.Size), Mathf.RoundToInt(worldPosition.y / BoardTileView.Size));
+            IntVector2 coord = new IntVector2(Mathf.RoundToInt(worldPosition.x / BoardTileView.Size), Mathf.RoundToInt(worldPosition.z / BoardTileView.Size));
             return GetTile(coord);
         }
 

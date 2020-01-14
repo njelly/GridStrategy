@@ -17,6 +17,7 @@ namespace Tofunaut.GridStrategy.Game
     {
         public static event EventHandler<PlayerEventArgs> PlayerTurnStarted;
         public static event EventHandler<PlayerEventArgs> PlayerTurnEnded;
+        public event EventHandler<PlayerEventArgs> PlayerLost;
 
         public IReadOnlyCollection<Card> Deck { get { return _deck.AsReadOnly(); } }
         public IReadOnlyCollection<Card> Hand { get { return _hand.AsReadOnly(); } }
@@ -24,6 +25,7 @@ namespace Tofunaut.GridStrategy.Game
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
         public Unit Hero { get { return _hero; } }
         public PlayerData PlayerData { get { return _playerData; } }
+        public bool HasLost => Hero.IsDead;
 
         /// <summary>
         /// The current energy a player has left this turn.
@@ -156,9 +158,39 @@ namespace Tofunaut.GridStrategy.Game
             // TODO: is this the default behavior? should the player be able to choose the initial facing direction?
             unit.SetFacing(Unit.VectorToFacing(_game.board.CenterPos - unit.Transform.position), false);
 
+            unit.OnTookDamage += OnUnitTookDamage;
+
             _units.Add(unit);
 
             return unit;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnUnitTookDamage(object sender, Unit.DamageEventArgs e)
+        {
+            if (!e.wasKilled)
+            {
+                return;
+            }
+
+            Unit senderUnit = sender as Unit;
+            senderUnit.OnTookDamage -= OnUnitTookDamage;
+
+            if (e.sourceUnit.Owner == this)
+            {
+                _units.Remove(e.sourceUnit);
+            }
+
+            if(e.targetUnit == Hero)
+            {
+                LoseGame();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void LoseGame()
+        {
+            PlayerLost?.Invoke(this, new PlayerEventArgs(this));
         }
 
         // --------------------------------------------------------------------------------------------

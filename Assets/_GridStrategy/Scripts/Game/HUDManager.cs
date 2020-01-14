@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using TofuCore;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
@@ -52,6 +53,12 @@ namespace Tofunaut.GridStrategy.Game.UI
         {
             base.PostRender();
             Player.PlayerTurnStarted += OnPlayerTurnStarted;
+
+            foreach(Player player in _playerToPlayerPanels.Keys)
+            {
+                player.Hero.OnTookDamage += OnUnitTookDamage;
+            }
+
             _game.GameBegan += OnGameBegan;
         }
 
@@ -68,6 +75,12 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
 
             Player.PlayerTurnStarted -= OnPlayerTurnStarted;
+
+            foreach (Player player in _playerToPlayerPanels.Keys)
+            {
+                player.Hero.OnTookDamage -= OnUnitTookDamage;
+            }
+
             _game.GameBegan -= OnGameBegan;
         }
 
@@ -132,6 +145,20 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
         }
 
+        // --------------------------------------------------------------------------------------------
+        private void OnUnitTookDamage(object sender, Unit.DamageEventArgs e)
+        {
+            foreach(Player player in _playerToPlayerPanels.Keys)
+            {
+                if(player.Hero != e.targetUnit)
+                {
+                    continue;
+                }
+
+                _playerToPlayerPanels[player].SetHealth(e.newHealth, e.targetUnit.MaxHealth);
+            }
+        }
+
         #region UIContextMenuView.IListener
 
         // --------------------------------------------------------------------------------------------
@@ -144,10 +171,10 @@ namespace Tofunaut.GridStrategy.Game.UI
 
         #region UIUnitOptionsView.IListener
 
-        public void OnUseSkillConfirmed(Unit unit, Unit.EFacing facing)
+        public void OnUseSkillConfirmed(Unit unit, Unit.EFacing facing, IntVector2 targetCoord)
         {
             _unitOptionsView.Hide();
-            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id, facing), () => { });
+            _game.QueueAction(new UseSkillAction(_game.CurrentPlayer.playerIndex, unit.id, facing, targetCoord), () => { });
         }
 
         #endregion UIUnitOptionsVIew.IListener

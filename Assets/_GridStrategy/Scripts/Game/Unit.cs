@@ -20,6 +20,8 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Unit : SharpGameObject
     {
+        public event EventHandler<DamageEventArgs> OnTookDamage;
+
         public enum EFacing
         {
             // DO NOT RE-ORDER
@@ -34,13 +36,16 @@ namespace Tofunaut.GridStrategy.Game
         private static readonly List<Unit> _idToUnit = new List<Unit>();
 
         public BoardTile BoardTile { get; private set; }
-        public float Health { get; protected set; }
-        public float MoveRange { get; protected set; }
+        public Skill Skill { get; private set; }
+        public int Health { get; protected set; }
+        public int MaxHealth => _data.health;
+        public int MoveRange { get; protected set; }
         public EFacing Facing { get { return _facing; } }
         public bool IsMoving => _moveAnim != null;
         public bool HasMoved { get; private set; }
         public bool HasUsedSkill { get; private set; }
         public Player Owner => _owner;
+        public bool IsDead => Health <= 0;
 
         public readonly int id;
 
@@ -69,6 +74,8 @@ namespace Tofunaut.GridStrategy.Game
 
             Player.PlayerTurnStarted += Player_PlayerTurnStarted;
             Player.PlayerTurnEnded += Player_PlayerTurnEnded;
+
+            Skill = new Skill(AppManager.Config.GetSkillData(_data.skillId), _game, this);
         }
 
         #region SharpGameObject
@@ -181,7 +188,7 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void UseSkill(EFacing faceTowards, Action onComplete)
+        public void UseSkill(EFacing faceTowards, IntVector2 targetCoord, Action onComplete)
         {
             if (HasUsedSkill)
             {
@@ -194,11 +201,97 @@ namespace Tofunaut.GridStrategy.Game
                 SetFacing(faceTowards, false);
             }
 
-            Debug.Log($"unit {id} used skill");
+            int numTimesSkillUsedOnTarget = 0;
+            int numTimesSkillUsedOnTargetCompleted = 0;
+            void SkillUsedOnTargetCallback()
+            {
+                numTimesSkillUsedOnTargetCompleted++;
+                if (numTimesSkillUsedOnTargetCompleted >= numTimesSkillUsedOnTarget)
+                {
+                    onComplete?.Invoke();
+                }
+            }
 
-            HasUsedSkill = true;
+            if (Skill.Target == SkillData.ETarget.None)
+            {
+                numTimesSkillUsedOnTarget++;
+                UseSkillNoTarget(SkillUsedOnTargetCallback);
+            }
+            else
+            {
+                List<BoardTile> targetTiles = Skill.GetTargetTiles(faceTowards, targetCoord);
+                foreach (BoardTile boardTile in targetTiles)
+                {
+                    if (Skill.Target == SkillData.ETarget.Tile)
+                    {
+                        numTimesSkillUsedOnTarget++;
+                        UseSkillOnBoardTile(boardTile, SkillUsedOnTargetCallback);
+                    }
+                    else
+                    {
+                        foreach (Unit occupant in boardTile.Occupants)
+                        {
+                            switch (Skill.Target)
+                            {
+                                case SkillData.ETarget.Ally:
+                                    if (IsAllyOf(occupant))
+                                    {
+                                        numTimesSkillUsedOnTarget++;
+                                        UseSkillOnUnit(occupant, SkillUsedOnTargetCallback);
+                                    }
+                                    break;
+                                case SkillData.ETarget.Enemy:
+                                    if (!IsAllyOf(occupant))
+                                    {
+                                        numTimesSkillUsedOnTarget++;
+                                        UseSkillOnUnit(occupant, SkillUsedOnTargetCallback);
+                                    }
+                                    break;
+                                case SkillData.ETarget.Self:
+                                    if (occupant == this)
+                                    {
+                                        numTimesSkillUsedOnTarget++;
+                                        UseSkillOnUnit(occupant, SkillUsedOnTargetCallback);
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-            onComplete?.Invoke();
+        // --------------------------------------------------------------------------------------------
+        private void UseSkillOnUnit(Unit targetUnit, Action onComplete)
+        {
+            if(Skill.DamageDealt > 0)
+            {
+                targetUnit.TakeDamage(this, Skill.DamageDealt);
+                onComplete?.Invoke();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void UseSkillOnBoardTile(BoardTile boardTile, Action onComplete)
+        {
+            throw new NotImplementedException();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void UseSkillNoTarget(Action onComplete)
+        {
+            throw new NotImplementedException();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void TakeDamage(Unit sourceUnit, int amount)
+        {
+            int previousHealth = Health;
+            Health = Mathf.Clamp(Health - amount, 0, Health);
+
+            Debug.Log($"unit {id} took {amount} damage. Health is now {Health}");
+
+            OnTookDamage?.Invoke(this, new DamageEventArgs(sourceUnit, this, previousHealth, Health, Health <= 0));
         }
 
         // --------------------------------------------------------------------------------------------
@@ -358,6 +451,25 @@ namespace Tofunaut.GridStrategy.Game
                 default:
                     Debug.LogError($"Facing not implemented: {facing}, can't rotate");
                     return v;
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public class DamageEventArgs : EventArgs
+        {
+            public readonly Unit sourceUnit;
+            public readonly Unit targetUnit;
+            public readonly int previousHealth;
+            public readonly int newHealth;
+            public readonly bool wasKilled;
+
+            public DamageEventArgs(Unit sourceUnit, Unit targetUnit, int previousHealth, int newHealth, bool wasKilled)
+            {
+                this.sourceUnit = sourceUnit;
+                this.targetUnit = targetUnit;
+                this.previousHealth = previousHealth;
+                this.newHealth = newHealth;
+                this.wasKilled = wasKilled;
             }
         }
     }

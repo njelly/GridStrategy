@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using TofuCore;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
@@ -22,7 +23,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         public interface IListener
         {
-            void OnUseSkillConfirmed(Unit unit, Unit.EFacing facing);
+            void OnUseSkillConfirmed(Unit unit, Unit.EFacing facing, IntVector2 targetCoord);
         }
 
         public static class State
@@ -38,8 +39,9 @@ namespace Tofunaut.GridStrategy.Game.UI
         private SharpUIImage _useSkillButton;
         private SharpSprite _facingArrow;
         private bool _selectingDirection;
-        private Vector3 _startDragWorldPos;
         private Unit.EFacing _currentFacing;
+        private Vector3 _startDragWorldPos;
+        private BoardTile _selectedBoardTile;
 
         // --------------------------------------------------------------------------------------------
         public UIUseSkillView(IListener listener, Game game)
@@ -48,6 +50,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _game = game;
 
             _facingArrow = new SharpSprite("FacingArrow", AppManager.AssetManager.Get<Sprite>(AssetPaths.Sprites.FacingArrow));
+            _facingArrow.LocalScale = Vector3.one * 5f;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -69,30 +72,33 @@ namespace Tofunaut.GridStrategy.Game.UI
 
                 PointerEventData pointerEventData = e.eventData as PointerEventData;
 
-                Ray ray = _game.gameCamera.ScreenPointToRay(pointerEventData.position);
-                RaycastHit[] hits = Physics.RaycastAll(ray);
-                foreach (RaycastHit hit in hits)
+                if(_game.board.RaycastToPlane(pointerEventData.position, out Vector3 dragWorldPos))
                 {
-                    BoardTileView view = hit.collider.GetComponentInParent<BoardTileView>();
-                    if (view != null)
+                    BoardTile draggingTile = _game.board.GetBoardTileAtPosition(dragWorldPos);
+                    if(draggingTile != null && (draggingTile.Coord - _following.BoardTile.Coord).ManhattanDistance == 1)
                     {
-                        view.BoardTile.AddChild(_facingArrow);
-                        _currentFacing = Unit.VectorToFacing(view.BoardTile.GameObject.transform.position - _startDragWorldPos);
-                        _facingArrow.LocalPosition = Vector3.zero;
+                        _currentFacing = Unit.VectorToFacing(draggingTile.Transform.position - _following.BoardTile.Transform.position);
+                        _selectedBoardTile = draggingTile;
+                        _selectedBoardTile.AddChild(_facingArrow);
                         _facingArrow.LocalRotation = Unit.FacingToRotation(_currentFacing);
+                    }
+                    else
+                    {
+                        // TODO: how to handle skills where the unit targets itself? Or a range?
+                        _selectedBoardTile = null;
+                        _currentFacing = _following.Facing;
                     }
                 }
             });
-
-            toReturn.SubscribeToEvent(EEventType.PointerUp, (object sender, EventSystemEventArgs e) =>
+            toReturn.SubscribeToEvent(EEventType.Drop, (object sender, EventSystemEventArgs e) =>
             {
-                if(_selectingDirection)
-                {
-                    _listener.OnUseSkillConfirmed(_following, _currentFacing);
-                }
-
                 if(_facingArrow.IsBuilt)
                 {
+                    if (_selectingDirection && _selectedBoardTile != null)
+                    {
+                        _listener.OnUseSkillConfirmed(_following, _currentFacing, _selectedBoardTile.Coord);
+                    }
+
                     _facingArrow.Destroy();
                 }
             });
@@ -106,17 +112,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 _useSkillButton.Destroy();
 
                 PointerEventData pointerEventData = e.eventData as PointerEventData;
-
-                Ray ray = _game.gameCamera.ScreenPointToRay(pointerEventData.position);
-                if(_game.board.RaycastToPlane(ray, out Vector3 worldPos))
-                {
-                    BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPos);
-                    if(boardTile != null)
-                    {
-                        boardTile.AddChild(_facingArrow);
-                        _facingArrow.LocalRotation = (Unit.FacingToRotation(Unit.VectorToFacing(boardTile.Transform.position - _startDragWorldPos)));
-                    }
-                }
+                _game.board.RaycastToPlane(pointerEventData.position, out _startDragWorldPos);
             });
 
             return toReturn;
@@ -128,6 +124,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             base.Show();
 
             _selectingDirection = false;
+            _selectedBoardTile = null;
 
             UpdatePosition();
 
@@ -138,6 +135,11 @@ namespace Tofunaut.GridStrategy.Game.UI
         public override void Hide()
         {
             base.Hide();
+
+            if(_facingArrow?.IsBuilt ?? false)
+            {
+                _facingArrow.Destroy();
+            }
 
             Updater.Instance.Remove(this);
         }

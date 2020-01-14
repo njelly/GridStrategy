@@ -99,7 +99,7 @@
             "health": 60,
             "moverange": 4,
             "travelspeed": 10,
-            "skill": "default_hero_attack"
+            "skillid": "default_hero_attack"
         },
         {
             "id": "enforcer",
@@ -107,7 +107,8 @@
             "aspect": "None",
             "health": 30,
             "moverange": 2,
-            "travelspeed": 10
+            "travelspeed": 10,
+            "skillid": "default_hero_attack"
         },
         {
             "id": "fire_sprite",
@@ -115,7 +116,8 @@
             "aspect": "Fire",
             "health": 20,
             "moverange": 3,
-            "travelspeed": 10
+            "travelspeed": 10,
+            "skillid": "default_hero_attack"
         },
         {
             "id": "water_sprite",
@@ -123,7 +125,8 @@
             "aspect": "Water",
             "health": 20,
             "moverange": 3,
-            "travelspeed": 10
+            "travelspeed": 10,
+            "skillid": "default_hero_attack"
         },
         {
             "id": "air_sprite",
@@ -131,7 +134,8 @@
             "aspect": "Air",
             "health": 20,
             "moverange": 3,
-            "travelspeed": 10
+            "travelspeed": 10,
+            "skillid": "default_hero_attack"
         },
         {
             "id": "earth_sprite",
@@ -139,7 +143,8 @@
             "aspect": "Earth",
             "health": 20,
             "moverange": 3,
-            "travelspeed": 10
+            "travelspeed": 10,
+            "skillid": "default_hero_attack"
         }
     ],
     "Skills": [
@@ -150,7 +155,7 @@
             "areasize": 1,
             "areatype": "single",
             "areaoffset": "1,0",
-            "damagedealt": 60
+            "damagedealt": 20
         }
     ],
     "Opponents": [

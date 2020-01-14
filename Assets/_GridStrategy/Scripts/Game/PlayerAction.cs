@@ -114,12 +114,14 @@ namespace Tofunaut.GridStrategy.Game
     {
         public int unitId;
         public int facingDir;
+        public IntVector2 targetCoord;
 
         // --------------------------------------------------------------------------------------------
-        public UseSkillAction(int playerIndex, int unitId, Unit.EFacing facingDir) : base(EType.UseSkill, playerIndex)
+        public UseSkillAction(int playerIndex, int unitId, Unit.EFacing facingDir, IntVector2 targetCoord) : base(EType.UseSkill, playerIndex)
         {
             this.unitId = unitId;
             this.facingDir = (int)facingDir;
+            this.targetCoord = targetCoord;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -138,7 +140,7 @@ namespace Tofunaut.GridStrategy.Game
         public override void Execute(Game game, Action OnComplete)
         {
             Unit unit = Unit.GetUnit(unitId);
-            unit.UseSkill((Unit.EFacing)facingDir, OnComplete);
+            unit.UseSkill((Unit.EFacing)facingDir, targetCoord, OnComplete);
         }
     }
 

@@ -98,16 +98,13 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-
-
-            //if (_groundPlane.Raycast(prevRay, out float prevDistance))
-            //{
-            //    Ray nextRay = UnityCamera.ScreenPointToRay(prevDragPosition + dragDelta);
-            //    if (_groundPlane.Raycast(nextRay, out float nextDistance))
-            //    {
-            //        LookAt(LookingAt + (prevRay.GetPoint(prevDistance) - nextRay.GetPoint(nextDistance)));
-            //    }
-            //}
+            if(_game.board.RaycastToPlane(prevDragPosition, out Vector3 prevWorldPos))
+            {
+                if(_game.board.RaycastToPlane(prevDragPosition + dragDelta, out Vector3 nextWorldPos))
+                {
+                    LookAt(LookingAt + (prevWorldPos - nextWorldPos));
+                }
+            }
         }
 
         // --------------------------------------------------------------------------------------------
