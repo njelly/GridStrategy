@@ -60,6 +60,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
 
             _game.GameBegan += OnGameBegan;
+            _game.GameFinished += OnGameFinished;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -82,6 +83,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
 
             _game.GameBegan -= OnGameBegan;
+            _game.GameFinished -= OnGameFinished;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -157,6 +159,12 @@ namespace Tofunaut.GridStrategy.Game.UI
 
                 _playerToPlayerPanels[player].SetHealth(e.newHealth, e.targetUnit.MaxHealth);
             }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnGameFinished(object sender, EventArgs e)
+        {
+            _contextMenuView.Hide();
         }
 
         #region UIContextMenuView.IListener

@@ -94,11 +94,14 @@ namespace Tofunaut.GridStrategy.UI
                 clientValidationErrorMessage.SetFontSize(28);
                 clientValidationErrorMessage.alignment = EAlignment.TopLeft;
                 clientValidationErrorMessage.margin = new RectOffset(20, 0, 20, 0);
-                clientValidationErrorMessage.TextAlignment = TMPro.TextAlignmentOptions.Left;
+                clientValidationErrorMessage.TextAlignment = TMPro.TextAlignmentOptions.TopLeft;
                 _canvasGroup.AddChild(clientValidationErrorMessage);
 
                 switch(AppManager.ClientState)
                 {
+                    case AppManager.EClientState.ForceOffline:
+                        clientValidationErrorMessage.Text = "Force offline";
+                        break;
                     case AppManager.EClientState.ValidationError:
                         clientValidationErrorMessage.Text = "Client failed to validate correctly";
                         break;

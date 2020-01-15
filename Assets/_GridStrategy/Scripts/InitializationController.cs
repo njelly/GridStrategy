@@ -85,6 +85,12 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void LogIn_Enter()
         {
+            if(AppManager.ForceOffline)
+            {
+                Debug.Log("Skipped log in step because ForceOnline is turned on");
+                _stateMachine.ChangeState(State.InitializeLocalPlayer);
+                return;
+            }
             AccountManager.Instance.LogIn(() =>
             {
                 _stateMachine.ChangeState(State.InitializeLocalPlayer);

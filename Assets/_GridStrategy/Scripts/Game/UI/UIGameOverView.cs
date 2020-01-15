@@ -46,7 +46,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             toReturn.AddChild(background);
 
             SharpUITextMeshPro gameOverLabel = new SharpUITextMeshPro("GameOverLabel", "Game Over");
-            gameOverLabel.SetFillSize(EAxis.X, 1f);
+            gameOverLabel.SetFillSize(EAxis.X, 0.8f);
             gameOverLabel.SetFixedSize(EAxis.Y, 200);
             gameOverLabel.alignment = EAlignment.TopCenter;
             gameOverLabel.AutoSizeFont();
@@ -68,7 +68,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
 
             SharpUITextMeshPro winnerLabel = new SharpUITextMeshPro("WinnerLabel", sb.ToString());
-            winnerLabel.SetFillSize(EAxis.X, 1f);
+            winnerLabel.SetFillSize(EAxis.X, 0.6f);
             winnerLabel.SetFixedSize(EAxis.Y, 100);
             winnerLabel.margin = new RectOffset(0, 0, 200, 0);
             winnerLabel.alignment = EAlignment.TopCenter;

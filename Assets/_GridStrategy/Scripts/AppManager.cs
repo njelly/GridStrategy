@@ -48,6 +48,11 @@ namespace Tofunaut.GridStrategy
             /// The client has succesfully validated.
             /// </summary>
             Valid = 3,
+
+            /// <summary>
+            /// ForceOffline has been set to true.
+            /// </summary>
+            ForceOffline = 4,
         }
 
         public static Version AppVersion { get; private set; }
@@ -56,8 +61,11 @@ namespace Tofunaut.GridStrategy
         public static AssetManager AssetManager { get { return _instance._assetManager; } }
         public static Transform Transform { get { return _instance.transform; } }
         public static Config Config { get; private set; }
+        public static bool ForceOffline => _instance._forceOffline;
 
         public GameObject testObjectsRoot;
+
+        [SerializeField] private bool _forceOffline;
 
         private TofuStateMachine _stateMachine;
         private AssetManager _assetManager;
@@ -84,6 +92,11 @@ namespace Tofunaut.GridStrategy
             _stateMachine.Register(State.InGame, InGame_Enter, null, InGame_Exit);
             _stateMachine.ChangeState(State.Initializing);
 
+            if(ForceOffline)
+            {
+                
+            }
+
             _assetManager = new AssetManager();
         }
 
@@ -107,6 +120,12 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Initializing_Enter()
         {
+            if(ForceOffline)
+            {
+                Config = Config.DefaultConfig();
+                ClientState = EClientState.ForceOffline;
+            }
+
             InitializationController initializationController = gameObject.RequireComponent<InitializationController>();
             initializationController.Completed += InitializationController_Completed;
             initializationController.enabled = true;
@@ -189,6 +208,8 @@ namespace Tofunaut.GridStrategy
                     Debug.LogError($"unhandled ingamecontroller intention: {inGameControllerEventArgs.intention}");
                     break;
             }
+
+            _stateMachine.ChangeState(State.StartMenu);
         }
 
         // --------------------------------------------------------------------------------------------
