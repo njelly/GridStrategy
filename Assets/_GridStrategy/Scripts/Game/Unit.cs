@@ -219,7 +219,7 @@ namespace Tofunaut.GridStrategy.Game
             }
             else
             {
-                List<BoardTile> targetTiles = Skill.GetTargetTiles(faceTowards, targetCoord);
+                List<BoardTile> targetTiles = Skill.GetAffectedTiles(faceTowards, targetCoord);
                 foreach (BoardTile boardTile in targetTiles)
                 {
                     if (Skill.Target == SkillData.ETarget.Tile)
@@ -288,8 +288,6 @@ namespace Tofunaut.GridStrategy.Game
         {
             int previousHealth = Health;
             Health = Mathf.Clamp(Health - amount, 0, Health);
-
-            Debug.Log($"unit {id} took {amount} damage. Health is now {Health}");
 
             OnTookDamage?.Invoke(this, new DamageEventArgs(sourceUnit, this, previousHealth, Health, Health <= 0));
         }

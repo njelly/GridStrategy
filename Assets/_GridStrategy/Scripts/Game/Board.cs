@@ -149,15 +149,85 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void HighlightBoardTilesForUnit(Unit unit)
+        public void HighlightBoardTilesForUnitMove(Unit unit)
         {
-            if(unit.HasMoved)
+            ClearAllBoardTileHighlights();
+            HighlightBoardTilesForUnitMoveRecursive(unit, new Dictionary<BoardTile, int>(), unit.BoardTile, 0);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void HighlightBoardTilesForUnitMoveRecursive(Unit unit, Dictionary<BoardTile, int> visitedToCost, BoardTile current, int cost)
+        {
+            if(current == null)
             {
-                ClearAllBoardTileHighlights();
+                return;
+            }
+
+            if (cost > unit.MoveRange)
+            {
+                return;
+            }
+
+            if (visitedToCost.ContainsKey(current))
+            {
+                int previousCost = visitedToCost[current];
+                if (cost < previousCost)
+                {
+                    visitedToCost[current] = cost;
+                }
+                else
+                {
+                    // we've alredy visited this tile and it was cheaper then, so we're done
+                    return;
+                }
             }
             else
             {
-                throw new NotImplementedException();
+                visitedToCost.Add(current, cost);
+            }
+
+            if(BoardTileView.TryGetView(current, out BoardTileView view))
+            {
+                view.SetHighlight(BoardTileView.EHighlight.Move);
+            }
+
+            BoardTile northTile = GetTile(current.xCoord, current.yCoord + 1);
+            if(northTile != null)
+            {
+                HighlightBoardTilesForUnitMoveRecursive(unit, visitedToCost, northTile, cost + northTile.GetMoveCostForUnit(unit));
+            }
+
+            BoardTile southTile = GetTile(current.xCoord, current.yCoord - 1);
+            if (southTile != null)
+            {
+                HighlightBoardTilesForUnitMoveRecursive(unit, visitedToCost, southTile, cost + southTile.GetMoveCostForUnit(unit));
+            }
+
+            BoardTile eastTile = GetTile(current.xCoord + 1, current.yCoord);
+            if (eastTile != null)
+            {
+                HighlightBoardTilesForUnitMoveRecursive(unit, visitedToCost, eastTile, cost + eastTile.GetMoveCostForUnit(unit));
+            }
+
+            BoardTile westTile = GetTile(current.xCoord - 1, current.yCoord);
+            if (westTile != null)
+            {
+                HighlightBoardTilesForUnitMoveRecursive(unit, visitedToCost, westTile, cost + westTile.GetMoveCostForUnit(unit));
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void HighlightBoardTilesForUseSkill(Skill skill)
+        {
+            ClearAllBoardTileHighlights();
+
+            List<BoardTile> targetableTiles = skill.GetTargetableTiles();
+            foreach(BoardTile boardTile in targetableTiles)
+            {
+                if (BoardTileView.TryGetView(boardTile, out BoardTileView view))
+                {
+                    view.SetHighlight(skill.DamageDealt > 0 ? BoardTileView.EHighlight.Attack : BoardTileView.EHighlight.Heal);
+                }
             }
         }
 

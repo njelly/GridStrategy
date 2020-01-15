@@ -20,6 +20,7 @@ namespace Tofunaut.GridStrategy.Game
             Move = 1,
             Attack = 2,
             Neutral = 3,
+            Heal = 4,
         }
 
         private static Dictionary<BoardTile, BoardTileView> _boardTileToView = new Dictionary<BoardTile, BoardTileView>();
@@ -38,6 +39,7 @@ namespace Tofunaut.GridStrategy.Game
         public MeshRenderer highlightMeshRenderer;
         public Material highlightMoveMaterial;
         public Material highlightAttackMaterial;
+        public Material highlightHealMaterial;
         public Material highlightNeutralMaterial;
 
         private EHighlight _highlight;
@@ -99,7 +101,11 @@ namespace Tofunaut.GridStrategy.Game
                     break;
                 case EHighlight.Attack:
                     highlightMeshRenderer.gameObject.SetActive(true);
-                    highlightSharedMaterials[0] = Instantiate(highlightMoveMaterial);
+                    highlightSharedMaterials[0] = Instantiate(highlightAttackMaterial);
+                    break;
+                case EHighlight.Heal:
+                    highlightMeshRenderer.gameObject.SetActive(true);
+                    highlightSharedMaterials[0] = Instantiate(highlightHealMaterial);
                     break;
                 case EHighlight.Neutral:
                     highlightMeshRenderer.gameObject.SetActive(true);

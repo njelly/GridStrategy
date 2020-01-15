@@ -69,9 +69,12 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _pathView.Destroy();
             }
+
             _currentPath = null;
             _endTile = null;
             _dragBoardDelta = Vector2.zero;
+            _draggingFrom = null;
+            _game.board.ClearAllBoardTileHighlights();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -142,14 +145,23 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            _draggingFrom = unitView;
-            if (_draggingFrom.Unit.HasMoved)
+            if (unitView.Unit.HasMoved)
             {
                 // don't show if the unit has already moved
                 return;
             }
 
-            if(_draggingFrom.Unit.Owner.playerIndex != _game.CurrentPlayer.playerIndex)
+            if (_draggingFrom == null)
+            {
+                _draggingFrom = unitView;
+                _game.board.HighlightBoardTilesForUnitMove(_draggingFrom.Unit);
+            }
+            else if(_draggingFrom != unitView)
+            {
+                return;
+            }
+
+            if (_draggingFrom.Unit.Owner.playerIndex != _game.CurrentPlayer.playerIndex)
             {
                 // don't show when the unit is not owned by the current player
                 return;
@@ -167,6 +179,12 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             IntVector2 hitCoord = boardTileView.BoardTile.Coord;
+
+            if(_endTile != null && _endTile.Coord == hitCoord)
+            {
+                // return immediately, this is the same tile
+                return;
+            }
 
             // check:
             // 1) the hitCoord is not null

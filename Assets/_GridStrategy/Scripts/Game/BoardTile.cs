@@ -88,6 +88,20 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
+        public bool ContainsAllyOf(Unit unit)
+        {
+            foreach (Unit occupant in _occupants)
+            {
+                if (occupant.IsAllyOf(unit))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // --------------------------------------------------------------------------------------------
         public bool IsAdjacentTo(BoardTile other)
         {
             return (Coord - other.Coord).ManhattanDistance == 1;

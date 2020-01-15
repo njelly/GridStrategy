@@ -595,6 +595,24 @@ namespace Tofunaut.GridStrategy
                     hasError = true;
                 }
 
+                // range
+                if (rawSkillData.TryGetValue("range", out object rangeObj))
+                {
+                    if (int.TryParse(rangeObj.ToString(), out int range))
+                    {
+                        skillData.range = range;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {rangeObj.ToString()} as int for range");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"skill data index {i} is missing a damage dealt");
+                    hasError = true;
+                }
+
                 // areaSize
                 if (rawSkillData.TryGetValue("areasize", out object areaSizeObj))
                 {
@@ -747,6 +765,7 @@ namespace Tofunaut.GridStrategy
 
         public string id;
         public ETarget target;
+        public int range;
         public EAspect aspect;
         public int areaSize;
         public EAreaType areaType;

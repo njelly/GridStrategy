@@ -152,6 +152,7 @@
             "id": "default_hero_attack",
             "aspect": "None",
             "target": "Enemy",
+            "range": 1,
             "areasize": 1,
             "areatype": "single",
             "areaoffset": "1,0",
