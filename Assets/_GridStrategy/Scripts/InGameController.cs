@@ -8,14 +8,14 @@
 
 using System.Collections.Generic;
 using Tofunaut.Core;
-using Tofunaut.GridStrategy.Game;
+using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy
 {
     // --------------------------------------------------------------------------------------------
-    public class InGameController : ControllerBehaviour
+    public class InGameController : ControllerBehaviour, UIGameOverView.IListener
     {
         // --------------------------------------------------------------------------------------------
         private static class State
@@ -32,6 +32,7 @@ namespace Tofunaut.GridStrategy
         private TofuStateMachine _stateMachine;
         private Game.Game _game;
         private List<PlayerData> _playerDatas;
+        private UIGameOverView _gameOverView;
 
         // --------------------------------------------------------------------------------------------
         private void Awake()
@@ -140,7 +141,12 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void PostGame_Enter()
         {
-            Complete(new ControllerCompletedEventArgs(true));
+            if(_gameOverView == null)
+            {
+                _gameOverView = new UIGameOverView(this, _game);
+            }
+
+            _gameOverView.Show();
         }
 
         #endregion State Machine
@@ -159,10 +165,40 @@ namespace Tofunaut.GridStrategy
                 playerData.ReleaseAssets(AppManager.AssetManager);
             }
 
+            _gameOverView.Hide();
+
             if (_game != null)
             {
                 _game.CleanUp();
                 _game = null;
+            }
+        }
+
+        #region UIGameOverView.IListener
+
+        // --------------------------------------------------------------------------------------------
+        public void OnReturnToStartClicked()
+        {
+            Complete(new InGameControllerCompletedEventArgs(true, InGameControllerCompletedEventArgs.Intention.ReturnToStart));
+        }
+
+        #endregion UIGameOverView.IListener
+
+        // --------------------------------------------------------------------------------------------
+        public class InGameControllerCompletedEventArgs : ControllerCompletedEventArgs
+        {
+            // --------------------------------------------------------------------------------------------
+            public enum Intention
+            {
+                ReturnToStart = 0,
+            }
+
+            public readonly Intention intention;
+
+            // --------------------------------------------------------------------------------------------
+            public InGameControllerCompletedEventArgs(bool succesful, Intention intention) : base(succesful)
+            {
+                this.intention = intention;
             }
         }
     }

@@ -179,7 +179,16 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void InGameController_Completed(object sender, ControllerCompletedEventArgs e)
         {
-            _stateMachine.ChangeState(State.StartMenu);
+            InGameController.InGameControllerCompletedEventArgs inGameControllerEventArgs = e as InGameController.InGameControllerCompletedEventArgs;
+            switch(inGameControllerEventArgs.intention)
+            {
+                case InGameController.InGameControllerCompletedEventArgs.Intention.ReturnToStart:
+                    _stateMachine.ChangeState(State.StartMenu);
+                    break;
+                default:
+                    Debug.LogError($"unhandled ingamecontroller intention: {inGameControllerEventArgs.intention}");
+                    break;
+            }
         }
 
         // --------------------------------------------------------------------------------------------

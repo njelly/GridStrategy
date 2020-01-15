@@ -139,6 +139,26 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
+        public List<Player> GetWinners()
+        {
+            List<Player> toReturn = new List<Player>();
+            if(HasFinished)
+            {
+                foreach(Player player in _players)
+                {
+                    if(player.HasLost)
+                    {
+                        continue;
+                    }
+
+                    toReturn.Add(player);
+                }
+            }
+
+            return toReturn;
+        }
+
+        // --------------------------------------------------------------------------------------------
         public void CleanUp()
         {
             _unitPathSelectionManager.OnPathSelected -= OnPathSelected;

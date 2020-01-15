@@ -8,7 +8,6 @@
 
 using System;
 using Tofunaut.GridStrategy.UI;
-using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
 using Tofunaut.SharpUnity.UI.Behaviour;
 using UnityEngine;
@@ -85,11 +84,6 @@ namespace Tofunaut.GridStrategy.Game.UI
                 {
                     onClick?.Invoke();
                 });
-            }
-
-            protected override void PostRender()
-            {
-                base.PostRender();
             }
         }
     }

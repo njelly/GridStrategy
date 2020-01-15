@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 //  UIHUDManager (c) 2020 Tofunaut
 //
@@ -43,7 +43,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _playerToPlayerPanels.Add(_game.LocalPlayer, new UILeftPlayerPanel(_game.LocalPlayer));
 
 
-            //TODO: Put this in a vertical layout group for all opponent players
+            // TODO: Put this in a vertical layout group for all opponent players
             // TODO: 1 is not guranteed to be an opponent player
             _playerToPlayerPanels.Add(_game.GetPlayer(1), new UIRightPlayerPanel(_game.GetPlayer(1)));
         }
