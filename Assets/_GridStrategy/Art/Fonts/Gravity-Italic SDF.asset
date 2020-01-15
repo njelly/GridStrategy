@@ -19,6 +19,7 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
@@ -107,9 +108,9 @@ Material:
     - _OutlineWidth: 0
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
-    - _ScaleRatioA: 1
-    - _ScaleRatioB: 1
-    - _ScaleRatioC: 1
+    - _ScaleRatioA: 0.8333333
+    - _ScaleRatioB: 0.6770833
+    - _ScaleRatioC: 0.6770833
     - _ScaleX: 1
     - _ScaleY: 1
     - _ShaderFlags: 0
@@ -153,9 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: Gravity-Italic SDF
   m_EditorClassIdentifier: 
-  hashCode: 0
+  hashCode: -279813120
   material: {fileID: -4901228523846848887}
-  materialHashCode: 0
+  materialHashCode: -539416181
   m_Version: 1.1.0
   m_SourceFontFileGUID: 60e585675821d604fbf0e6292f91585d
   m_SourceFontFile_EditorRef: {fileID: 0}
