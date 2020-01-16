@@ -74,7 +74,7 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: c81766c98586baf41b9b1625b8c39cf9
-    m_Address: WorkerView
+    m_Address: FireSpriteView
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: c9da88734fa7c3a428386a19eb26a98e

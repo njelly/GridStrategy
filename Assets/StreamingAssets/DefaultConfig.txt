@@ -7,51 +7,41 @@
     "Cards": [
         {
             "id": "enforcer",
-            "displayname": "Enforcer",
-            "type": "Ally",
-            "energyreq": 1
+            "energyreq": 1,
+            "spawnunit": "enforcer"
         },
         {
             "id": "fast_learner",
-            "displayname": "Fast Learner",
-            "type": "Equip",
             "energyreq": 3
         },
         {
             "id": "solidify",
-            "displayname": "Solidify",
-            "type": "Skill",
             "energyreq": 2
         },
         {
             "id": "sound_off",
-            "displayname": "Sound Off",
-            "type": "Skill",
             "energyreq": 6
         },
         {
             "id": "fire_sprite",
-            "displayname": "Fire Sprite",
-            "type": "Ally",
-            "energyreq": 2
+            "energyreq": 2,
+            "illustrationprefab": "FireSpriteView",
+            "spawnunit": "fire_sprite"
         },
         {
             "id": "water_sprite",
-            "displayname": "Water Sprite",
-            "type": "Ally",
-            "energyreq": 2
+            "energyreq": 2,
+            "spawnunit": "water_sprite"
         },
         {
             "id": "air_sprite",
-            "displayname": "Air Sprite",
-            "type": "Ally",
-            "energyreq": 2
+            "energyreq": 2,
+            "spawnunit": "air_sprite"
         },
         {
             "id": "earth_sprite",
-            "displayname": "Earth Sprite",
-            "type": "Ally",
-            "energyreq": 2
+            "energyreq": 2,
+            "spawnunit": "earth_sprite"
         }
     ],
     "Decks": [

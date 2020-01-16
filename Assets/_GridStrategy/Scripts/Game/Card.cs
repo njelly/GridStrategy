@@ -11,19 +11,8 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
-    public abstract class Card
+    public class Card
     {
-        public enum Type
-        {
-            Invalid = 0,
-            Ally = 1,
-            Skill = 2,
-            Equip = 3,
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public abstract Type CardType { get; }
-
         public Player Owner { get { return _owner; } }
 
         public readonly string name;
@@ -34,7 +23,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         protected Card(CardData data)
         {
-            name = data.displayName;
+            name = data.id;
             solidarityRequired = data.energyRequired;
         }
 
@@ -47,25 +36,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public static Card Create(Player owner, CardData data)
         {
-            Card toReturn;
-            switch (data.type)
-            {
-                case Type.Invalid:
-                    Debug.LogError("can't create a card with an invalid type");
-                    return null;
-                case Type.Ally:
-                    toReturn = AllyCard.Create(data);
-                    break;
-                case Type.Skill:
-                    toReturn = SkillCard.Create(data);
-                    break;
-                case Type.Equip:
-                    toReturn = EquipCard.Create(data);
-                    break;
-                default:
-                    Debug.LogError($"the type {data.type} has not been implemented.");
-                    return null;
-            }
+            Card toReturn = new Card(data);
 
             toReturn._owner = owner;
 

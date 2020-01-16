@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using TofuCore;
 using Tofunaut.GridStrategy.Game;
-using Tofunaut.TofuCore;
 using Tofunaut.UnityUtils;
 using UnityEngine;
 
@@ -223,36 +222,6 @@ namespace Tofunaut.GridStrategy
                     Debug.LogError($"card data index {i} is missing an id");
                 }
 
-                // displayname
-                if (rawCardData.TryGetValue("displayname", out object displayNameObj))
-                {
-                    cardData.displayName = displayNameObj.ToString();
-                }
-                else
-                {
-                    hasErrors |= true;
-                    Debug.LogError($"card data index {i} is missing a display name");
-                }
-
-                // type
-                if (rawCardData.TryGetValue("type", out object typeObj))
-                {
-                    if (Enum.TryParse(typeObj.ToString(), true, out Card.Type cardType))
-                    {
-                        cardData.type = cardType;
-                    }
-                    else
-                    {
-                        hasErrors |= true;
-                        Debug.LogError($"Could not parse {typeObj.ToString()} as Card.Type, index {i}");
-                    }
-                }
-                else
-                {
-                    hasErrors |= true;
-                    Debug.LogError($"card data index {i} is missing a card type");
-                }
-
                 // energyreq
                 if (rawCardData.TryGetValue("energyreq", out object energyReqObj))
                 {
@@ -270,6 +239,24 @@ namespace Tofunaut.GridStrategy
                 {
                     hasErrors |= true;
                     Debug.LogError($"card data index {i} is missing a value for solidarityreq");
+                }
+
+                // illustrationPrefab
+                if (rawCardData.TryGetValue("illustrationprefab", out object illustrationPrefabObj))
+                {
+                    cardData.illustrationPrefabPath = illustrationPrefabObj.ToString();
+                }
+
+                // spawnUnitId
+                if (rawCardData.TryGetValue("spawnunit", out object spawnUnitIdObj))
+                {
+                    cardData.spawnUnitId = spawnUnitIdObj.ToString();
+                }
+
+                // useSkillId
+                if (rawCardData.TryGetValue("useskillid", out object useSkillIdObj))
+                {
+                    cardData.useSkillId = useSkillIdObj.ToString();
                 }
 
                 _idToCardData.Add(cardData.id, cardData);
@@ -713,9 +700,10 @@ namespace Tofunaut.GridStrategy
     public struct CardData
     {
         public string id;
-        public string displayName;
-        public Card.Type type;
         public int energyRequired;
+        public string illustrationPrefabPath;
+        public string spawnUnitId;
+        public string useSkillId;
     }
 
     // --------------------------------------------------------------------------------------------
