@@ -12,7 +12,8 @@ namespace Tofunaut.GridStrategy.UI
 {
     // --------------------------------------------------------------------------------------------
     /// <summary>
-    /// Assuming all SharpUIView instances will use UIMainCanvas.Instance as their parent, this removes a bit of boilerplate.
+    /// Assuming all SharpUIView instances will use UIMainCanvas.Instance as their parent, this
+    /// removes a bit of boilerplate.
     /// </summary>
     public abstract class UIGridStrategyView : SharpUIView
     {
