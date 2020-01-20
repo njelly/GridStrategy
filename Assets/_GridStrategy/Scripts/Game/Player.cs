@@ -19,9 +19,6 @@ namespace Tofunaut.GridStrategy.Game
         public static event EventHandler<PlayerEventArgs> PlayerTurnEnded;
         public event EventHandler<PlayerEventArgs> PlayerLost;
 
-        public IReadOnlyCollection<Card> Deck { get { return _deck.AsReadOnly(); } }
-        public IReadOnlyCollection<Card> Hand { get { return _hand.AsReadOnly(); } }
-        public IReadOnlyCollection<Card> DiscardPile { get { return _discardPile.AsReadOnly(); } }
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
         public Unit Hero { get { return _hero; } }
         public PlayerData PlayerData { get { return _playerData; } }
@@ -41,13 +38,13 @@ namespace Tofunaut.GridStrategy.Game
         public readonly string name;
 
         // Cards the player does not have access to until they are drawn.
-        private readonly List<Card> _deck;
+        private readonly Deck _deck;
 
-        // The cards the player has access to and can potentially play on the player's turn.
-        private readonly List<Card> _hand;
+        // Cards the player has already used.
+        private readonly DiscardPile _discardPile;
 
-        // Cards that have been discarded from the player's hand.
-        private readonly List<Card> _discardPile;
+        // Cards the player currently has access to.
+        private readonly Hand _hand;
 
         // The game entities the player controls on the board.
         private readonly List<Unit> _units;
@@ -62,7 +59,7 @@ namespace Tofunaut.GridStrategy.Game
         private readonly PlayerData _playerData;
 
         // --------------------------------------------------------------------------------------------
-        public Player(PlayerData playerData, Game game, int playerIndex)
+        public Player(PlayerData playerData, Game game, int playerIndex, uint deckSeed)
         {
             this.playerIndex = playerIndex;
             this.name = playerData.name;
@@ -71,21 +68,13 @@ namespace Tofunaut.GridStrategy.Game
             _playerData = playerData;
 
             // create the player's deck
-            _deck = new List<Card>();
-            foreach (string cardId in playerData.deckData.cardIdToCount.Keys)
-            {
-                CardData cardData = AppManager.Config.GetCardData(cardId);
-                for (int i = 0; i < playerData.deckData.cardIdToCount[cardId]; i++)
-                {
-                    _deck.Add(Card.Create(this, cardData));
-                }
-            }
+            _deck = new Deck(game, playerData.deckData, this, deckSeed);
 
-            // create the player's hand, but it will be empty until the player draws cards
-            _hand = new List<Card>();
+            // create the player's discard pile
+            _discardPile = new DiscardPile(_game, this);
 
-            // empty discard pile
-            _discardPile = new List<Card>();
+            // create the player's hand
+            _hand = new Hand(_game, this, _deck, _discardPile);
 
             // create the list of units and the player's hero, and add the hero to the list of units
             _units = new List<Unit>();
@@ -102,6 +91,12 @@ namespace Tofunaut.GridStrategy.Game
 
             _energy = _energyCap;
 
+            // draw a card if there are any cards left
+            if(_deck.NumCardsLeft > 0)
+            {
+                DrawCard();
+            }
+
             PlayerTurnStarted?.Invoke(this, new PlayerEventArgs(this));
         }
 
@@ -111,41 +106,9 @@ namespace Tofunaut.GridStrategy.Game
             PlayerTurnEnded?.Invoke(this, new PlayerEventArgs(this));
         }
 
-        // --------------------------------------------------------------------------------------------
         public void DrawCard()
         {
-            Card nextCard = _deck[0];
-            _deck.RemoveAt(0);
-            _hand.Add(nextCard);
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public void Discard(Card card)
-        {
-            // first attempt to remove the card from the player's hand, then try to remove it from the players deck
-            if (!_hand.Remove(card))
-            {
-                if (_deck.Remove(card))
-                {
-                    Debug.LogError($"the card {card.name} is not owned by this player");
-                    return;
-                }
-            }
-
-            _discardPile.Add(card);
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public void ShuffleDeck()
-        {
-            // TODO: might want to make this guaranteed to be deterministic
-            for (int i = 0; i < _deck.Count; i++)
-            {
-                int randomIndex = UnityEngine.Random.Range(0, _deck.Count - 1);
-                Card temp = _deck[randomIndex];
-                _deck[randomIndex] = _deck[i];
-                _deck[i] = temp;
-            }
+            _hand.DrawCard();
         }
 
         // --------------------------------------------------------------------------------------------

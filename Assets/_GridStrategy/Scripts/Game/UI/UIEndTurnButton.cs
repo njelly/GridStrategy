@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using Tofunaut.SharpUnity.UI;
 using Tofunaut.SharpUnity.UI.Behaviour;
 using UnityEngine;

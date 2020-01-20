@@ -31,7 +31,7 @@ namespace Tofunaut.GridStrategy.Game.UI
 
         // --------------------------------------------------------------------------------------------
         // always render on top so this blocks input
-        public UILeftPlayerPanel(Player player) : base (UIPriorities.UIWorldInteractionManager + 1)
+        public UILeftPlayerPanel(Player player) : base(UIPriorities.UIWorldInteractionManager + 1)
         {
             _player = player;
         }
@@ -134,7 +134,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                     _energyIncrements.Add(newIncrement);
                 }
 
-                for(int i = 0; i < _energyIncrements.Count; i++)
+                for (int i = 0; i < _energyIncrements.Count; i++)
                 {
                     _energyIncrements[i].IsAvailable = i < _currentEnergy;
                 }
@@ -154,7 +154,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                     set
                     {
                         _isAvailable = value;
-                        if(IsBuilt)
+                        if (IsBuilt)
                         {
                             UpdateVisuals();
                         }
@@ -181,7 +181,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 // --------------------------------------------------------------------------------------------
                 private void UpdateVisuals()
                 {
-                    if(_isAvailable)
+                    if (_isAvailable)
                     {
                         Color = ActiveColor;
                     }

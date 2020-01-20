@@ -71,7 +71,7 @@ namespace Tofunaut.GridStrategy
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                this.Complete(new ControllerCompletedEventArgs(false));
+                this.Complete(new InGameControllerCompletedEventArgs(false, InGameControllerCompletedEventArgs.Intention.ReturnToStart));
             }
         }
 
@@ -165,7 +165,7 @@ namespace Tofunaut.GridStrategy
                 playerData.ReleaseAssets(AppManager.AssetManager);
             }
 
-            _gameOverView.Hide();
+            _gameOverView?.Hide();
 
             if (_game != null)
             {

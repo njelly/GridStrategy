@@ -1,7 +1,9 @@
 {
     "Global": [
         {
-            "maxplayerenergy": 8
+            "maxplayerenergy": 8,
+            "maxhandsize": 8,
+            "starthandsize": 5
         }
     ],
     "Cards": [

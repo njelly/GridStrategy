@@ -30,6 +30,8 @@ namespace Tofunaut.GridStrategy
         private delegate bool ParseRawDataDelegate(object[] rawData);
 
         public int MaxPlayerEnergy { get; private set; }
+        public int MaxHandSize { get; private set; }
+        public int StartHandSize { get; private set; }
 
         private Dictionary<string, CardData> _idToCardData;
         private Dictionary<string, DeckData> _idToDeckData;
@@ -171,7 +173,7 @@ namespace Tofunaut.GridStrategy
             {
                 if(int.TryParse(maxPlayerEnergyObj.ToString(), out int maxPlayerEnergy))
                 {
-                    MaxPlayerEnergy = maxPlayerEnergy;
+                    this.MaxPlayerEnergy = maxPlayerEnergy;
                 }
                 else
                 {
@@ -182,6 +184,44 @@ namespace Tofunaut.GridStrategy
             else
             {
                 Debug.LogError("the config data is missing a value for MaxPlayerEnergy");
+                return false;
+            }
+
+
+            if (globalData.TryGetValue("maxhandsize", out object maxHandSizeObj))
+            {
+                if (int.TryParse(maxHandSizeObj.ToString(), out int maxHandSize))
+                {
+                    this.MaxHandSize = maxHandSize;
+                }
+                else
+                {
+                    Debug.LogError($"Could not parse {maxHandSizeObj.ToString()} as int for MaxHandSize");
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.LogError("the config data is missing a value for MaxHandSize");
+                return false;
+            }
+
+
+            if (globalData.TryGetValue("starthandsize", out object startHandSizeObj))
+            {
+                if (int.TryParse(startHandSizeObj.ToString(), out int startHandSize))
+                {
+                    this.StartHandSize = startHandSize;
+                }
+                else
+                {
+                    Debug.LogError($"Could not parse {startHandSizeObj.ToString()} as int for StartHandSize");
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.LogError("the config data is missing a value for StartHandSize");
                 return false;
             }
 

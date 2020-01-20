@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
+using Tofunaut.TofuCore;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -33,6 +34,7 @@ namespace Tofunaut.GridStrategy.Game
         ///</summary>
         public Player CurrentPlayer => _players[_currentPlayerIndex];
         public Player LocalPlayer => _players[_localPlayerIndex];
+        public SerializedRandom Random => _random;
 
         public readonly GameCamera gameCamera;
         public readonly SharpLight sun;
@@ -47,12 +49,16 @@ namespace Tofunaut.GridStrategy.Game
         private HUDManager _hudManager;
         private UIWorldInteractionPanel _uiWorldInteractionPanel;
         private UnitPathSelectionManager _unitPathSelectionManager;
+        private SerializedRandom _random;
 
         // --------------------------------------------------------------------------------------------
         public Game(List<PlayerData> playerDatas, int localPlayerIndex)
         {
             _currentPlayerIndex = 0;
             _localPlayerIndex = localPlayerIndex;
+
+            // TODO: when networked, we need to share this in the room properites and then deserialize it on all clients
+            _random = SerializedRandom.CreateNewInstance(1024);
 
             board = new Board(this, 8, 8);
             board.Render(AppManager.Transform);
@@ -64,7 +70,8 @@ namespace Tofunaut.GridStrategy.Game
             _players = new List<Player>();
             for (int i = 0; i < playerDatas.Count; i++)
             {
-                Player player = new Player(playerDatas[i], this, i);
+                // TODO: players need to have a synced initial seed
+                Player player = new Player(playerDatas[i], this, i, (uint) i);
                 player.PlayerLost += OnPlayerLost;
                 _players.Add(player);
             }

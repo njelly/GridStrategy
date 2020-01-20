@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -21,26 +22,22 @@ namespace Tofunaut.GridStrategy.Game
         private Player _owner;
 
         // --------------------------------------------------------------------------------------------
-        protected Card(CardData data)
+        public Card(CardData data, Player owner)
         {
             name = data.id;
+            _owner = owner;
             solidarityRequired = data.energyRequired;
         }
 
         // --------------------------------------------------------------------------------------------
-        public void Discard()
+        public class CardEventArgs : EventArgs
         {
-            _owner.Discard(this);
-        }
+            public readonly Card card;
 
-        // --------------------------------------------------------------------------------------------
-        public static Card Create(Player owner, CardData data)
-        {
-            Card toReturn = new Card(data);
-
-            toReturn._owner = owner;
-
-            return toReturn;
+            public CardEventArgs(Card card)
+            {
+                this.card = card;
+            }
         }
     }
 }
