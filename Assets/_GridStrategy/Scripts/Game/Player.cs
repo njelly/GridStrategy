@@ -20,7 +20,8 @@ namespace Tofunaut.GridStrategy.Game
         public event EventHandler<PlayerEventArgs> PlayerLost;
 
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
-        public Unit Hero { get { return _hero; } }
+        public Unit Hero => _hero;
+        public Hand Hand => _hand;
         public PlayerData PlayerData { get { return _playerData; } }
         public bool HasLost => Hero.IsDead;
 
@@ -81,6 +82,8 @@ namespace Tofunaut.GridStrategy.Game
 
             // create the hero and place it on the board
             _hero = PlaceUnit(playerData.heroData, _game.board.GetHeroStartTile(playerIndex));
+
+            _game.GameBegan += OnGameBegan;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -94,7 +97,15 @@ namespace Tofunaut.GridStrategy.Game
             // draw a card if there are any cards left
             if(_deck.NumCardsLeft > 0)
             {
-                DrawCard();
+                if(_hand.Cards.Count < AppManager.Config.MaxHandSize)
+                {
+                    _hand.DrawCard();
+                }
+                else
+                {
+                    // TODO: lots of games have a penalty when the player has too many cards in their hand
+                    // Do that here.
+                }
             }
 
             PlayerTurnStarted?.Invoke(this, new PlayerEventArgs(this));
@@ -104,11 +115,6 @@ namespace Tofunaut.GridStrategy.Game
         public void EndTurn()
         {
             PlayerTurnEnded?.Invoke(this, new PlayerEventArgs(this));
-        }
-
-        public void DrawCard()
-        {
-            _hand.DrawCard();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -154,6 +160,25 @@ namespace Tofunaut.GridStrategy.Game
         private void LoseGame()
         {
             PlayerLost?.Invoke(this, new PlayerEventArgs(this));
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnGameBegan(object sender, EventArgs e)
+        {
+            _game.GameBegan -= OnGameBegan;
+
+            _game.GameFinished += OnGameFinished;
+
+            for (int i = 0; i < AppManager.Config.StartHandSize; i++)
+            {
+                _hand.DrawCard();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnGameFinished(object sender, EventArgs e)
+        {
+            _game.GameFinished -= OnGameFinished;
         }
 
         // --------------------------------------------------------------------------------------------

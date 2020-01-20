@@ -31,7 +31,7 @@ namespace Tofunaut.GridStrategy.Game.UI
 
         // --------------------------------------------------------------------------------------------
         // always render on top so this blocks input
-        public UILeftPlayerPanel(Player player) : base(UIPriorities.UIWorldInteractionManager + 1)
+        public UILeftPlayerPanel(Player player) : base(UIPriorities.HUD + 1)
         {
             _player = player;
         }

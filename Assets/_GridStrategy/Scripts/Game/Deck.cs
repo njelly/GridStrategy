@@ -83,6 +83,8 @@ namespace Tofunaut.GridStrategy.Game
                     cardAsDeckMember.hasBeenDrawn = true;
                     _cards[i] = cardAsDeckMember;
 
+                    NumCardsLeft--;
+
                     toReturn = _cards[i].card;
                 }
             }

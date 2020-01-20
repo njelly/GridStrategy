@@ -14,19 +14,27 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Card
     {
+        private static uint _idCounter;
+
         public Player Owner { get { return _owner; } }
 
+        public readonly CardData cardData;
         public readonly string name;
         public readonly int solidarityRequired;
+
+        private readonly uint _id;
 
         private Player _owner;
 
         // --------------------------------------------------------------------------------------------
         public Card(CardData data, Player owner)
         {
+            cardData = data;
             name = data.id;
             _owner = owner;
             solidarityRequired = data.energyRequired;
+
+            _id = _idCounter++;
         }
 
         // --------------------------------------------------------------------------------------------

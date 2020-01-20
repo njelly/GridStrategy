@@ -12,6 +12,7 @@ using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Tofunaut.GridStrategy.UI
 {
@@ -68,7 +69,7 @@ namespace Tofunaut.GridStrategy.UI
 
             if(!string.IsNullOrEmpty(cardData.illustrationPrefabPath))
             {
-                _prefabViewport = new SharpUIPrefabToRenderTexture("PrefabViewport", AppManager.AssetManager.Get<GameObject>(cardData.illustrationPrefabPath), ViewportSize);
+                _prefabViewport = new SharpUIPrefabToRenderTexture("PrefabViewport", AppManager.AssetManager.Get<GameObject>(cardData.illustrationPrefabPath), ViewportSize, true);
                 _prefabViewport.SetFillSize();
                 _prefabViewport.SetCameraDistanceAndAngle(new Vector3(0f, 0.5f, 0f), 2f, Quaternion.Euler(0f, 30f, 10f));
                 _prefabViewportBackground.AddChild(_prefabViewport);
@@ -87,6 +88,16 @@ namespace Tofunaut.GridStrategy.UI
             _titleBackground.alignment = EAlignment.TopCenter;
             _titleBackground.margin = TitleOffset;
             _cardBackground.AddChild(_titleBackground);
+
+            SharpUITextMeshPro titleBackgroundLabel = new SharpUITextMeshPro("TitleLabel", cardData.id);
+            titleBackgroundLabel.SetFillSize();
+            titleBackgroundLabel.AutoSizeFont();
+            titleBackgroundLabel.TextAlignment = TMPro.TextAlignmentOptions.Left;
+            titleBackgroundLabel.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityRegular);
+            titleBackgroundLabel.alignment = EAlignment.MiddleLeft;
+            titleBackgroundLabel.margin = new RectOffset(20, 0, 0, 0);
+            titleBackgroundLabel.Color = Color.black;
+            _titleBackground.AddChild(titleBackgroundLabel);
 
             _infoBarBackground = new SharpUIImage("InfoBarBackground", null);
             _infoBarBackground.Color = TitleColor;

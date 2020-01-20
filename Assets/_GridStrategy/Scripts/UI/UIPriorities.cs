@@ -13,7 +13,8 @@ namespace Tofunaut.GridStrategy.UI
     {
         public const int UIWorldInteractionManager = -1;
         public const int Default = 0;
-        public const int Popup = 100;
-        public const int HUD = 1;
+        public const int Popup = 1000;
+        public const int HUD = 100;
+        public const int WorldUI = 10;
     }
 }

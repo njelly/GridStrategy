@@ -25,6 +25,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         private UIContextMenuView _contextMenuView;
         private UIUseSkillView _unitOptionsView;
         private Dictionary<Player, UILeftPlayerPanel> _playerToPlayerPanels;
+        private UIPlayerHand _localPlayerHand;
 
         // --------------------------------------------------------------------------------------------
         private HUDManager(Game game) : base("UIHUDManager")
@@ -41,6 +42,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _unitOptionsView = new UIUseSkillView(this, _game);
             _playerToPlayerPanels = new Dictionary<Player, UILeftPlayerPanel>();
             _playerToPlayerPanels.Add(_game.LocalPlayer, new UILeftPlayerPanel(_game.LocalPlayer));
+            _localPlayerHand = new UIPlayerHand(_game.LocalPlayer);
 
 
             // TODO: Put this in a vertical layout group for all opponent players
@@ -81,6 +83,8 @@ namespace Tofunaut.GridStrategy.Game.UI
             {
                 player.Hero.OnTookDamage -= OnUnitTookDamage;
             }
+
+            _localPlayerHand.Hide();
 
             _game.GameBegan -= OnGameBegan;
             _game.GameFinished -= OnGameFinished;
@@ -124,6 +128,8 @@ namespace Tofunaut.GridStrategy.Game.UI
             {
                 playerPanel.Show();
             }
+
+            _localPlayerHand.Show();
         }
 
         // --------------------------------------------------------------------------------------------

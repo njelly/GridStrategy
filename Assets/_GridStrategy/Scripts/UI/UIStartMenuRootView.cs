@@ -114,15 +114,6 @@ namespace Tofunaut.GridStrategy.UI
                 }
             }
 
-            CardData fireSpriteCardData = AppManager.Config.GetCardData("fire_sprite");
-            UICard.LoadRequiredAssets(fireSpriteCardData, () =>
-            {
-                UICard testCard = new UICard(fireSpriteCardData);
-                testCard.margin = new RectOffset(50, 0, 50, 0);
-                testCard.alignment = EAlignment.TopLeft;
-                _canvasGroup.AddChild(testCard);
-            });
-
             return _background;
         }
 

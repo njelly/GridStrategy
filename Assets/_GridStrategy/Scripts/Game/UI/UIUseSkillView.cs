@@ -46,7 +46,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         private List<BoardTile> _targetableTiles;
 
         // --------------------------------------------------------------------------------------------
-        public UIUseSkillView(IListener listener, Game game)
+        public UIUseSkillView(IListener listener, Game game) : base (UIPriorities.WorldUI)
         {
             _listener = listener;
             _game = game;
