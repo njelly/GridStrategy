@@ -16,14 +16,13 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class BoardTile : SharpGameObject
     {
-        public IReadOnlyCollection<Unit> Occupants { get { return _occupants.AsReadOnly(); } }
+        public Unit Occupant { get; private set; }
         public IntVector2 Coord { get { return new IntVector2(xCoord, yCoord); } }
 
         public readonly int xCoord;
         public readonly int yCoord;
 
         private BoardTileView _view;
-        private List<Unit> _occupants;
 
         // --------------------------------------------------------------------------------------------
         public BoardTile(int xCoord, int yCoord) : base($"BoardTile {xCoord},{yCoord}")
@@ -32,20 +31,22 @@ namespace Tofunaut.GridStrategy.Game
             this.yCoord = yCoord;
 
             LocalPosition = new Vector3(xCoord * BoardTileView.Size, 0, yCoord * BoardTileView.Size);
-
-            _occupants = new List<Unit>();
         }
 
         // --------------------------------------------------------------------------------------------
-        public void AddOccupant(Unit unit)
+        public void SetOccupant(Unit unit)
         {
-            _occupants.Add(unit);
-        }
+            if(Occupant == unit)
+            {
+                return;
+            }
 
-        // --------------------------------------------------------------------------------------------
-        public void RemoveOccupant(Unit unit)
-        {
-            _occupants.Remove(unit);
+            if(unit != null && Occupant != null)
+            {
+                Debug.LogError($"the board tile {xCoord}, {yCoord} is already occupied by unit {Occupant.id}");
+            }
+
+            Occupant = unit;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -71,34 +72,6 @@ namespace Tofunaut.GridStrategy.Game
             {
                 return 1;
             }
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public bool ContainsEnemyOf(Unit unit)
-        {
-            foreach(Unit occupant in _occupants)
-            {
-                if(occupant.IsEnemyOf(unit))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public bool ContainsAllyOf(Unit unit)
-        {
-            foreach (Unit occupant in _occupants)
-            {
-                if (occupant.IsAllyOf(unit))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         // --------------------------------------------------------------------------------------------

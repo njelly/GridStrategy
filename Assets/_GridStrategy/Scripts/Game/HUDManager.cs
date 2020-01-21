@@ -12,12 +12,13 @@ using TofuCore;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
+using UnityEngine.EventSystems;
 
 // --------------------------------------------------------------------------------------------
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class HUDManager : SharpGameObject, UIContextMenuView.IListener, UIUseSkillView.IListener
+    public class HUDManager : SharpGameObject, UIContextMenuView.IListener, UIUseSkillView.IListener, UIPlayerHand.IListener
     {
         private Game _game;
         private UIBeginTurnBanner _beginTurnBanner;
@@ -42,7 +43,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             _unitOptionsView = new UIUseSkillView(this, _game);
             _playerToPlayerPanels = new Dictionary<Player, UILeftPlayerPanel>();
             _playerToPlayerPanels.Add(_game.LocalPlayer, new UILeftPlayerPanel(_game.LocalPlayer));
-            _localPlayerHand = new UIPlayerHand(_game.LocalPlayer);
+            _localPlayerHand = new UIPlayerHand(this, _game.LocalPlayer);
 
 
             // TODO: Put this in a vertical layout group for all opponent players
@@ -192,6 +193,20 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         #endregion UIUnitOptionsVIew.IListener
+
+        #region UIPlayerHand.IListener
+
+        public void OnPlayerDraggedOutCard(Card card)
+        {
+            _game.board.HighlightBoardTilesForPlayCard(card);
+        }
+
+        public void OnPlayerReleasedCard(Card card, PointerEventData pointerEventData)
+        {
+            _game.board.ClearAllBoardTileHighlights();
+        }
+
+        #endregion UIPlayerHand.IListener
 
         // --------------------------------------------------------------------------------------------
         public static HUDManager Create(Game game)

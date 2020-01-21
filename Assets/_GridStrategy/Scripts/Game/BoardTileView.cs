@@ -21,6 +21,7 @@ namespace Tofunaut.GridStrategy.Game
             Attack = 2,
             Neutral = 3,
             Heal = 4,
+            Spawn = 5,
         }
 
         private static Dictionary<BoardTile, BoardTileView> _boardTileToView = new Dictionary<BoardTile, BoardTileView>();
@@ -95,6 +96,7 @@ namespace Tofunaut.GridStrategy.Game
                 case EHighlight.None:
                     highlightMeshRenderer.gameObject.SetActive(false);
                     break;
+                case EHighlight.Spawn: // TODO: a different material for spawn than for move?
                 case EHighlight.Move:
                     highlightMeshRenderer.gameObject.SetActive(true);
                     highlightSharedMaterials[0] = Instantiate(highlightMoveMaterial);

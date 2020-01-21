@@ -229,32 +229,29 @@ namespace Tofunaut.GridStrategy.Game
                     }
                     else
                     {
-                        foreach (Unit occupant in boardTile.Occupants)
+                        switch (Skill.Target)
                         {
-                            switch (Skill.Target)
-                            {
-                                case SkillData.ETarget.Ally:
-                                    if (IsAllyOf(occupant))
-                                    {
-                                        numTimesSkillUsedOnTarget++;
-                                        UseSkillOnUnit(occupant, SkillUsedOnTargetCallback);
-                                    }
-                                    break;
-                                case SkillData.ETarget.Enemy:
-                                    if (!IsAllyOf(occupant))
-                                    {
-                                        numTimesSkillUsedOnTarget++;
-                                        UseSkillOnUnit(occupant, SkillUsedOnTargetCallback);
-                                    }
-                                    break;
-                                case SkillData.ETarget.Self:
-                                    if (occupant == this)
-                                    {
-                                        numTimesSkillUsedOnTarget++;
-                                        UseSkillOnUnit(occupant, SkillUsedOnTargetCallback);
-                                    }
-                                    break;
-                            }
+                            case SkillData.ETarget.Ally:
+                                if (IsAllyOf(boardTile.Occupant))
+                                {
+                                    numTimesSkillUsedOnTarget++;
+                                    UseSkillOnUnit(boardTile.Occupant, SkillUsedOnTargetCallback);
+                                }
+                                break;
+                            case SkillData.ETarget.Enemy:
+                                if (!IsAllyOf(boardTile.Occupant))
+                                {
+                                    numTimesSkillUsedOnTarget++;
+                                    UseSkillOnUnit(boardTile.Occupant, SkillUsedOnTargetCallback);
+                                }
+                                break;
+                            case SkillData.ETarget.Self:
+                                if (boardTile.Occupant == this)
+                                {
+                                    numTimesSkillUsedOnTarget++;
+                                    UseSkillOnUnit(boardTile.Occupant, SkillUsedOnTargetCallback);
+                                }
+                                break;
                         }
                     }
                 }
@@ -313,11 +310,11 @@ namespace Tofunaut.GridStrategy.Game
             if(BoardTile != newTile)
             {
                 // leave the current tile, if it exists 
-                BoardTile?.RemoveOccupant(this);
+                BoardTile?.SetOccupant(null);
 
                 // set the new tile, then add this unit as an occupant
                 BoardTile = newTile;
-                newTile.AddOccupant(this);
+                newTile.SetOccupant(this);
             }
 
             if (asChild)
@@ -385,6 +382,22 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             // TODO: something when the player turn ends
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static bool CanSpawnOnTile(UnitData unitData, BoardTile boardTile, Unit spawnFrom)
+        {
+            if(boardTile.Occupant != null)
+            {
+                return false;
+            }
+
+            if((boardTile.Coord - spawnFrom.BoardTile.Coord).ManhattanDistance > 1)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         // --------------------------------------------------------------------------------------------

@@ -80,17 +80,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void UpdatePathColor()
         {
-            bool isEnemy = false;
-            foreach (Unit occupant in _endTile.Occupants)
-            {
-                if (!_draggingFrom.Unit.IsAllyOf(occupant))
-                {
-                    isEnemy = true;
-                    break;
-                }
-            }
-
-            if (isEnemy)
+            if (_endTile.Occupant != null && !_draggingFrom.Unit.IsAllyOf(_endTile.Occupant))
             {
                 _pathView.StartColor = Color.red;
                 _pathView.EndColor = Color.red;
@@ -175,6 +165,12 @@ namespace Tofunaut.GridStrategy.Game
             BoardTileView boardTileView = RaycastForBoardTileView(prevDragPosition + dragDelta);
             if (boardTileView == null)
             {
+                return;
+            }
+
+            if(boardTileView.BoardTile != _draggingFrom.Unit.BoardTile && boardTileView.BoardTile.Occupant != null)
+            {
+                // if this isn't the tile we started from and the tile is already occupied, return
                 return;
             }
 

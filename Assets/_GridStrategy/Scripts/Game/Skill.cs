@@ -19,18 +19,18 @@ namespace Tofunaut.GridStrategy.Game
         public SkillData.ETarget Target => _skillData.target;
         public int DamageDealt => _skillData.damageDealt;
         public int Range => _skillData.range;
-        public Unit User => _unit;
+        public Unit User => _user;
 
         private readonly Game _game;
-        private readonly Unit _unit;
+        private readonly Unit _user;
         private readonly SkillData _skillData;
 
         // --------------------------------------------------------------------------------------------
-        public Skill(SkillData skillData, Game game, Unit unit)
+        public Skill(SkillData skillData, Game game, Unit user)
         {
             _skillData = skillData;
             _game = game;
-            _unit = unit;
+            _user = user;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -53,24 +53,36 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public List<BoardTile> GetTargetableTiles()
         {
+            return GetTargetableTiles(_skillData, _game, _user);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool IsTileValidTarget(BoardTile tile)
+        {
+            return IsTileValidTarget(_skillData, _user, tile);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static List<BoardTile> GetTargetableTiles(SkillData skillData, Game game, Unit user)
+        {
             List<BoardTile> toReturn = new List<BoardTile>();
 
-            for(int x = 0; x < _game.board.width; x++)
+            for (int x = 0; x < game.board.width; x++)
             {
-                for(int y = 0; y < _game.board.height; y++)
+                for (int y = 0; y < game.board.height; y++)
                 {
-                    BoardTile boardTile = _game.board.GetTile(x, y);
-                    if(boardTile == null)
+                    BoardTile boardTile = game.board.GetTile(x, y);
+                    if (boardTile == null)
                     {
                         continue;
                     }
 
-                    if (!IsTileValidTarget(boardTile))
+                    if (!IsTileValidTarget(skillData, user, boardTile))
                     {
                         continue;
                     }
 
-                    if((boardTile.Coord - User.BoardTile.Coord).ManhattanDistance > _skillData.range)
+                    if ((boardTile.Coord - user.BoardTile.Coord).ManhattanDistance > skillData.range)
                     {
                         continue;
                     }
@@ -83,22 +95,22 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public bool IsTileValidTarget(BoardTile tile)
+        public static bool IsTileValidTarget(SkillData skillData, Unit user, BoardTile tile)
         {
-            switch (Target)
+            switch (skillData.target)
             {
                 case SkillData.ETarget.Ally:
-                    return tile.ContainsAllyOf(User);
+                    return tile.Occupant?.IsAllyOf(user) ?? false;
                 case SkillData.ETarget.Enemy:
-                    return tile.ContainsEnemyOf(User);
+                    return tile.Occupant?.IsEnemyOf(user) ?? false;
                 case SkillData.ETarget.Tile:
                     return true;
                 case SkillData.ETarget.Self:
-                    return tile == User.BoardTile;
+                    return tile == user.BoardTile;
                 case SkillData.ETarget.None:
                     return false;
                 default:
-                    Debug.LogError($"CanTargetTile not implemented for {Target}");
+                    Debug.LogError($"CanTargetTile not implemented for {skillData.target}");
                     return false;
             }
         }

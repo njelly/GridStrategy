@@ -20,6 +20,12 @@ namespace Tofunaut.GridStrategy.Game.UI
     // --------------------------------------------------------------------------------------------
     public class UIPlayerHand : UIGridStrategyView
     {
+        public interface IListener
+        {
+            void OnPlayerDraggedOutCard(Card uiCard);
+            void OnPlayerReleasedCard(Card uiCard, PointerEventData pointerEventData);
+        }
+
         private const float CardFanAngleStep = 3f;
         private const float CardFanMaxYOffset = 20f;
         private const float CardFanAnimTime = 0.5f;
@@ -28,8 +34,10 @@ namespace Tofunaut.GridStrategy.Game.UI
         private const float CardPeekAnimTime = 0.2f;
         private const float CardCorrectRotAnimTime = 0.2f;
 
+        private readonly IListener _listener;
         private readonly Player _player;
         private readonly Dictionary<Card, UICard> _cardToUICard;
+        private readonly Dictionary<UICard, Card> _uiCardToCard;
 
         private TofuAnimation _cardFanAnim;
         private SharpUIHorizontalLayout _cardLayout;
@@ -40,10 +48,12 @@ namespace Tofunaut.GridStrategy.Game.UI
         private TofuAnimation _cardCorrectRotAnim;
 
         // --------------------------------------------------------------------------------------------
-        public UIPlayerHand(Player player) : base(UIPriorities.HUD - 1)
+        public UIPlayerHand(IListener listener, Player player) : base(UIPriorities.HUD - 1)
         {
+            _listener = listener;
             _player = player;
             _cardToUICard = new Dictionary<Card, UICard>();
+            _uiCardToCard = new Dictionary<UICard, Card>();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -170,6 +180,7 @@ namespace Tofunaut.GridStrategy.Game.UI
 
                         UICard uiCard = new UICard(card.cardData);
                         _cardToUICard.Add(card, uiCard);
+                        _uiCardToCard.Add(uiCard, card);
                         MainPanel.AddChild(uiCard);
 
                         uiCard.SubscribeToEvent(EEventType.PointerEnter, (object eSender, EventSystemEventArgs eventArgs) =>
@@ -190,7 +201,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                         });
                         uiCard.SubscribeToEvent(EEventType.PointerUp, (object eSender, EventSystemEventArgs eventArgs) =>
                         {
-                            UICard_OnPointerUp(uiCard);
+                            UICard_OnPointerUp(uiCard, eventArgs.eventData as PointerEventData);
                         });
 
                         if (numLoadCalls == numLoadCallsCompleted)
@@ -251,16 +262,22 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         // --------------------------------------------------------------------------------------------
-        private void UICard_OnPointerDown(UICard card, PointerEventData pointerEventData)
+        private void UICard_OnPointerDown(UICard uiCard, PointerEventData pointerEventData)
         {
-            if(card == _hoverCard)
+            if(uiCard == _hoverCard)
             {
                 _draggingCard = _hoverCard;
                 _hoverCard = null;
             }
+            else
+            {
+                return;
+            }
 
             _dragStartPointerPos = pointerEventData.position;
-            _dragStartAnchorPos = card.RectTransform.anchoredPosition;
+            _dragStartAnchorPos = uiCard.RectTransform.anchoredPosition;
+
+            _listener.OnPlayerDraggedOutCard(_uiCardToCard[uiCard]);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -291,12 +308,14 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         // --------------------------------------------------------------------------------------------
-        private void UICard_OnPointerUp(UICard card)
+        private void UICard_OnPointerUp(UICard uiCard, PointerEventData pointerEventData)
         {
-            if(card != _draggingCard)
+            if(uiCard != _draggingCard)
             {
                 return;
             }
+
+            _listener.OnPlayerReleasedCard(_uiCardToCard[uiCard], pointerEventData);
 
             _cardCorrectRotAnim?.Stop();
             _cardCorrectRotAnim = null;
@@ -344,7 +363,10 @@ namespace Tofunaut.GridStrategy.Game.UI
             foreach(Card card in toRemove)
             {
                 MainPanel.RemoveChild(_cardToUICard[card], true);
+
+                UICard uiCard = _cardToUICard[card];
                 _cardToUICard.Remove(card);
+                _uiCardToCard.Remove(uiCard);
             }
 
             PositionCards(true);

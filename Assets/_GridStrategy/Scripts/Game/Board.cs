@@ -163,6 +163,11 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
+            if(current.Occupant != null && current.Occupant != unit)
+            {
+                return;
+            }
+
             if (cost > unit.MoveRange)
             {
                 return;
@@ -227,6 +232,19 @@ namespace Tofunaut.GridStrategy.Game
                 if (BoardTileView.TryGetView(boardTile, out BoardTileView view))
                 {
                     view.SetHighlight(skill.DamageDealt > 0 ? BoardTileView.EHighlight.Attack : BoardTileView.EHighlight.Heal);
+                }
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void HighlightBoardTilesForPlayCard(Card card)
+        {
+            List<BoardTile> targetableTiles = card.GetPlayableTiles();
+            foreach(BoardTile boardTile in targetableTiles)
+            {
+                if (BoardTileView.TryGetView(boardTile, out BoardTileView view))
+                {
+                    view.SetHighlight(BoardTileView.EHighlight.Spawn);
                 }
             }
         }

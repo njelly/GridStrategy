@@ -37,7 +37,7 @@ namespace Tofunaut.GridStrategy.Game
                     cardsAsList.Add(new CardAsDeckMember
                     {
                         hasBeenDrawn = false,
-                        card = new Card(AppManager.Config.GetCardData(key), owner)
+                        card = new Card(AppManager.Config.GetCardData(key), game, owner)
                     });
                 }
             }
