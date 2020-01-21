@@ -26,12 +26,18 @@ namespace Tofunaut.GridStrategy.Game.UI
         private const float CardFanXSpread = 130f;
         private const float CardPeekAmount = 60f;
         private const float CardPeekAnimTime = 0.2f;
+        private const float CardCorrectRotAnimTime = 0.2f;
 
         private readonly Player _player;
         private readonly Dictionary<Card, UICard> _cardToUICard;
 
         private TofuAnimation _cardFanAnim;
         private SharpUIHorizontalLayout _cardLayout;
+        private UICard _hoverCard;
+        private UICard _draggingCard;
+        private Vector2 _dragStartPointerPos;
+        private Vector2 _dragStartAnchorPos;
+        private TofuAnimation _cardCorrectRotAnim;
 
         // --------------------------------------------------------------------------------------------
         public UIPlayerHand(Player player) : base(UIPriorities.HUD - 1)
@@ -174,6 +180,18 @@ namespace Tofunaut.GridStrategy.Game.UI
                         {
                             UICard_OnPointerExit(uiCard);
                         });
+                        uiCard.SubscribeToEvent(EEventType.PointerDown, (object eSender, EventSystemEventArgs eventArgs) =>
+                        {
+                            UICard_OnPointerDown(uiCard, eventArgs.eventData as PointerEventData);
+                        });
+                        uiCard.SubscribeToEvent(EEventType.Drag, (object eSender, EventSystemEventArgs eventArgs) =>
+                        {
+                            UICard_OnDrag(uiCard, eventArgs.eventData as PointerEventData);
+                        });
+                        uiCard.SubscribeToEvent(EEventType.PointerUp, (object eSender, EventSystemEventArgs eventArgs) =>
+                        {
+                            UICard_OnPointerUp(uiCard);
+                        });
 
                         if (numLoadCalls == numLoadCallsCompleted)
                         {
@@ -198,6 +216,8 @@ namespace Tofunaut.GridStrategy.Game.UI
             Vector3 startPos = uiCard.LocalPosition;
             Vector3 endPos = GetCardFanOffsets()[cardIndex] + (Quaternion.Euler(0f, 0f, -angle) * (Vector3.up * CardPeekAmount));
 
+            _hoverCard = uiCard;
+
             new TofuAnimation()
                 .Value01(CardPeekAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
                 {
@@ -209,16 +229,81 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         private void UICard_OnPointerExit(UICard uiCard)
         {
-            int cardIndex = GetIndexForUICard(uiCard);
-            Vector3 startPos = uiCard.LocalPosition;
-            Vector3 endPos = GetCardFanOffsets()[cardIndex];
+            if(_hoverCard == uiCard)
+            {
+                _hoverCard = null;
+            }
 
-            new TofuAnimation()
-                .Value01(CardPeekAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
-                {
-                    uiCard.LocalPosition = Vector3.LerpUnclamped(startPos, endPos, newValue);
-                })
-                .Play();
+            // only return the card to the hand if we aren't dragging
+            if(_draggingCard == null)
+            {
+                int cardIndex = GetIndexForUICard(uiCard);
+                Vector3 startPos = uiCard.LocalPosition;
+                Vector3 endPos = GetCardFanOffsets()[cardIndex];
+
+                new TofuAnimation()
+                    .Value01(CardPeekAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+                    {
+                        uiCard.LocalPosition = Vector3.LerpUnclamped(startPos, endPos, newValue);
+                    })
+                    .Play();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void UICard_OnPointerDown(UICard card, PointerEventData pointerEventData)
+        {
+            if(card == _hoverCard)
+            {
+                _draggingCard = _hoverCard;
+                _hoverCard = null;
+            }
+
+            _dragStartPointerPos = pointerEventData.position;
+            _dragStartAnchorPos = card.RectTransform.anchoredPosition;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void UICard_OnDrag(UICard card, PointerEventData pointerEventData)
+        {
+            if(card != _draggingCard)
+            {
+                return;
+            }
+
+            card.RectTransform.anchoredPosition = _dragStartAnchorPos + (pointerEventData.position - _dragStartPointerPos);
+
+            if(_cardCorrectRotAnim == null)
+            {
+                Quaternion startRot = card.LocalRotation;
+                _cardCorrectRotAnim = new TofuAnimation()
+                    .Value01(CardCorrectRotAnimTime, EEaseType.Linear, (float newValue) =>
+                    {
+                        card.LocalRotation = Quaternion.SlerpUnclamped(startRot, Quaternion.Euler(0f, 0f, 0f), newValue);
+                    })
+                    .Then()
+                    .Execute(() =>
+                    {
+                        _cardCorrectRotAnim = null;
+                    })
+                    .Play();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void UICard_OnPointerUp(UICard card)
+        {
+            if(card != _draggingCard)
+            {
+                return;
+            }
+
+            _cardCorrectRotAnim?.Stop();
+            _cardCorrectRotAnim = null;
+
+            _draggingCard = null;
+
+            PositionCards(true);
         }
 
         // --------------------------------------------------------------------------------------------
