@@ -288,7 +288,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 return;
             }
 
-            card.RectTransform.anchoredPosition = _dragStartAnchorPos + (pointerEventData.position - _dragStartPointerPos);
+            card.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos);
 
             if(_cardCorrectRotAnim == null)
             {
