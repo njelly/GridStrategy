@@ -61,11 +61,27 @@ namespace Tofunaut.GridStrategy
         public static AssetManager AssetManager { get { return _instance._assetManager; } }
         public static Transform Transform { get { return _instance.transform; } }
         public static Config Config { get; private set; }
-        public static bool ForceOffline => _instance._forceOffline;
+        public static bool ForceOffline
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return _instance._forceOffline;
+#else
+                return false;
+#endif
+            }
+        }
 
-        public GameObject testObjectsRoot;
+        [Tooltip("The root object for any lights, canvases, etc. used in the editor. Will be destroyed immediately when the game starts.")]
+        [SerializeField] private GameObject _testObjectsRoot;
 
+        [Header("Developer Options")]
+        [Tooltip("Run the app as if the user has no internet connection.")]
         [SerializeField] private bool _forceOffline;
+        [Tooltip("Enter a game with a custom configuration (Not implemented!) imediately after logging in, skipping the start screen.")]
+        [SerializeField] private bool _enterTestGame;
+        // TODO: it might be useful to have some sort of scriptable object to configure the test game here
 
         private TofuStateMachine _stateMachine;
         private AssetManager _assetManager;
@@ -76,7 +92,7 @@ namespace Tofunaut.GridStrategy
             base.Awake();
 
             // test objects are for messing around in the scene and should be destroyed immediately
-            Destroy(testObjectsRoot);
+            Destroy(_testObjectsRoot);
 
             DontDestroyOnLoad(gameObject);
 
@@ -91,11 +107,6 @@ namespace Tofunaut.GridStrategy
             _stateMachine.Register(State.StartMenu, StartMenu_Enter, null, StartMenu_Exit);
             _stateMachine.Register(State.InGame, InGame_Enter, null, InGame_Exit);
             _stateMachine.ChangeState(State.Initializing);
-
-            if(ForceOffline)
-            {
-                
-            }
 
             _assetManager = new AssetManager();
         }
@@ -115,7 +126,7 @@ namespace Tofunaut.GridStrategy
             _stateMachine.Update(Time.deltaTime);
         }
 
-        #region State Machine
+#region State Machine
 
         // --------------------------------------------------------------------------------------------
         private void Initializing_Enter()
@@ -171,11 +182,19 @@ namespace Tofunaut.GridStrategy
             inGameController.enabled = false;
         }
 
-        #endregion State Machine
+#endregion State Machine
 
         // --------------------------------------------------------------------------------------------
         private void InitializationController_Completed(object sender, ControllerCompletedEventArgs e)
         {
+#if UNITY_EDITOR
+            if(_enterTestGame)
+            {
+                // TODO: somehow configure the test game in the unity editor before entering
+                _stateMachine.ChangeState(State.InGame);
+                return;
+            }
+#endif
             _stateMachine.ChangeState(State.StartMenu);
         }
 
@@ -189,7 +208,7 @@ namespace Tofunaut.GridStrategy
                     Application.Quit();
                     Debug.Log("The app has quit");
                     break;
-                case StartMenuControllerCompletedEventArgs.Intention.StartSinglePlayer:
+                case StartMenuControllerCompletedEventArgs.Intention.EnterTestGame:
                     _stateMachine.ChangeState(State.InGame);
                     break;
             }

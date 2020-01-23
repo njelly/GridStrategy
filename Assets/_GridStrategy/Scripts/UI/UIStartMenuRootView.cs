@@ -18,12 +18,9 @@ namespace Tofunaut.GridStrategy.UI
     // --------------------------------------------------------------------------------------------
     public class UIStartMenuRootView : UIGridStrategyView
     {
-        public interface IUIStartMenuRootViewListener
+        public interface IListener
         {
-            void OnRootNewGameClicked();
-            void OnRootContinueClicked();
-            void OnRootMultiplayerClicked();
-            void OnRootOptionsClicked();
+            void OnTestGameButtonClicked();
         }
 
         private const float BackgroundFadeInTime = 6f;
@@ -33,18 +30,15 @@ namespace Tofunaut.GridStrategy.UI
         private const float CanvasGroupFadeInDelay = 1f;
         private const float CanvasGroupFadeInTime = 3f;
 
-        private IUIStartMenuRootViewListener _listener;
+        private IListener _listener;
         private SharpUIImage _background;
         private SharpUICanvasGroup _canvasGroup;
         private SharpUIBase _buttonLayout;
         private UIStartMenuButton _newGameButton;
-        private UIStartMenuButton _continueButton;
-        private UIStartMenuButton _multiplayerButton;
-        private UIStartMenuButton _optionsButton;
 
 
         // --------------------------------------------------------------------------------------------
-        public UIStartMenuRootView(IUIStartMenuRootViewListener listener)
+        public UIStartMenuRootView(IListener listener)
         {
             _listener = listener;
         }
@@ -128,17 +122,8 @@ namespace Tofunaut.GridStrategy.UI
             toReturn.spacing = 50;
             toReturn.SetFitSize();
 
-            _newGameButton = new UIStartMenuButton("New Game", () => { AnimateNewGameButtonSelected(_listener.OnRootNewGameClicked); });
+            _newGameButton = new UIStartMenuButton("Test Game", () => { AnimateNewGameButtonSelected(_listener.OnTestGameButtonClicked); });
             toReturn.AddChild(_newGameButton);
-
-            _continueButton = new UIStartMenuButton("Continue", () => { AnimateContinueButtonSelected(_listener.OnRootContinueClicked); });
-            toReturn.AddChild(_continueButton);
-
-            _multiplayerButton = new UIStartMenuButton("Multiplayer", () => { AnimateMultiplayerButtonSelected(_listener.OnRootMultiplayerClicked); });
-            toReturn.AddChild(_multiplayerButton);
-
-            _optionsButton = new UIStartMenuButton("Options", () => { AnimateOptionsButtonSelected(_listener.OnRootOptionsClicked); });
-            toReturn.AddChild(_optionsButton);
 
             return toReturn;
         }
@@ -175,34 +160,9 @@ namespace Tofunaut.GridStrategy.UI
 
 
         // --------------------------------------------------------------------------------------------
-        // TODO: put these into one function somehow
         private void AnimateNewGameButtonSelected(Action onComplete)
         {
             _newGameButton.AnimateSelected(onComplete);
-            _continueButton.AnimateAway(0.3f);
-            _multiplayerButton.AnimateAway(0.2f);
-            _optionsButton.AnimateAway(0.1f);
-        }
-        private void AnimateContinueButtonSelected(Action onComplete)
-        {
-            _newGameButton.AnimateAway(0.3f);
-            _continueButton.AnimateSelected(onComplete);
-            _multiplayerButton.AnimateAway(0.2f);
-            _optionsButton.AnimateAway(0.1f);
-        }
-        private void AnimateMultiplayerButtonSelected(Action onComplete)
-        {
-            _newGameButton.AnimateAway(0.3f);
-            _continueButton.AnimateAway(0.2f);
-            _multiplayerButton.AnimateSelected(onComplete);
-            _optionsButton.AnimateAway(0.1f);
-        }
-        private void AnimateOptionsButtonSelected(Action onComplete)
-        {
-            _newGameButton.AnimateAway(0.3f);
-            _continueButton.AnimateAway(0.2f);
-            _multiplayerButton.AnimateAway(0.1f);
-            _optionsButton.AnimateSelected(onComplete);
         }
 
 

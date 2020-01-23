@@ -14,7 +14,7 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy
 {
     // --------------------------------------------------------------------------------------------
-    public class StartMenuController : ControllerBehaviour, UIStartMenuRootView.IUIStartMenuRootViewListener
+    public class StartMenuController : ControllerBehaviour, UIStartMenuRootView.IListener
     {
 
         // --------------------------------------------------------------------------------------------
@@ -111,30 +111,9 @@ namespace Tofunaut.GridStrategy
 
 
         // --------------------------------------------------------------------------------------------
-        public void OnRootNewGameClicked()
+        public void OnTestGameButtonClicked()
         {
-            Complete(new StartMenuControllerCompletedEventArgs(StartMenuControllerCompletedEventArgs.Intention.StartSinglePlayer, true));
-        }
-
-
-        // --------------------------------------------------------------------------------------------
-        public void OnRootContinueClicked()
-        {
-            Debug.Log("Continue...");
-        }
-
-
-        // --------------------------------------------------------------------------------------------
-        public void OnRootMultiplayerClicked()
-        {
-            Debug.Log("Multiplayer...");
-        }
-
-
-        // --------------------------------------------------------------------------------------------
-        public void OnRootOptionsClicked()
-        {
-            Debug.Log("Options...");
+            Complete(new StartMenuControllerCompletedEventArgs(StartMenuControllerCompletedEventArgs.Intention.EnterTestGame, true));
         }
     }
 
@@ -144,7 +123,7 @@ namespace Tofunaut.GridStrategy
         public enum Intention
         {
             QuitApp,
-            StartSinglePlayer,
+            EnterTestGame,
         }
 
         public readonly Intention intention;
