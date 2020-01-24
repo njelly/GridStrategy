@@ -34,6 +34,8 @@ namespace Tofunaut.GridStrategy.UI
         public static Color TitleColor => new Color(0.8f, 0.8f, 0.8f, 1f);
         public static Color DescriptionBoxColor => new Color(1f, 1f, 1f, 1f);
 
+        public CardData CardData => _cardData;
+
         private readonly CardData _cardData;
         private readonly SharpUIImage _border;
         private readonly SharpUIImage _cardBackground;

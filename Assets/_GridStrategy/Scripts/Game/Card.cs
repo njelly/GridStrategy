@@ -39,22 +39,28 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public List<BoardTile> GetPlayableTiles()
         {
+            return GetPlayableTiles(_game, _owner, cardData);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static List<BoardTile> GetPlayableTiles(Game game, Player owner, CardData cardData)
+        {
             List<BoardTile> toReturn = new List<BoardTile>();
 
-            if(!string.IsNullOrEmpty(cardData.useSkillId))
+            if (!string.IsNullOrEmpty(cardData.useSkillId))
             {
-                return Skill.GetTargetableTiles(AppManager.Config.GetSkillData(cardData.useSkillId), _game, Owner.Hero);
+                return Skill.GetTargetableTiles(AppManager.Config.GetSkillData(cardData.useSkillId), game, owner.Hero);
             }
 
-            if(!string.IsNullOrEmpty(cardData.spawnUnitId))
+            if (!string.IsNullOrEmpty(cardData.spawnUnitId))
             {
                 UnitData unitData = AppManager.Config.GetUnitData(cardData.spawnUnitId);
-                for (int x = 0; x < _game.board.width; x++)
+                for (int x = 0; x < game.board.width; x++)
                 {
-                    for(int y = 0; y < _game.board.height; y++)
+                    for (int y = 0; y < game.board.height; y++)
                     {
-                        BoardTile boardTile = _game.board.GetTile(x, y);
-                        if(Unit.CanSpawnOnTile(unitData, boardTile, Owner.Hero))
+                        BoardTile boardTile = game.board.GetTile(x, y);
+                        if (Unit.CanSpawnOnTile(unitData, boardTile, owner.Hero))
                         {
                             toReturn.Add(boardTile);
                         }

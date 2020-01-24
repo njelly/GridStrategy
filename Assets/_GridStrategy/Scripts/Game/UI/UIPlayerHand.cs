@@ -33,8 +33,11 @@ namespace Tofunaut.GridStrategy.Game.UI
         private const float CardPeekAmount = 60f;
         private const float CardPeekAnimTime = 0.2f;
         private const float CardCorrectRotAnimTime = 0.2f;
+        private const float CardOverPlayableTileAnimTime = 1f;
+        private static Vector2 CardOverPlayableTileOffset => new Vector2(200f, 0f);
 
         private readonly IListener _listener;
+        private readonly Game _game;
         private readonly Player _player;
         private readonly Dictionary<Card, UICard> _cardToUICard;
         private readonly Dictionary<UICard, Card> _uiCardToCard;
@@ -45,15 +48,21 @@ namespace Tofunaut.GridStrategy.Game.UI
         private UICard _draggingCard;
         private Vector2 _dragStartPointerPos;
         private Vector2 _dragStartAnchorPos;
+        private Vector2 _draggingCardAnchorPosOffset;
         private TofuAnimation _cardCorrectRotAnim;
+        private TofuAnimation _cardOverPlayableTileAnimation;
+        private TofuAnimation _cardNotOverPlayableTileAnimation;
+        private List<BoardTile> _draggingCardPlayableTiles;
 
         // --------------------------------------------------------------------------------------------
-        public UIPlayerHand(IListener listener, Player player) : base(UIPriorities.HUD - 1)
+        public UIPlayerHand(IListener listener, Game game, Player player) : base(UIPriorities.HUD - 1)
         {
             _listener = listener;
+            _game = game;
             _player = player;
             _cardToUICard = new Dictionary<Card, UICard>();
             _uiCardToCard = new Dictionary<UICard, Card>();
+            _draggingCardPlayableTiles = new List<BoardTile>();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -266,6 +275,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         {
             if(uiCard == _hoverCard)
             {
+                _draggingCardPlayableTiles = Card.GetPlayableTiles(_game, _player, uiCard.CardData);
                 _draggingCard = _hoverCard;
                 _hoverCard = null;
             }
@@ -288,7 +298,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 return;
             }
 
-            card.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos);
+            Vector2 anchorPos = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos);
 
             if(_cardCorrectRotAnim == null)
             {
@@ -298,13 +308,51 @@ namespace Tofunaut.GridStrategy.Game.UI
                     {
                         card.LocalRotation = Quaternion.SlerpUnclamped(startRot, Quaternion.Euler(0f, 0f, 0f), newValue);
                     })
-                    .Then()
-                    .Execute(() =>
-                    {
-                        _cardCorrectRotAnim = null;
-                    })
                     .Play();
             }
+
+            // TODO: animate the card to the side when over a tile... not quite working at the moment
+            //if(_game.board.RaycastToPlane(pointerEventData.position, out Vector3 worldPos))
+            //{
+            //    BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPos);
+            //    if(boardTile != null && _draggingCardPlayableTiles.Contains(boardTile))
+            //    {
+            //        _cardNotOverPlayableTileAnimation?.Stop();
+            //        if (_cardOverPlayableTileAnimation == null)
+            //        {
+            //            _cardOverPlayableTileAnimation = new TofuAnimation()
+            //                .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+            //                {
+            //                    Vector2 targetOffset = CardOverPlayableTileOffset;
+            //                    if(targetOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
+            //                    {
+            //                        targetOffset.x *= -1;
+            //                    }
+            //                    _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(Vector2.zero, targetOffset, newValue);
+            //                })
+            //                .Play();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Debug.Log("card NOT over playable tile!");
+            //        _cardOverPlayableTileAnimation?.Stop();
+            //        if (_cardNotOverPlayableTileAnimation == null)
+            //        {
+            //            _cardNotOverPlayableTileAnimation = new TofuAnimation()
+            //                .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+            //                {
+            //                    Vector2 targetOffset = _draggingCardAnchorPosOffset;
+            //                    if(_draggingCardAnchorPosOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
+            //                    {
+            //                        targetOffset.x *= -1;
+            //                    }
+            //                    _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(targetOffset, Vector2.zero, newValue);
+            //                })
+            //                .Play();
+            //        }
+            //    }
+            //}
         }
 
         // --------------------------------------------------------------------------------------------
@@ -319,6 +367,12 @@ namespace Tofunaut.GridStrategy.Game.UI
 
             _cardCorrectRotAnim?.Stop();
             _cardCorrectRotAnim = null;
+
+            _cardOverPlayableTileAnimation?.Stop();
+            _cardOverPlayableTileAnimation = null;
+
+            _cardNotOverPlayableTileAnimation?.Stop();
+            _cardNotOverPlayableTileAnimation = null;
 
             _draggingCard = null;
 
