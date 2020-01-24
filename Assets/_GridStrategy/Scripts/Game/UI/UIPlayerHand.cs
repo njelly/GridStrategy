@@ -212,6 +212,10 @@ namespace Tofunaut.GridStrategy.Game.UI
                         {
                             UICard_OnPointerUp(uiCard, eventArgs.eventData as PointerEventData);
                         });
+                        uiCard.SubscribeToEvent(EEventType.PointerHold, (object eSender, EventSystemEventArgs eventArgs) =>
+                        {
+                            UICard_OnPointerHold(uiCard, eventArgs.eventData as PointerEventData);
+                        });
 
                         if (numLoadCalls == numLoadCallsCompleted)
                         {
@@ -291,68 +295,79 @@ namespace Tofunaut.GridStrategy.Game.UI
         }
 
         // --------------------------------------------------------------------------------------------
-        private void UICard_OnDrag(UICard card, PointerEventData pointerEventData)
+        private void UICard_OnDrag(UICard uiCard, PointerEventData pointerEventData)
         {
-            if(card != _draggingCard)
+            if(uiCard != _draggingCard)
             {
                 return;
             }
 
-            Vector2 anchorPos = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos);
+            uiCard.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos) + _draggingCardAnchorPosOffset;
 
             if(_cardCorrectRotAnim == null)
             {
-                Quaternion startRot = card.LocalRotation;
+                Quaternion startRot = uiCard.LocalRotation;
                 _cardCorrectRotAnim = new TofuAnimation()
                     .Value01(CardCorrectRotAnimTime, EEaseType.Linear, (float newValue) =>
                     {
-                        card.LocalRotation = Quaternion.SlerpUnclamped(startRot, Quaternion.Euler(0f, 0f, 0f), newValue);
+                        uiCard.LocalRotation = Quaternion.SlerpUnclamped(startRot, Quaternion.Euler(0f, 0f, 0f), newValue);
                     })
                     .Play();
             }
+        }
 
-            // TODO: animate the card to the side when over a tile... not quite working at the moment
-            //if(_game.board.RaycastToPlane(pointerEventData.position, out Vector3 worldPos))
-            //{
-            //    BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPos);
-            //    if(boardTile != null && _draggingCardPlayableTiles.Contains(boardTile))
-            //    {
-            //        _cardNotOverPlayableTileAnimation?.Stop();
-            //        if (_cardOverPlayableTileAnimation == null)
-            //        {
-            //            _cardOverPlayableTileAnimation = new TofuAnimation()
-            //                .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
-            //                {
-            //                    Vector2 targetOffset = CardOverPlayableTileOffset;
-            //                    if(targetOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
-            //                    {
-            //                        targetOffset.x *= -1;
-            //                    }
-            //                    _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(Vector2.zero, targetOffset, newValue);
-            //                })
-            //                .Play();
-            //        }
-            //    }
-            //    else
-            //    {
-            //        Debug.Log("card NOT over playable tile!");
-            //        _cardOverPlayableTileAnimation?.Stop();
-            //        if (_cardNotOverPlayableTileAnimation == null)
-            //        {
-            //            _cardNotOverPlayableTileAnimation = new TofuAnimation()
-            //                .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
-            //                {
-            //                    Vector2 targetOffset = _draggingCardAnchorPosOffset;
-            //                    if(_draggingCardAnchorPosOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
-            //                    {
-            //                        targetOffset.x *= -1;
-            //                    }
-            //                    _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(targetOffset, Vector2.zero, newValue);
-            //                })
-            //                .Play();
-            //        }
-            //    }
-            //}
+        // --------------------------------------------------------------------------------------------
+        private void UICard_OnPointerHold(UICard uiCard, PointerEventData pointerEventData)
+        {
+            if (uiCard != _draggingCard)
+            {
+                return;
+            }
+
+            uiCard.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos) + _draggingCardAnchorPosOffset;
+
+            if (_game.board.RaycastToPlane(pointerEventData.position, out Vector3 worldPos))
+            {
+                BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPos);
+                if (boardTile != null && _draggingCardPlayableTiles.Contains(boardTile))
+                {
+                    _cardNotOverPlayableTileAnimation?.Stop();
+                    _cardNotOverPlayableTileAnimation = null;
+                    if (_cardOverPlayableTileAnimation == null)
+                    {
+                        _cardOverPlayableTileAnimation = new TofuAnimation()
+                            .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+                            {
+                                Vector2 targetOffset = CardOverPlayableTileOffset;
+                                if (targetOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
+                                {
+                                    targetOffset.x *= -1;
+                                }
+                                _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(Vector2.zero, targetOffset, newValue);
+                            })
+                            .Play();
+                    }
+                }
+                else
+                {
+                    _cardOverPlayableTileAnimation?.Stop();
+                    _cardOverPlayableTileAnimation = null;
+                    if (_cardNotOverPlayableTileAnimation == null)
+                    {
+                        _cardNotOverPlayableTileAnimation = new TofuAnimation()
+                            .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+                            {
+                                Vector2 targetOffset = _draggingCardAnchorPosOffset;
+                                if (_draggingCardAnchorPosOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
+                                {
+                                    targetOffset.x *= -1;
+                                }
+                                _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(targetOffset, Vector2.zero, newValue);
+                            })
+                            .Play();
+                    }
+                }
+            }
         }
 
         // --------------------------------------------------------------------------------------------
