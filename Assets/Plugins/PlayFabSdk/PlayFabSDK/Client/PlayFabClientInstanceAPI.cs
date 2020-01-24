@@ -111,7 +111,7 @@ namespace PlayFab
         /// <summary>
         /// Adds users to the set of those able to update both the shared data, as well as the set of users in the group. Only users
         /// in the group can add new members. Shared Groups are designed for sharing data between a very small number of players,
-        /// please see our guide: https://api.playfab.com/docs/tutorials/landing-players/shared-groups
+        /// please see our guide: https://docs.microsoft.com/gaming/playfab/features/social/groups/using-shared-group-data
         /// </summary>
         public void AddSharedGroupMembers(AddSharedGroupMembersRequest request, Action<AddSharedGroupMembersResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -229,7 +229,7 @@ namespace PlayFab
         /// Requests the creation of a shared group object, containing key/value pairs which may be updated by all members of the
         /// group. Upon creation, the current user will be the only member of the group. Shared Groups are designed for sharing data
         /// between a very small number of players, please see our guide:
-        /// https://docs.microsoft.com/en-us/gaming/playfab/features/social/groups/using-shared-group-data
+        /// https://docs.microsoft.com/gaming/playfab/features/social/groups/using-shared-group-data
         /// </summary>
         public void CreateSharedGroup(CreateSharedGroupRequest request, Action<CreateSharedGroupResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -364,7 +364,7 @@ namespace PlayFab
         /// URL will attempt to download the content. A HEAD query to the returned URL will attempt to retrieve the metadata of the
         /// content. Note that a successful result does not guarantee the existence of this content - if it has not been uploaded,
         /// the query to retrieve the data will fail. See this post for more information:
-        /// https://community.playfab.com/hc/en-us/community/posts/205469488-How-to-upload-files-to-PlayFab-s-Content-Service. Also,
+        /// https://community.playfab.com/hc/community/posts/205469488-How-to-upload-files-to-PlayFab-s-Content-Service. Also,
         /// please be aware that the Content service is specifically PlayFab's CDN offering, for which standard CDN rates apply.
         /// </summary>
         public void GetContentDownloadUrl(GetContentDownloadUrlRequest request, Action<GetContentDownloadUrlResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -493,7 +493,7 @@ namespace PlayFab
 
         /// <summary>
         /// Gets a Photon custom authentication token that can be used to securely join the player into a Photon room. See
-        /// https://docs.microsoft.com/en-us/gaming/playfab/features/multiplayer/photon/quickstart for more details.
+        /// https://docs.microsoft.com/gaming/playfab/features/multiplayer/photon/quickstart for more details.
         /// </summary>
         public void GetPhotonAuthenticationToken(GetPhotonAuthenticationTokenRequest request, Action<GetPhotonAuthenticationTokenResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -738,7 +738,7 @@ namespace PlayFab
         /// Retrieves data stored in a shared group object, as well as the list of members in the group. Non-members of the group
         /// may use this to retrieve group data, including membership, but they will not receive data for keys marked as private.
         /// Shared Groups are designed for sharing data between a very small number of players, please see our guide:
-        /// https://api.playfab.com/docs/tutorials/landing-players/shared-groups
+        /// https://docs.microsoft.com/gaming/playfab/features/social/groups/using-shared-group-data
         /// </summary>
         public void GetSharedGroupData(GetSharedGroupDataRequest request, Action<GetSharedGroupDataResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1408,7 +1408,7 @@ namespace PlayFab
         /// Removes users from the set of those able to update the shared data and the set of users in the group. Only users in the
         /// group can remove members. If as a result of the call, zero users remain with access, the group and its associated data
         /// will be deleted. Shared Groups are designed for sharing data between a very small number of players, please see our
-        /// guide: https://api.playfab.com/docs/tutorials/landing-players/shared-groups
+        /// guide: https://docs.microsoft.com/gaming/playfab/features/social/groups/using-shared-group-data
         /// </summary>
         public void RemoveSharedGroupMembers(RemoveSharedGroupMembersRequest request, Action<RemoveSharedGroupMembersResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1766,7 +1766,7 @@ namespace PlayFab
         /// or added in this call will be readable by users not in the group. By default, data permissions are set to Private.
         /// Regardless of the permission setting, only members of the group can update the data. Shared Groups are designed for
         /// sharing data between a very small number of players, please see our guide:
-        /// https://api.playfab.com/docs/tutorials/landing-players/shared-groups
+        /// https://docs.microsoft.com/gaming/playfab/features/social/groups/using-shared-group-data
         /// </summary>
         public void UpdateSharedGroupData(UpdateSharedGroupDataRequest request, Action<UpdateSharedGroupDataResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {

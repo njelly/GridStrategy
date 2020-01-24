@@ -60,7 +60,7 @@ namespace Tofunaut.GridStrategy.Game
             // TODO: when networked, we need to share this in the room properites and then deserialize it on all clients
             _random = SerializedRandom.CreateNewInstance(1024);
 
-            board = new Board(this, 8, 8);
+            board = new Board(this, 5, 5);
             board.Render(AppManager.Transform);
 
             sun = SharpLight.Sun();

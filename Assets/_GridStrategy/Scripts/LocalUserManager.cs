@@ -98,7 +98,7 @@ namespace Tofunaut.GridStrategy
             // if the user is logged in, attempt to write their data to their account
             if (AccountManager.LoggedIn)
             {
-                AccountManager.Instance.WriteUserData(LocalUserData, onComplete, (TofuError errorCode, string errorMessage) =>
+                AccountManager.Instance.WriteUserData(LocalUserData, onComplete, (TofuErrorCode errorCode, string errorMessage) =>
                 {
                     Debug.LogError($"Failed to write player data remotely, code: {errorCode}, message: {errorMessage}");
                     onComplete();

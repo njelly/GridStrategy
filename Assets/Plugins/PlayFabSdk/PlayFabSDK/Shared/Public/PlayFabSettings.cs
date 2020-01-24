@@ -33,18 +33,23 @@ namespace PlayFab
 
         private static PlayFabSharedSettings _playFabShared = null;
         private static PlayFabSharedSettings PlayFabSharedPrivate { get { if (_playFabShared == null) _playFabShared = GetSharedSettingsObjectPrivate(); return _playFabShared; } }
-        internal static readonly PlayFabApiSettings staticSettings = new PlayFabSettingsRedirect(() => { return PlayFabSharedPrivate; });
 
-        // This field will likely be removed someday
-        internal readonly static PlayFabAuthenticationContext staticPlayer = new PlayFabAuthenticationContext();
+        /// <summary>
+        /// Global settings used by all static API classes, and as the default for all instance API classes
+        /// </summary>
+        public static readonly PlayFabApiSettings staticSettings = new PlayFabSettingsRedirect(() => { return PlayFabSharedPrivate; });
+        /// <summary>
+        /// Global user for all static API classes
+        /// </summary>
+        public static readonly PlayFabAuthenticationContext staticPlayer = new PlayFabAuthenticationContext();
 
-        public const string SdkVersion = "2.79.191218";
+        public const string SdkVersion = "2.80.200121";
         public const string BuildIdentifier = "jbuild_unitysdk__sdk-unity-3-slave_0";
-        public const string VersionString = "UnitySDK-2.79.191218";
+        public const string VersionString = "UnitySDK-2.80.200121";
         public const string AD_TYPE_IDFA = "Idfa";
         public const string AD_TYPE_ANDROID_ID = "Adid";
 
-        internal const string DefaultPlayFabApiUrl = "playfabapi.com";
+        public const string DefaultPlayFabApiUrl = "playfabapi.com";
 
         private static PlayFabSharedSettings GetSharedSettingsObjectPrivate()
         {

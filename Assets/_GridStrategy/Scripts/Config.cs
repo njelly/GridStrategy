@@ -19,6 +19,14 @@ namespace Tofunaut.GridStrategy
     // --------------------------------------------------------------------------------------------
     public class Config
     {
+        public const string LangKeyError = "#LANG#ERROR#";
+        public const string StringIdError = "#ID#ERROR#";
+        public static class LanguageKeys
+        {
+            public const string IdKey = "id";
+            public const string English = "en";
+        }
+
         private static readonly string DefaultConfigPath = Path.Combine(Application.streamingAssetsPath, "DefaultConfig.txt");
 
         private const string CardsKey = "Cards";
@@ -26,6 +34,7 @@ namespace Tofunaut.GridStrategy
         private const string UnitsKey = "Units";
         private const string OpponentsKey = "Opponents";
         private const string SkillsKey = "Skills";
+        private const string I18NKey = "i18n";
 
         private delegate bool ParseRawDataDelegate(object[] rawData);
 
@@ -38,6 +47,8 @@ namespace Tofunaut.GridStrategy
         private Dictionary<string, UnitData> _idToUnitData;
         private Dictionary<string, OpponentData> _idToOpponentData;
         private Dictionary<string, SkillData> _idToSkillData;
+        private Dictionary<string, Dictionary<string, string>> _i18n;
+        private string _languageKey;
 
         // --------------------------------------------------------------------------------------------
         public Config(string serializedData, bool overwriteDefaultConfig)
@@ -45,6 +56,9 @@ namespace Tofunaut.GridStrategy
             Dictionary<string, object[]> sheetData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object[]>>(serializedData);
 
             bool parsedWithErrors = false;
+
+            // default to English, since... I speak english...
+            _languageKey = LanguageKeys.English;
 
             // get global data
             if (sheetData.TryGetValue("Global", out object[] globalDatas))
@@ -69,6 +83,7 @@ namespace Tofunaut.GridStrategy
             parsedWithErrors |= !TryParseRawData(UnitsKey, sheetData, BuildUnitDatas);
             parsedWithErrors |= !TryParseRawData(OpponentsKey, sheetData, BuildOpponentDatas);
             parsedWithErrors |= !TryParseRawData(SkillsKey, sheetData, BuildSkillDatas);
+            parsedWithErrors |= !TryParseI18N(sheetData);
 
             if (parsedWithErrors)
             {
@@ -144,6 +159,32 @@ namespace Tofunaut.GridStrategy
 
             Debug.LogError($"no skill for the id {id}");
             return new SkillData();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void SetLanugage(string languageKey)
+        {
+            _languageKey = languageKey;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public string Localize(string id)
+        {
+            if(_i18n.TryGetValue(id, out Dictionary<string, string> langDict))
+            {
+                if(langDict.TryGetValue(id, out string toReturn))
+                {
+                    return toReturn;
+                }
+                else
+                {
+                    return StringIdError;
+                }
+            }
+            else
+            {
+                return LangKeyError;
+            }
         }
 
         // --------------------------------------------------------------------------------------------
@@ -722,6 +763,56 @@ namespace Tofunaut.GridStrategy
             return !hasError;
         }
 
+        // --------------------------------------------------------------------------------------------
+        public bool TryParseI18N(Dictionary<string, object[]> sheetData)
+        {
+            bool hasError = false;
+            _i18n = new Dictionary<string, Dictionary<string, string>>();
+            if(sheetData.TryGetValue(I18NKey, out object[] i18nObjArray))
+            {
+                foreach(object i18nObj in i18nObjArray)
+                {
+                    try
+                    {
+                        Dictionary<string, string> i18nData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(i18nObj.ToString());
+
+                        if(i18nData.TryGetValue(LanguageKeys.IdKey, out string id))
+                        {
+                            _i18n.Add(id, new Dictionary<string, string>());
+
+                            if(i18nData.TryGetValue(LanguageKeys.English, out string enValue))
+                            {
+                                _i18n[id].Add(LanguageKeys.English, enValue);
+                            }
+                            else
+                            {
+                                Debug.LogError($"no value found in i18n dict for {id} in the language {LanguageKeys.English}");
+                                hasError = true;
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError($"no value found in i18n dict for {LanguageKeys.IdKey}");
+                            hasError = true;
+                        }
+                    }
+                    catch(Newtonsoft.Json.JsonException e)
+                    {
+                        Debug.LogError($"failed to parse i18n object: {e.Message}");
+                        hasError = true;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError($"the string {I18NKey} was not present in the sheeet data");
+                hasError = true;
+            }
+
+            return !hasError;
+        }
+
+        // --------------------------------------------------------------------------------------------
         public static Config DefaultConfig()
         {
             if (!File.Exists(DefaultConfigPath))

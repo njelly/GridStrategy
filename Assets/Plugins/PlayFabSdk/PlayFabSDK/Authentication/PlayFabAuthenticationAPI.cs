@@ -47,14 +47,14 @@ namespace PlayFab
             if (context.IsClientLoggedIn()) { authType = AuthType.LoginSession; }
 #endif
 #if ENABLE_PLAYFABSERVER_API || ENABLE_PLAYFABADMIN_API
-            if (callSettings.DeveloperSecretKey != null) { authType = AuthType.DevSecretKey; } // TODO: Need to get the correct settings first
+            if (callSettings.DeveloperSecretKey != null) { authType = AuthType.DevSecretKey; }
 #endif
 #if !DISABLE_PLAYFABENTITY_API
             if (context.IsEntityLoggedIn()) { authType = AuthType.EntityToken; }
 #endif
 
 
-            PlayFabHttp.MakeApiCall("/Authentication/GetEntityToken", request, authType, resultCallback, errorCallback, customData, extraHeaders, context);
+            PlayFabHttp.MakeApiCall("/Authentication/GetEntityToken", request, authType, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace PlayFab
             if (!context.IsEntityLoggedIn()) throw new PlayFabException(PlayFabExceptionCode.NotLoggedIn,"Must be logged in to call this method");
 
 
-            PlayFabHttp.MakeApiCall("/Authentication/ValidateEntityToken", request, AuthType.EntityToken, resultCallback, errorCallback, customData, extraHeaders, context);
+            PlayFabHttp.MakeApiCall("/Authentication/ValidateEntityToken", request, AuthType.EntityToken, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
 

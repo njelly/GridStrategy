@@ -446,7 +446,7 @@ namespace PlayFab.Internal
             }
         }
 
-        protected internal static void ClearAllEvents()
+        public static void ClearAllEvents()
         {
             ApiProcessingEventHandler = null;
             ApiProcessingErrorEventHandler = null;

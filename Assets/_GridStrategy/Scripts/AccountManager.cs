@@ -57,10 +57,11 @@ namespace Tofunaut.GridStrategy
                 _accountData = _authenticationManager.AccountData;
                 AuthenticatedSuccessfully?.Invoke(this, new AuthenticatedSuccessfullyEventArgs(_accountData));
                 onSuccess();
-            }, (TofuError errorCode, string errorMessage) => {
+            }, (TofuErrorCode errorCode, string errorMessage) =>
+            {
                 FailedToAuthenticate?.Invoke(this, EventArgs.Empty);
                 onFailure(errorCode, errorMessage);
-            } );
+            });
         }
 
 

@@ -2105,6 +2105,7 @@ namespace PlayFab.AdminModels
         InsightsManagementTitleInEvaluationMode,
         CloudScriptAzureFunctionsQueueRequestError,
         EvaluationModeTitleCountExceeded,
+        InsightsManagementTitleNotInFlight,
         MatchmakingEntityInvalid,
         MatchmakingPlayerAttributesInvalid,
         MatchmakingQueueNotFound,

@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace PlayFab.Internal
 {
-    internal static class PlayFabUtil
+    public static class PlayFabUtil
     {
         static PlayFabUtil() { }
 

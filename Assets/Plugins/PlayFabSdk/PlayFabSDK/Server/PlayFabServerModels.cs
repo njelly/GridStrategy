@@ -1881,6 +1881,7 @@ namespace PlayFab.ServerModels
         InsightsManagementTitleInEvaluationMode,
         CloudScriptAzureFunctionsQueueRequestError,
         EvaluationModeTitleCountExceeded,
+        InsightsManagementTitleNotInFlight,
         MatchmakingEntityInvalid,
         MatchmakingPlayerAttributesInvalid,
         MatchmakingQueueNotFound,
@@ -3649,6 +3650,36 @@ namespace PlayFab.ServerModels
         /// Linked account username of the user on the platform, if available
         /// </summary>
         public string Username;
+    }
+
+    [Serializable]
+    public class LinkPSNAccountRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Authentication code provided by the PlayStation Network.
+        /// </summary>
+        public string AuthCode;
+        /// <summary>
+        /// If another user is already linked to the account, unlink the other user and re-link.
+        /// </summary>
+        public bool? ForceLink;
+        /// <summary>
+        /// Id of the PSN issuer environment. If null, defaults to 256 (production)
+        /// </summary>
+        public int? IssuerId;
+        /// <summary>
+        /// Unique PlayFab assigned ID of the user on whom the operation will be performed.
+        /// </summary>
+        public string PlayFabId;
+        /// <summary>
+        /// Redirect URI supplied to PSN when requesting an auth code
+        /// </summary>
+        public string RedirectUri;
+    }
+
+    [Serializable]
+    public class LinkPSNAccountResult : PlayFabResultCommon
+    {
     }
 
     [Serializable]
@@ -5598,6 +5629,20 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
+    public class UnlinkPSNAccountRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Unique PlayFab assigned ID of the user on whom the operation will be performed.
+        /// </summary>
+        public string PlayFabId;
+    }
+
+    [Serializable]
+    public class UnlinkPSNAccountResult : PlayFabResultCommon
+    {
+    }
+
+    [Serializable]
     public class UnlinkServerCustomIdRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -6485,10 +6530,6 @@ namespace PlayFab.ServerModels
         /// </summary>
         public string CharacterId;
         /// <summary>
-        /// The optional custom tags associated with the event (e.g. build number, external trace identifiers, etc.).
-        /// </summary>
-        public Dictionary<string,string> EventCustomTags;
-        /// <summary>
         /// The name of the event, within the namespace scoped to the title. The naming convention is up to the caller, but it
         /// commonly follows the subject_verb_object pattern (e.g. player_logged_in).
         /// </summary>
@@ -6516,10 +6557,6 @@ namespace PlayFab.ServerModels
         /// </summary>
         public Dictionary<string,object> Body;
         /// <summary>
-        /// The optional custom tags associated with the event (e.g. build number, external trace identifiers, etc.).
-        /// </summary>
-        public Dictionary<string,string> EventCustomTags;
-        /// <summary>
         /// The name of the event, within the namespace scoped to the title. The naming convention is up to the caller, but it
         /// commonly follows the subject_verb_object pattern (e.g. player_logged_in).
         /// </summary>
@@ -6546,10 +6583,6 @@ namespace PlayFab.ServerModels
         /// Custom event properties. Each property consists of a name (string) and a value (JSON object).
         /// </summary>
         public Dictionary<string,object> Body;
-        /// <summary>
-        /// The optional custom tags associated with the event (e.g. build number, external trace identifiers, etc.).
-        /// </summary>
-        public Dictionary<string,string> EventCustomTags;
         /// <summary>
         /// The name of the event, within the namespace scoped to the title. The naming convention is up to the caller, but it
         /// commonly follows the subject_verb_object pattern (e.g. player_logged_in).
