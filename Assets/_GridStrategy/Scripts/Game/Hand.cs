@@ -55,9 +55,13 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            _discardPile.Add(card);
-
             OnPlayerDiscardedCard?.Invoke(this, new Card.CardEventArgs(card));
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool ContainsCard(Card card)
+        {
+            return _cards.Contains(card);
         }
     }
 }

@@ -15,9 +15,10 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Player
     {
-        public static event EventHandler<PlayerEventArgs> PlayerTurnStarted;
-        public static event EventHandler<PlayerEventArgs> PlayerTurnEnded;
+        public event EventHandler<PlayerEventArgs> PlayerTurnStarted;
+        public event EventHandler<PlayerEventArgs> PlayerTurnEnded;
         public event EventHandler<PlayerEventArgs> PlayerLost;
+        public event EventHandler<PlayerEventArgs> PlayerPlayedCard;
 
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
         public Unit Hero => _hero;
@@ -115,6 +116,30 @@ namespace Tofunaut.GridStrategy.Game
         public void EndTurn()
         {
             PlayerTurnEnded?.Invoke(this, new PlayerEventArgs(this));
+        }
+
+        // --------------------------------------------------------------------------------------------s
+        public void PlayCard(Card card, BoardTile targetTile)
+        {
+            _energy = Mathf.Clamp(_energy - card.energyRequired, 0, _energyCap);
+
+            if(!string.IsNullOrEmpty(card.cardData.spawnUnitId))
+            {
+                PlaceUnit(AppManager.Config.GetUnitData(card.cardData.spawnUnitId), targetTile);
+            }
+            if(!string.IsNullOrEmpty(card.cardData.useSkillId))
+            {
+                throw new NotImplementedException("haven't implemented playing cards with useSkillId");
+            }
+
+            if(_hand.ContainsCard(card))
+            {
+                _hand.DiscardCard(card);
+            }
+
+            _discardPile.Add(card);
+
+            PlayerPlayedCard?.Invoke(this, new PlayerEventArgs(this));
         }
 
         // --------------------------------------------------------------------------------------------

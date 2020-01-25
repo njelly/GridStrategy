@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 925957138239149712}
   - component: {fileID: 379213142038819249}
   - component: {fileID: 1531960483557231409}
+  - component: {fileID: 4409295545196328302}
   m_Layer: 0
   m_Name: FireSpriteView
   m_TagString: Untagged
@@ -63,6 +64,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &4409295545196328302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925957138239149715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12299b3501af3cb43a5e775d96ed2c5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidbody: {fileID: 1531960483557231409}
+  collider: {fileID: 379213142038819249}
 --- !u!1 &2189010008706832741
 GameObject:
   m_ObjectHideFlags: 0

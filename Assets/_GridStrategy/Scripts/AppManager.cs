@@ -255,15 +255,17 @@ namespace Tofunaut.GridStrategy
 
             if(e.accountData.titleData.TryGetValue("game_config", out string serializedConfig))
             {
-                serializedConfig = serializedConfig.Replace(@"\r", "");
-                serializedConfig = serializedConfig.Replace(@"\n", "");
+                // TODO: Does it matter to remove these characters? It makes the default config unreadable...
+                //serializedConfig = serializedConfig.Replace(" ", "");
+                //serializedConfig = serializedConfig.Replace("\t", "");
+                //serializedConfig = serializedConfig.Replace("\r", "");
+                //serializedConfig = serializedConfig.Replace("\n", "");
 
                 Config = new Config(serializedConfig, true);
             }
             else
             {
                 Debug.LogError("the key game_config wasn't found in the title data");
-
                 Config = Config.DefaultConfig();
             }
         }

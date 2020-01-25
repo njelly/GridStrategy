@@ -12,6 +12,7 @@ using TofuCore;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 // --------------------------------------------------------------------------------------------
@@ -55,11 +56,12 @@ namespace Tofunaut.GridStrategy.Game.UI
         protected override void PostRender()
         {
             base.PostRender();
-            Player.PlayerTurnStarted += OnPlayerTurnStarted;
 
             foreach(Player player in _playerToPlayerPanels.Keys)
             {
                 player.Hero.OnTookDamage += OnUnitTookDamage;
+                player.PlayerTurnStarted += OnPlayerTurnStarted;
+                player.PlayerPlayedCard += OnPlayerPlayedCard;
             }
 
             _game.GameBegan += OnGameBegan;
@@ -78,11 +80,11 @@ namespace Tofunaut.GridStrategy.Game.UI
                 playerPanel.Hide();
             }
 
-            Player.PlayerTurnStarted -= OnPlayerTurnStarted;
-
             foreach (Player player in _playerToPlayerPanels.Keys)
             {
                 player.Hero.OnTookDamage -= OnUnitTookDamage;
+                player.PlayerTurnStarted -= OnPlayerTurnStarted;
+                player.PlayerPlayedCard -= OnPlayerPlayedCard;
             }
 
             _localPlayerHand.Hide();
@@ -147,11 +149,14 @@ namespace Tofunaut.GridStrategy.Game.UI
             {
                 _unitOptionsView.Hide();
             }
+            
+            _playerToPlayerPanels[e.player].SetEnergy(e.player.Energy, e.player.EnergyCap);
+        }
 
-            foreach (Player player in _playerToPlayerPanels.Keys)
-            {
-                _playerToPlayerPanels[player].SetEnergy(player.Energy, player.EnergyCap);
-            }
+        // --------------------------------------------------------------------------------------------
+        private void OnPlayerPlayedCard(object sender, Player.PlayerEventArgs e)
+        {
+            _playerToPlayerPanels[e.player].SetEnergy(e.player.Energy, e.player.EnergyCap);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -196,14 +201,25 @@ namespace Tofunaut.GridStrategy.Game.UI
 
         #region UIPlayerHand.IListener
 
+        // --------------------------------------------------------------------------------------------
         public void OnPlayerDraggedOutCard(Card card)
         {
             _game.board.HighlightBoardTilesForPlayCard(card);
         }
 
+        // --------------------------------------------------------------------------------------------
         public void OnPlayerReleasedCard(Card card, PointerEventData pointerEventData)
         {
             _game.board.ClearAllBoardTileHighlights();
+
+            if(_game.board.RaycastToPlane(_game.gameCamera.ScreenPointToRay(pointerEventData.position),out Vector3 worldPosition)) 
+            {
+                BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPosition);
+                if(boardTile != null && Card.CanPlayOnTile(_game, card.Owner, card.cardData, boardTile))
+                {
+                    _game.QueueAction(new PlayCardAction(card.Owner.playerIndex, card.id, boardTile.Coord), () => { });
+                }
+            }
         }
 
         #endregion UIPlayerHand.IListener

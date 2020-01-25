@@ -28,11 +28,15 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void OnDestroy()
         {
-            _unitToView.Remove(Unit);
+            // Unit will be null when this prefab is instantiated without calling Create
+            if(Unit != null)
+            {
+                _unitToView.Remove(Unit);
+            }
         }
 
         // --------------------------------------------------------------------------------------------
-        public static void Create(Unit unit, UnitData data, InstantiateDelegate callback)
+        public static void CreateForGame(Unit unit, UnitData data, InstantiateDelegate callback)
         {
             AppManager.AssetManager.Load(data.prefabPath, (bool successful, GameObject payload) =>
             {

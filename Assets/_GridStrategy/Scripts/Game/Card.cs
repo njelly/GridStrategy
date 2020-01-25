@@ -15,11 +15,15 @@ namespace Tofunaut.GridStrategy.Game
     // --------------------------------------------------------------------------------------------
     public class Card
     {
+        private static int _idCounter = 0;
+        private static List<Card> _idToCard = new List<Card>();
+
         public Player Owner { get { return _owner; } }
 
         public readonly CardData cardData;
         public readonly string name;
-        public readonly int solidarityRequired;
+        public readonly int energyRequired;
+        public readonly int id;
 
         private readonly Game _game;
 
@@ -31,15 +35,25 @@ namespace Tofunaut.GridStrategy.Game
             cardData = data;
             name = data.id;
             _owner = owner;
-            solidarityRequired = data.energyRequired;
+            energyRequired = data.energyRequired;
 
             _game = game;
+
+            id = _idCounter;
+            _idCounter++;
+            _idToCard.Add(this);
         }
 
         // --------------------------------------------------------------------------------------------
         public List<BoardTile> GetPlayableTiles()
         {
             return GetPlayableTiles(_game, _owner, cardData);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public bool CanPlayOnTile(BoardTile boardTile)
+        {
+            return GetPlayableTiles().Contains(boardTile);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -71,6 +85,23 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             return toReturn;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static bool CanPlayOnTile(Game game, Player owner, CardData cardData, BoardTile boardTile)
+        {
+            return GetPlayableTiles(game, owner, cardData).Contains(boardTile);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public static Card GetCard(int id)
+        {
+            if (id >= _idToCard.Count)
+            {
+                Debug.LogError($"no unit for id {id}");
+            }
+
+            return _idToCard[id];
         }
 
         // --------------------------------------------------------------------------------------------

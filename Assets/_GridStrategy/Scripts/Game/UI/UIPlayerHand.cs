@@ -12,6 +12,7 @@ using Tofunaut.Animation;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity.UI;
 using Tofunaut.SharpUnity.UI.Behaviour;
+using Tofunaut.UnityUtils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -50,7 +51,7 @@ namespace Tofunaut.GridStrategy.Game.UI
         private Vector2 _dragStartAnchorPos;
         private Vector2 _draggingCardAnchorPosOffset;
         private TofuAnimation _cardCorrectRotAnim;
-        private TofuAnimation _cardOverPlayableTileAnimation;
+        private TofuAnimation _cardOffsetAnimation;
         private TofuAnimation _cardNotOverPlayableTileAnimation;
         private List<BoardTile> _draggingCardPlayableTiles;
 
@@ -212,10 +213,6 @@ namespace Tofunaut.GridStrategy.Game.UI
                         {
                             UICard_OnPointerUp(uiCard, eventArgs.eventData as PointerEventData);
                         });
-                        uiCard.SubscribeToEvent(EEventType.PointerHold, (object eSender, EventSystemEventArgs eventArgs) =>
-                        {
-                            UICard_OnPointerHold(uiCard, eventArgs.eventData as PointerEventData);
-                        });
 
                         if (numLoadCalls == numLoadCallsCompleted)
                         {
@@ -302,8 +299,6 @@ namespace Tofunaut.GridStrategy.Game.UI
                 return;
             }
 
-            uiCard.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos) + _draggingCardAnchorPosOffset;
-
             if(_cardCorrectRotAnim == null)
             {
                 Quaternion startRot = uiCard.LocalRotation;
@@ -314,61 +309,81 @@ namespace Tofunaut.GridStrategy.Game.UI
                     })
                     .Play();
             }
+
+            //if(_game.board.RaycastToPlane(_game.gameCamera.ScreenPointToRay(pointerEventData.position), out Vector3 worldPos))
+            //{
+            //    BoardTile draggingOverTile = _game.board.GetBoardTileAtPosition(worldPos);
+            //    if(draggingOverTile != null)
+            //    {
+            //        List<BoardTile> playableTiles = Card.GetPlayableTiles(_game, _player, _draggingCard.CardData);
+            //        bool isTilePlayable = false;
+            //        foreach(BoardTile boardTile in playableTiles)
+            //        {
+            //            isTilePlayable |= boardTile == draggingOverTile;
+            //        }
+            //        if(isTilePlayable)
+            //        {
+            //            AnimateCardToSide();
+            //        }
+            //        else
+            //        {
+            //            CenterCardOnPointer();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        CenterCardOnPointer();
+            //    }
+            //}
+            //else
+            //{
+            //    CenterCardOnPointer();
+            //}
+
+            _draggingCard.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos) + _draggingCardAnchorPosOffset;
         }
 
-        // --------------------------------------------------------------------------------------------
-        private void UICard_OnPointerHold(UICard uiCard, PointerEventData pointerEventData)
-        {
-            if (uiCard != _draggingCard)
-            {
-                return;
-            }
-
-            uiCard.RectTransform.anchoredPosition = _dragStartAnchorPos + UIMainCanvas.Instance.PointerPositionToAnchoredPosition(pointerEventData.position - _dragStartPointerPos) + _draggingCardAnchorPosOffset;
-
-            if (_game.board.RaycastToPlane(pointerEventData.position, out Vector3 worldPos))
-            {
-                BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPos);
-                if (boardTile != null && _draggingCardPlayableTiles.Contains(boardTile))
-                {
-                    _cardNotOverPlayableTileAnimation?.Stop();
-                    _cardNotOverPlayableTileAnimation = null;
-                    if (_cardOverPlayableTileAnimation == null)
-                    {
-                        _cardOverPlayableTileAnimation = new TofuAnimation()
-                            .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
-                            {
-                                Vector2 targetOffset = CardOverPlayableTileOffset;
-                                if (targetOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
-                                {
-                                    targetOffset.x *= -1;
-                                }
-                                _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(Vector2.zero, targetOffset, newValue);
-                            })
-                            .Play();
-                    }
-                }
-                else
-                {
-                    _cardOverPlayableTileAnimation?.Stop();
-                    _cardOverPlayableTileAnimation = null;
-                    if (_cardNotOverPlayableTileAnimation == null)
-                    {
-                        _cardNotOverPlayableTileAnimation = new TofuAnimation()
-                            .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
-                            {
-                                Vector2 targetOffset = _draggingCardAnchorPosOffset;
-                                if (_draggingCardAnchorPosOffset.x + _draggingCard.RectTransform.sizeDelta.x > (_draggingCard.Parent as IRectTransformOwner).RectTransform.sizeDelta.x)
-                                {
-                                    targetOffset.x *= -1;
-                                }
-                                _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(targetOffset, Vector2.zero, newValue);
-                            })
-                            .Play();
-                    }
-                }
-            }
-        }
+        //private void AnimateCardToSide()
+        //{
+        //    _cardOffsetAnimation?.Stop();
+        //    _cardOffsetAnimation = null;
+        //
+        //    Vector2 startOffset = _draggingCardAnchorPosOffset;
+        //    Vector2 endOffset = CardOverPlayableTileOffset;
+        //
+        //    _cardOffsetAnimation = new TofuAnimation()
+        //        .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+        //        {
+        //            _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(startOffset, endOffset, newValue);
+        //        })
+        //        .Then()
+        //        .Execute(() =>
+        //        {
+        //            _cardOffsetAnimation = null;
+        //        })
+        //        .Play();
+        //}
+        //
+        //// --------------------------------------------------------------------------------------------
+        //private void CenterCardOnPointer()
+        //{
+        //    _cardOffsetAnimation?.Stop();
+        //    _cardOffsetAnimation = null;
+        //
+        //    Vector2 startOffset = _draggingCardAnchorPosOffset;
+        //
+        //    _cardOffsetAnimation = new TofuAnimation()
+        //        .Value01(CardOverPlayableTileAnimTime, EEaseType.EaseOutExpo, (float newValue) =>
+        //        {
+        //            _draggingCardAnchorPosOffset = Vector2.LerpUnclamped(startOffset, Vector2.zero, newValue);
+        //        })
+        //        .Then()
+        //        .Execute(() =>
+        //        {
+        //            _cardOffsetAnimation = null;
+        //        })
+        //        .Play();
+        //}
 
         // --------------------------------------------------------------------------------------------
         private void UICard_OnPointerUp(UICard uiCard, PointerEventData pointerEventData)
@@ -383,13 +398,11 @@ namespace Tofunaut.GridStrategy.Game.UI
             _cardCorrectRotAnim?.Stop();
             _cardCorrectRotAnim = null;
 
-            _cardOverPlayableTileAnimation?.Stop();
-            _cardOverPlayableTileAnimation = null;
-
-            _cardNotOverPlayableTileAnimation?.Stop();
-            _cardNotOverPlayableTileAnimation = null;
+            _cardOffsetAnimation?.Stop();
+            _cardOffsetAnimation = null;
 
             _draggingCard = null;
+            _draggingCardAnchorPosOffset = Vector2.zero;
 
             PositionCards(true);
         }

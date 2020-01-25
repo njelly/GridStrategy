@@ -28,6 +28,7 @@ namespace Tofunaut.GridStrategy.Game
             MoveUnit = 1,
             UseSkill = 2,
             EndTurn = 3,
+            PlayCard = 4,
         }
 
         public EType type;
@@ -165,6 +166,54 @@ namespace Tofunaut.GridStrategy.Game
         {
             game.EndTurn();
             OnComplete?.Invoke();
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------
+    /// <summary>
+    /// End the player's turn.
+    /// </summary>
+    public class PlayCardAction : PlayerAction
+    {
+        public int cardId;
+        public IntVector2 coord;
+
+        public PlayCardAction(int playerIndex, int cardId, IntVector2 coord) : base(EType.PlayCard, playerIndex)
+        {
+            this.cardId = cardId;
+            this.coord = coord;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override bool IsValid(Game game)
+        {
+            Card card = Card.GetCard(cardId);
+            BoardTile boardTile = game.board.GetTile(coord);
+            if(boardTile == null)
+            {
+                return false;
+            }
+
+            if(!card.CanPlayOnTile(boardTile))
+            {
+                return false;
+            }
+
+            if(card.energyRequired > card.Owner.Energy)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public override void Execute(Game game, Action OnComplete)
+        {
+            Card card = Card.GetCard(cardId);
+            BoardTile boardTile = game.board.GetTile(coord);
+
+            card.Owner.PlayCard(card, boardTile);
         }
     }
 }

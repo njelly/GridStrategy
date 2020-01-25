@@ -72,9 +72,6 @@ namespace Tofunaut.GridStrategy.Game
             Health = _data.health;
             MoveRange = _data.moveRange;
 
-            Player.PlayerTurnStarted += Player_PlayerTurnStarted;
-            Player.PlayerTurnEnded += Player_PlayerTurnEnded;
-
             Skill = new Skill(AppManager.Config.GetSkillData(_data.skillId), _game, this);
         }
 
@@ -83,10 +80,13 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         protected override void Build()
         {
-            UnitView.Create(this, _data, (UnitView view) =>
+            UnitView.CreateForGame(this, _data, (UnitView view) =>
             {
                 _view = view;
             });
+
+            _owner.PlayerTurnStarted += Player_PlayerTurnStarted;
+            _owner.PlayerTurnEnded += Player_PlayerTurnEnded;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -94,8 +94,8 @@ namespace Tofunaut.GridStrategy.Game
         {
             base.Destroy();
 
-            Player.PlayerTurnStarted -= Player_PlayerTurnStarted;
-            Player.PlayerTurnEnded -= Player_PlayerTurnEnded;
+            _owner.PlayerTurnStarted -= Player_PlayerTurnStarted;
+            _owner.PlayerTurnEnded -= Player_PlayerTurnEnded;
         }
 
         #endregion SharpGameObject
