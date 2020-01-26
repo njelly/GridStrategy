@@ -196,6 +196,8 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
+            HasUsedSkill = true;
+
             if(faceTowards != Facing)
             {
                 SetFacing(faceTowards, false);

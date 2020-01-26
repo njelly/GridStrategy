@@ -61,6 +61,12 @@ namespace Tofunaut.GridStrategy.Game
         {
             List<BoardTile> toReturn = new List<BoardTile>();
 
+            if(cardData.energyRequired > owner.Energy)
+            {
+                // return empty list because this card is too expensive to be palyed.
+                return toReturn;
+            }
+
             if (!string.IsNullOrEmpty(cardData.useSkillId))
             {
                 return Skill.GetTargetableTiles(AppManager.Config.GetSkillData(cardData.useSkillId), game, owner.Hero);
