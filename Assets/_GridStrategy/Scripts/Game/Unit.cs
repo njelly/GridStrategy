@@ -80,7 +80,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         protected override void Build()
         {
-            UnitView.CreateForGame(this, _data, (UnitView view) =>
+            UnitView.CreateForGame(_game, this, _data, (UnitView view) =>
             {
                 _view = view;
             });
@@ -287,6 +287,11 @@ namespace Tofunaut.GridStrategy.Game
             Health = Mathf.Clamp(Health - amount, 0, Health);
 
             OnTookDamage?.Invoke(this, new DamageEventArgs(sourceUnit, this, previousHealth, Health, Health <= 0));
+
+            if(Health <= 0)
+            {
+                Destroy();
+            }
         }
 
         // --------------------------------------------------------------------------------------------

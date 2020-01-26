@@ -190,7 +190,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             if(!_selectingDirection)
             {
                 _useSkillButton.RectTransform.anchoredPosition = new Vector2(0, 100)
-                    + UIMainCanvas.Instance.GetCanvasPositionForGameObject(_following.GameObject, _game.gameCamera.UnityCamera);
+                    + UIMainCanvas.Instance.GetCanvasPositionForWorldPosition(_following.GameObject.transform.position, _game.gameCamera.UnityCamera);
             }
         }
 

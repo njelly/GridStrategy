@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using TofuCore;
+using Tofunaut.GridStrategy.UI;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -25,6 +26,8 @@ namespace Tofunaut.GridStrategy.Game
         public new Rigidbody rigidbody;
         public new Collider collider;
 
+        private UIUnitHealthBarView _healthBarView;
+
         // --------------------------------------------------------------------------------------------
         private void OnDestroy()
         {
@@ -36,7 +39,7 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public static void CreateForGame(Unit unit, UnitData data, InstantiateDelegate callback)
+        public static void CreateForGame(Game game, Unit unit, UnitData data, InstantiateDelegate callback)
         {
             AppManager.AssetManager.Load(data.prefabPath, (bool successful, GameObject payload) =>
             {
@@ -46,6 +49,7 @@ namespace Tofunaut.GridStrategy.Game
 
                     UnitView view = viewGo.GetComponent<UnitView>();
                     view.Unit = unit;
+                    view._healthBarView = new UIUnitHealthBarView(game, unit);
 
                     _unitToView.Add(unit, view);
 
