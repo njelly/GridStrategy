@@ -221,6 +221,175 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        private class IntVector2AsAStarNode
+        {
+            public IntVector2 coord;
+            public IntVector2AsAStarNode previous;
+            public int f, g, h;
+
+            public IntVector2[] ToPath()
+            {
+                List<IntVector2> asList = new List<IntVector2>();
+                IntVector2AsAStarNode current = this;
+                while (current != null)
+                {
+                    asList.Add(current.coord);
+                    current = current.previous;
+                }
+                asList.Reverse();
+                return asList.ToArray();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Finds the best path for a unit to a target coordinate using A*
+        /// </summary>
+        public IntVector2[] BestPathForUnit(Unit unit, IntVector2 startCoord, IntVector2 targetCoord, int movementExhausted)
+        {
+            // A* implementation for best path
+            List<IntVector2AsAStarNode> open = new List<IntVector2AsAStarNode>();
+            List<IntVector2AsAStarNode> closed = new List<IntVector2AsAStarNode>();
+            open.Add(new IntVector2AsAStarNode
+            {
+                coord = startCoord,
+                previous = null,
+                f = 0,
+                g = 0,
+                h = 0,
+            });
+
+            int moveRange = unit.MoveRange - movementExhausted;
+
+            IntVector2[] bestPath = new IntVector2[0];
+            while(open.Count > 0)
+            {
+                // sort the open list ascending by f value
+                open.Sort((IntVector2AsAStarNode a, IntVector2AsAStarNode b) =>
+                {
+                    return a.f.CompareTo(b.f);
+                });
+
+                // set the current node to the node with the least f
+                IntVector2AsAStarNode currentNode = open[0];
+
+                closed.Add(open[0]);
+                open.RemoveAt(0);
+
+                if(currentNode.coord.Equals(targetCoord)) // remember to you .Equals() instead of == becuase these are not the same object
+                {
+                    bestPath = currentNode.ToPath();
+                    break;
+                }
+
+                List<BoardTile> nextBoardTiles = new List<BoardTile>();
+                BoardTile northTile = GetTile(currentNode.coord.x, currentNode.coord.y + 1);
+                if(northTile != null)
+                {
+                    nextBoardTiles.Add(northTile);
+                }
+                BoardTile southTile = GetTile(currentNode.coord.x, currentNode.coord.y - 1);
+                if (southTile != null)
+                {
+                    nextBoardTiles.Add(southTile);
+                }
+                BoardTile eastTile = GetTile(currentNode.coord.x + 1, currentNode.coord.y);
+                if (eastTile != null)
+                {
+                    nextBoardTiles.Add(eastTile);
+                }
+                BoardTile westTile = GetTile(currentNode.coord.x - 1, currentNode.coord.y);
+                if (westTile != null)
+                {
+                    nextBoardTiles.Add(westTile);
+                }
+                foreach(BoardTile boardTile in nextBoardTiles)
+                {
+                    // check if we've already visited this coord
+                    bool isClosed = false;
+                    foreach(IntVector2AsAStarNode closedNode in closed)
+                    {
+                        isClosed |= closedNode.coord.Equals(boardTile.Coord);
+                    }
+                    if(isClosed)
+                    {
+                        continue;
+                    }
+
+                    // create a new node to add to the open list
+                    IntVector2AsAStarNode childNode = new IntVector2AsAStarNode();
+                    childNode.coord = boardTile.Coord;
+                    childNode.previous = currentNode;
+                    childNode.g = currentNode.g + boardTile.GetMoveCostForUnit(unit);
+                    childNode.h = (boardTile.Coord - targetCoord).ManhattanDistance;
+                    childNode.f = childNode.g + childNode.h;
+
+                    // we can't look at tiles that are beyond a unit's move range or that are occupied by some other unit
+                    if(childNode.g > moveRange || (boardTile.Occupant != null && boardTile.Occupant != unit))
+                    {
+                        continue;
+                    }
+
+                    // check if we've visited this coord but now we have a better path to it
+                    bool foundBetterPath = false;
+                    bool haveVisited = false;
+                    foreach (IntVector2AsAStarNode openNode in open)
+                    {
+                        if(!openNode.coord.Equals(childNode.coord))
+                        {
+                            continue;
+                        }
+
+                        haveVisited = true;
+
+                        if(openNode.f < childNode.f)
+                        {
+                            continue;
+                        }
+
+                        // we've found a better node!
+                        openNode.g = childNode.g;
+                        openNode.h = childNode.h;
+                        openNode.f = childNode.f;
+                        openNode.previous = childNode.previous;
+                        foundBetterPath = true;
+                    }
+
+                    if(!haveVisited || !foundBetterPath)
+                    {
+                        open.Add(childNode);
+                    }
+                }
+            }
+
+            if(bestPath.Length == 0)
+            {
+                // if we haven't found a best path, then there's no way the unit could move to the target
+                // instead, return the best path to the node closest to the target
+                List<IntVector2AsAStarNode> toCullFromClosed = new List<IntVector2AsAStarNode>();
+                foreach (IntVector2AsAStarNode closedNode in closed)
+                {
+                    if (closedNode.g != moveRange)
+                    {
+                        toCullFromClosed.Remove(closedNode);
+                    }
+                }
+                foreach (IntVector2AsAStarNode toRemove in toCullFromClosed)
+                {
+                    closed.Remove(toRemove);
+                }
+
+                closed.Sort((IntVector2AsAStarNode a, IntVector2AsAStarNode b) =>
+                {
+                    return a.f.CompareTo(b.f);
+                });
+
+                bestPath = closed[0].ToPath();
+            }
+
+            return bestPath;
+        }
+
         // --------------------------------------------------------------------------------------------
         public void HighlightBoardTilesForUseSkill(Skill skill)
         {

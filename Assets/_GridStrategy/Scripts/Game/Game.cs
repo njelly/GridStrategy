@@ -48,7 +48,7 @@ namespace Tofunaut.GridStrategy.Game
         private int _actionIndex;
         private HUDManager _hudManager;
         private UIWorldInteractionPanel _uiWorldInteractionPanel;
-        private UnitPathSelectionManager _unitPathSelectionManager;
+        private UnitActionManager _unitActionManager;
         private SerializedRandom _random;
 
         // --------------------------------------------------------------------------------------------
@@ -79,11 +79,8 @@ namespace Tofunaut.GridStrategy.Game
             // This needs to happen before gameCamera, since it needs to register itself as a listener to UIWorldIteractionPanel
             _uiWorldInteractionPanel = UIWorldInteractionPanel.Create(this);
 
-            _unitPathSelectionManager = new UnitPathSelectionManager(this);
-            _unitPathSelectionManager.OnPathSelected += OnPathSelected;
-            _unitPathSelectionManager.OnBoardTileSelected += OnBoardTileSelected;
-            _unitPathSelectionManager.OnUnitSelected += OnUnitSelected;
-            UIWorldInteractionPanel.AddListener(_unitPathSelectionManager);
+            _unitActionManager = new UnitActionManager(this);
+            UIWorldInteractionPanel.AddListener(_unitActionManager);
 
             gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
             gameCamera.Render(AppManager.Transform);
@@ -168,10 +165,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void CleanUp()
         {
-            _unitPathSelectionManager.OnPathSelected -= OnPathSelected;
-            _unitPathSelectionManager.OnBoardTileSelected -= OnBoardTileSelected;
-            _unitPathSelectionManager.OnUnitSelected -= OnUnitSelected;
-            UIWorldInteractionPanel.RemoveListener(_unitPathSelectionManager);
+            UIWorldInteractionPanel.RemoveListener(_unitActionManager);
 
             gameCamera.Destroy();
             sun.Destroy();
@@ -214,48 +208,6 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             CurrentPlayer.StartTurn();
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void OnPathSelected(object sender, UnitPathSelectionManager.PathEventArgs e)
-        {
-            _hudManager.ShowConfirmationDialog(() =>
-            {
-                _unitPathSelectionManager.Enabled = false;
-                QueueAction(new MoveAction(_currentPlayerIndex, e.unitView.Unit.id, e.path), () =>
-                {
-                    _unitPathSelectionManager.Enabled = true;
-                });
-            }, () =>
-            {
-                _unitPathSelectionManager.ClearSelection();
-            });
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void OnBoardTileSelected(object sender, UnitPathSelectionManager.BoardTileEventArgs e)
-        {
-            if(e.boardTileView != null)
-            {
-                if(e.boardTileView.BoardTile == board.HighlightedTile)
-                {
-                    board.ClearAllBoardTileHighlights();
-                }
-                else
-                {
-                    board.HighlightBoardTile(e.boardTileView.BoardTile.Coord);
-                }
-            }
-            else
-            {
-                board.ClearAllBoardTileHighlights();
-            }
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void OnUnitSelected(object sender, UnitPathSelectionManager.UnitEventArgs e)
-        {
-            _hudManager.ShowUnitOptions(e.unitView.Unit);
         }
 
         // --------------------------------------------------------------------------------------------

@@ -93,13 +93,13 @@ namespace Tofunaut.GridStrategy.Game.UI
         // --------------------------------------------------------------------------------------------
         public static void AddListener(IListener listener)
         {
-            _instance._listeners.Add(listener);
+            _instance?._listeners.Add(listener);
         }
 
         // --------------------------------------------------------------------------------------------
         public static void RemoveListener(IListener listener)
         {
-            _instance._listeners.Remove(listener);
+            _instance?._listeners.Remove(listener);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                     UnitView view = hit.collider.GetComponentInParent<UnitView>();
                     if (view != null && view == _potentialSelectedUnitView)
                     {
-                        foreach(IListener listener in _listeners)
+                        foreach (IListener listener in _listeners)
                         {
                             listener.OnSelectedUnitView(view);
                         }
@@ -162,7 +162,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 }
             }
 
-            if(!upOnUnitView)
+            if (!upOnUnitView)
             {
                 foreach (IListener listener in _listeners)
                 {
@@ -207,7 +207,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
 
             UIWorldInteractionPanel toReturn = new UIWorldInteractionPanel(game);
-            UIMainCanvas.Instance.AddChild(toReturn, UIPriorities.UIWorldInteractionManager);
+            UIMainCanvas.Instance.AddChild(toReturn, UIPriorities.UIWorldInteractionPanel);
 
             return toReturn;
         }

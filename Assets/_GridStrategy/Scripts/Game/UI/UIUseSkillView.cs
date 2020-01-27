@@ -19,7 +19,7 @@ using UnityEngine.EventSystems;
 namespace Tofunaut.GridStrategy.Game.UI
 {
     // --------------------------------------------------------------------------------------------
-    public class UIUseSkillView : UIGridStrategyView, Updater.IUpdateable
+    public class UIUseSkillView : UIGridStrategyView
     {
         // --------------------------------------------------------------------------------------------
         public interface IListener
@@ -39,7 +39,6 @@ namespace Tofunaut.GridStrategy.Game.UI
         private Unit _following;
         private SharpUIImage _useSkillButton;
         private SharpSprite _facingArrow;
-        private bool _selectingDirection;
         private Unit.EFacing _currentFacing;
         private Vector3 _startDragWorldPos;
         private BoardTile _selectedBoardTile;
@@ -61,13 +60,9 @@ namespace Tofunaut.GridStrategy.Game.UI
             SharpUINonDrawingGraphic toReturn = new SharpUINonDrawingGraphic("UIUnitOptionsView");
             toReturn.SetFillSize();
 
-            toReturn.SubscribeToEvent(EEventType.PointerDown, (object sender, EventSystemEventArgs e) =>
-            {
-                Hide();
-            });
             toReturn.SubscribeToEvent(EEventType.Drag, (object sender, EventSystemEventArgs e) =>
             {
-                if(!_selectingDirection)
+                if(_following == null)
                 {
                     return;
                 }
@@ -103,7 +98,7 @@ namespace Tofunaut.GridStrategy.Game.UI
             {
                 if(_facingArrow.IsBuilt)
                 {
-                    if (_selectingDirection && _selectedBoardTile != null)
+                    if (_selectedBoardTile != null)
                     {
                         _listener.OnUseSkillConfirmed(_following, _currentFacing, _selectedBoardTile.Coord);
                     }
@@ -114,18 +109,6 @@ namespace Tofunaut.GridStrategy.Game.UI
                 {
                     Hide();
                 }
-            });
-
-            _useSkillButton = new UIUnitOptionButton("UseSkillButton", "Use Skill");
-            toReturn.AddChild(_useSkillButton);
-
-            _useSkillButton.SubscribeToEvent(EEventType.PointerDown, (object sender, EventSystemEventArgs e) =>
-            {
-                _selectingDirection = true;
-                _useSkillButton.Destroy();
-
-                PointerEventData pointerEventData = e.eventData as PointerEventData;
-                _game.board.RaycastToPlane(pointerEventData.position, out _startDragWorldPos);
             });
 
             return toReturn;
@@ -141,14 +124,9 @@ namespace Tofunaut.GridStrategy.Game.UI
 
             base.Show();
 
-            _selectingDirection = false;
             _selectedBoardTile = null;
 
             _game.board.HighlightBoardTilesForUseSkill(_following.Skill);
-
-            UpdatePosition();
-
-            Updater.Instance.Add(this);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -162,8 +140,6 @@ namespace Tofunaut.GridStrategy.Game.UI
             }
 
             _game.board.ClearAllBoardTileHighlights();
-
-            Updater.Instance.Remove(this);
         }
 
         // --------------------------------------------------------------------------------------------
@@ -171,50 +147,6 @@ namespace Tofunaut.GridStrategy.Game.UI
         {
             _following = unit;
             _targetableTiles = unit.Skill.GetTargetableTiles();
-        }
-
-        // --------------------------------------------------------------------------------------------
-        public void Update(float deltaTime)
-        {
-            if(_following == null || !_following.IsBuilt)
-            {
-                Hide();
-            }
-
-            UpdatePosition();
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private void UpdatePosition()
-        {
-            if(!_selectingDirection)
-            {
-                _useSkillButton.RectTransform.anchoredPosition = new Vector2(0, 100)
-                    + UIMainCanvas.Instance.GetCanvasPositionForWorldPosition(_following.GameObject.transform.position, _game.gameCamera.UnityCamera);
-            }
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private class UIUnitOptionButton : SharpUIImage
-        {
-            public Vector2 Size => new Vector2(200, 80);
-
-            // --------------------------------------------------------------------------------------------
-            public UIUnitOptionButton(string name, string caption) : base(name, null)
-            {
-                SetFixedSize(Size);
-                Color = new Color(0.25f, 0.25f, 0.25f, 1f);
-                margin = new RectOffset(10, 10, 10, 10);
-
-                SharpUITextMeshPro label = new SharpUITextMeshPro($"{name}_label", caption);
-                label.SetFillSize();
-                label.AutoSizeFont();
-                label.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityBook);
-                label.Color = Color.black;
-                label.TextAlignment = TMPro.TextAlignmentOptions.Center;
-                label.Color = Color.white;
-                AddChild(label);
-            }
         }
     }
 }

@@ -197,6 +197,7 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             HasUsedSkill = true;
+            HasMoved = true; // don't allow movement after using skill
 
             if(faceTowards != Facing)
             {

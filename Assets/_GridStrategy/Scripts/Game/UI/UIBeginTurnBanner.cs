@@ -27,7 +27,7 @@ namespace Tofunaut.GridStrategy.UI
         private TofuAnimation _anim;
 
         // always render behind the UIWorldIteractionManager so that this doesn't block input
-        public UIBeginTurnBanner() : base(UIPriorities.UIWorldInteractionManager - 1) { }
+        public UIBeginTurnBanner() : base(UIPriorities.UIWorldInteractionPanel - 1) { }
 
         protected override SharpUIBase BuildMainPanel()
         {

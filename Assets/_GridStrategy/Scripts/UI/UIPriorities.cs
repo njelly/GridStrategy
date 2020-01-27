@@ -11,7 +11,7 @@ namespace Tofunaut.GridStrategy.UI
     // --------------------------------------------------------------------------------------------
     public static class UIPriorities
     {
-        public const int UIWorldInteractionManager = -1;
+        public const int UIWorldInteractionPanel = -1;
         public const int Default = 0;
         public const int Popup = 1000;
         public const int HUD = 100;
