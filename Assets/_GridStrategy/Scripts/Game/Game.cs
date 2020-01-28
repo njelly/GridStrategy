@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  GameManager (c) 2019 Tofunaut
+//  Game (c) 2019 Tofunaut
 //
 //  Created by Nathaniel Ellingson for GridStrategy on 11/28/2019
 //

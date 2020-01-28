@@ -1,9 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UnitActionManager (c) 2019 Tofunaut
+//
+//  Created by Nathaniel Ellingson for GridStrategy on 01/26/2020
+//
+////////////////////////////////////////////////////////////////////////////////
+
 using Tofunaut.GridStrategy.Game.UI;
-using Tofunaut.SharpUnity;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
 {
+    // --------------------------------------------------------------------------------------------
     public class UnitActionManager : UIWorldInteractionPanel.IListener
     {
         private readonly Game _game;
@@ -12,6 +20,7 @@ namespace Tofunaut.GridStrategy.Game
         private UnitPathSelectionView _pathSelectionView;
         private BoardTile _prevBoardTile;
 
+        // --------------------------------------------------------------------------------------------
         public UnitActionManager(Game game)
         {
             _game = game;
@@ -21,8 +30,10 @@ namespace Tofunaut.GridStrategy.Game
 
         #region UIWorldInteractionPanel.IListener
 
+        // --------------------------------------------------------------------------------------------
         public void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta) { }
 
+        // --------------------------------------------------------------------------------------------
         public void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta)
         {
             if(_selectedUnit != null && unitView.Unit != _selectedUnit)
@@ -56,8 +67,10 @@ namespace Tofunaut.GridStrategy.Game
             }
         }
 
+        // --------------------------------------------------------------------------------------------
         public void OnPointerDownOverBoard(BoardTileView boardTileView) { }
 
+        // --------------------------------------------------------------------------------------------
         public void OnReleasedBoard(Vector2 releasePosition)
         {
             if(_pathSelectionView.IsBuilt)
@@ -68,7 +81,7 @@ namespace Tofunaut.GridStrategy.Game
             _selectedUnit = null;
         }
 
-
+        // --------------------------------------------------------------------------------------------
         public void OnSelectedUnitView(UnitView unitView) { }
 
         #endregion UIWorldInteractionPanel.IListener
