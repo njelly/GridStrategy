@@ -128,6 +128,8 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
+
+
             List<Vector3> positionsAsList = new List<Vector3>();
             IntVector2[] simplifiedPath = Board.SimplifyPath(CurrentPath);
             foreach(IntVector2 pathPoint in simplifiedPath)

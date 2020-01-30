@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using TofuCore;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.TofuCore;
@@ -20,7 +21,7 @@ namespace Tofunaut.GridStrategy.Game
     /// Represents a single instance of a GridStrategy game.
     /// </summary>
     // TODO: Extend this class for NetworkedGame, LocalGame, etc.
-    public class Game
+    public class Game : UnitActionManager.IListener
     {
         public event EventHandler GameBegan;
         public event EventHandler GameFinished;
@@ -79,7 +80,7 @@ namespace Tofunaut.GridStrategy.Game
             // This needs to happen before gameCamera, since it needs to register itself as a listener to UIWorldIteractionPanel
             _uiWorldInteractionPanel = UIWorldInteractionPanel.Create(this);
 
-            _unitActionManager = new UnitActionManager(this);
+            _unitActionManager = new UnitActionManager(this, this);
             UIWorldInteractionPanel.AddListener(_unitActionManager);
 
             gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
@@ -233,6 +234,16 @@ namespace Tofunaut.GridStrategy.Game
         {
             HasFinished = true;
             GameFinished?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnPathSelected(Unit unit, IntVector2[] path)
+        {
+            QueueAction(new MoveAction(CurrentPlayer.playerIndex, unit.id, path), () => { });
+        }
+
+        public void OnSkillTargetSelected(Unit unit, Unit.EFacing facing, BoardTile target)
+        {
+            QueueAction(new UseSkillAction(CurrentPlayer.playerIndex, unit.id, facing, target.Coord), () => { });
         }
 
         // --------------------------------------------------------------------------------------------

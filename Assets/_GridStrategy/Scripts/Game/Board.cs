@@ -589,7 +589,7 @@ namespace Tofunaut.GridStrategy.Game
                     break;
                 }
 
-                if (i < path.Length - 1 && path[i].IsCollinear(path[i - 1], path[i + 1]))
+                if (i < path.Length - 1 && (path[i].IsCollinear(path[i - 1], path[i + 1]) || path[i].Equals(path[i - 1]) || path[i].Equals(path[i + 1])))
                 {
                     // remove coords that are collinear with the previous and next coords
                     removePoint = true;

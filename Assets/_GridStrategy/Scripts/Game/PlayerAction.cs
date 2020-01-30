@@ -89,6 +89,13 @@ namespace Tofunaut.GridStrategy.Game
                 return false;
             }
 
+            foreach(IntVector2 pathPoint in path)
+            {
+                Debug.Log(pathPoint.ToString());
+            }
+
+            Debug.Log(game.board.CalculatePathCost(path, toMove));
+
             if(game.board.CalculatePathCost(path, toMove) > toMove.MoveRange)
             {
                 Debug.LogError("path is too expensive");
