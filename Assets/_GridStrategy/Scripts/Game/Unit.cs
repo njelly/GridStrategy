@@ -360,12 +360,22 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public bool IsAllyOf(Unit other)
         {
+            if(other == null)
+            {
+                return false;
+            }
+
             return other.Owner == _owner;
         }
 
         // --------------------------------------------------------------------------------------------
         public bool IsEnemyOf(Unit other)
         {
+            if (other == null)
+            {
+                return false;
+            }
+
             return other.Owner != _owner;
         }
 

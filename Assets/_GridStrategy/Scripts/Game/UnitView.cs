@@ -36,6 +36,11 @@ namespace Tofunaut.GridStrategy.Game
             {
                 _unitToView.Remove(Unit);
             }
+
+            if(_healthBarView?.IsShowing ?? false)
+            {
+                _healthBarView.Hide();
+            }
         }
 
         // --------------------------------------------------------------------------------------------

@@ -572,6 +572,8 @@ namespace Tofunaut.GridStrategy.Game
         /// </summary>
         public static IntVector2[] SimplifyPath(IntVector2[] path)
         {
+            path = RemoveDuplicates(path);
+
             if (!IsPathValid(path))
             {
                 Debug.LogError("can't simplify, path is not valid");
@@ -589,7 +591,7 @@ namespace Tofunaut.GridStrategy.Game
                     break;
                 }
 
-                if (i < path.Length - 1 && (path[i].IsCollinear(path[i - 1], path[i + 1]) || path[i].Equals(path[i - 1]) || path[i].Equals(path[i + 1])))
+                if (i < path.Length - 1 && path[i].IsCollinear(path[i - 1], path[i + 1]))
                 {
                     // remove coords that are collinear with the previous and next coords
                     removePoint = true;
@@ -606,10 +608,39 @@ namespace Tofunaut.GridStrategy.Game
 
                 return SimplifyPath(path);
             }
-            else
+
+            return path;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Removes any duplicate entries in the path array.
+        /// </summary>
+        public static IntVector2[] RemoveDuplicates(IntVector2[] path)
+        {
+            bool removePoint = false;
+            int i = 1;
+            for(; i < path.Length; i++)
             {
-                return path;
+
+                if (path[i].Equals(path[i - 1]))
+                {
+                    // remove coords that are collinear with the previous and next coords
+                    removePoint = true;
+                    break;
+                }
             }
+
+            if (removePoint)
+            {
+                List<IntVector2> pathAsList = new List<IntVector2>(path);
+                pathAsList.RemoveAt(i);
+                path = pathAsList.ToArray();
+
+                return RemoveDuplicates(path);
+            }
+
+            return path;
         }
 
         // --------------------------------------------------------------------------------------------

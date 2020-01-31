@@ -84,7 +84,7 @@ namespace Tofunaut.GridStrategy.Game
                 {
                     backtrackedPath[i] = CurrentPath[i];
                 }
-                CurrentPath = backtrackedPath;
+                CurrentPath = Board.RemoveDuplicates(backtrackedPath);
             }
             else
             {
@@ -95,7 +95,7 @@ namespace Tofunaut.GridStrategy.Game
                 {
                     appendedPathAsList.Add(toAppend[i - CurrentPath.Length]);
                 }
-                CurrentPath = appendedPathAsList.ToArray();
+                CurrentPath = Board.RemoveDuplicates(appendedPathAsList.ToArray());
             }
 
             SetPostionsBasedOnCurrentPath();
