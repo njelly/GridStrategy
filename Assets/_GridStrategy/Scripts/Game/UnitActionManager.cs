@@ -52,10 +52,6 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            _selectedUnit = unitView.Unit;
-            _pathSelectionView.unit = _selectedUnit;
-            _useSkillView.unit = _selectedUnit;
-
             if (_game.board.RaycastToPlane(_game.gameCamera.ScreenPointToRay(prevDragPosition + dragDelta), out Vector3 worldPos))
             {
                 BoardTile boardTile = _game.board.GetBoardTileAtPosition(worldPos);
@@ -65,36 +61,19 @@ namespace Tofunaut.GridStrategy.Game
                 }
             }
 
-            if (!_selectedUnit.HasMoved)
+            if(_pathSelectionView.IsBuilt)
             {
-                if(!_pathSelectionView.IsBuilt)
-                {
-                    _pathSelectionView.Render(AppManager.Transform);
-                }
-                if(_useSkillView.IsBuilt)
-                {
-                    _useSkillView.Destroy();
-                }
-
                 _pathSelectionView.PathTo(_prevBoardTile);
             }
-            else if(!_selectedUnit.HasUsedSkill)
-            {
-                if(!_useSkillView.IsBuilt)
-                {
-                    _useSkillView.Render(AppManager.Transform);
-                }
-                if(_pathSelectionView.IsBuilt)
-                {
-                    _pathSelectionView.Destroy();
-                }
 
+            if(_useSkillView.IsBuilt)
+            {
                 _useSkillView.TargetTowardTile(_prevBoardTile);
             }
         }
 
         // --------------------------------------------------------------------------------------------
-        public void OnPointerDownOverBoard(BoardTileView boardTileView) { }
+        public void OnPointerDownOverBoardTileView(BoardTileView boardTileView) { }
 
         // --------------------------------------------------------------------------------------------
         public void OnReleasedBoard(Vector2 releasePosition)
@@ -107,8 +86,10 @@ namespace Tofunaut.GridStrategy.Game
                 {
                     _listener.OnPathSelected(_selectedUnit, _pathSelectionView.CurrentPath);
                 }
+
                 _pathSelectionView.Destroy();
             }
+
             if (_useSkillView.IsBuilt)
             {
                 // if we are targeting a tile, then notify the listener
@@ -124,7 +105,45 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public void OnSelectedUnitView(UnitView unitView) { }
+        public void OnSelectedUnitView(UnitView unitView)
+        {
+            // TODO: show some sort of context menu for the unit here
+            // TODO: for now, just destroy any visible views
+
+            if (_pathSelectionView.IsBuilt)
+            {
+                _pathSelectionView.Destroy();
+            }
+
+            if (_useSkillView.IsBuilt)
+            {
+                _useSkillView.Destroy();
+            }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void OnPointerDownOverUnitView(UnitView unitView)
+        {
+            _selectedUnit = unitView.Unit;
+            _pathSelectionView.unit = _selectedUnit;
+            _useSkillView.unit = _selectedUnit;
+            _prevBoardTile = unitView.Unit.BoardTile;
+
+            if (!_selectedUnit.HasMoved)
+            {
+                if (!_pathSelectionView.IsBuilt)
+                {
+                    _pathSelectionView.Render(AppManager.Transform);
+                }
+            }
+            else if (!_selectedUnit.HasUsedSkill)
+            {
+                if (!_useSkillView.IsBuilt)
+                {
+                    _useSkillView.Render(AppManager.Transform);
+                }
+            }
+        }
 
         #endregion UIWorldInteractionPanel.IListener
     }

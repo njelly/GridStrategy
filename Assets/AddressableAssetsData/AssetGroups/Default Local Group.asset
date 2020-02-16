@@ -29,6 +29,10 @@ MonoBehaviour:
     m_Address: Assets/_GridStrategy/Prefabs/FX/GroundFog/GroundFog.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 0c636b15e25194d968ec062df7b985ba
+    m_Address: unit_stay
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: 249925a26ff066247b9c5755cb47894e
     m_Address: Assets/_GridStrategy/Art/Fonts/Gravity-Bold SDF.asset
     m_ReadOnly: 0

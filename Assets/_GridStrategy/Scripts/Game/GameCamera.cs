@@ -98,9 +98,9 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            if(_game.board.RaycastToPlane(prevDragPosition, out Vector3 prevWorldPos))
+            if (_game.board.RaycastToPlane(prevDragPosition, out Vector3 prevWorldPos))
             {
-                if(_game.board.RaycastToPlane(prevDragPosition + dragDelta, out Vector3 nextWorldPos))
+                if (_game.board.RaycastToPlane(prevDragPosition + dragDelta, out Vector3 nextWorldPos))
                 {
                     LookAt(LookingAt + (prevWorldPos - nextWorldPos));
                 }
@@ -114,7 +114,10 @@ namespace Tofunaut.GridStrategy.Game
         public void OnReleasedBoard(Vector2 releasePosition) { }
 
         // --------------------------------------------------------------------------------------------
-        public void OnPointerDownOverBoard(BoardTileView boardTileView) { }
+        public void OnPointerDownOverBoardTileView(BoardTileView boardTileView) { }
+
+        // --------------------------------------------------------------------------------------------
+        public void OnPointerDownOverUnitView(UnitView unitView) { }
 
         #endregion UIWorldInteractionPanel.IListener
     }

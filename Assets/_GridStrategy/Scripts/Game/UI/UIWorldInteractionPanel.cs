@@ -26,7 +26,8 @@ namespace Tofunaut.GridStrategy.Game.UI
         public interface IListener
         {
             void OnSelectedUnitView(UnitView unitView);
-            void OnPointerDownOverBoard(BoardTileView boardTileView);
+            void OnPointerDownOverUnitView(UnitView unitView);
+            void OnPointerDownOverBoardTileView(BoardTileView boardTileView);
             void OnReleasedBoard(Vector2 releasePosition);
             void OnDragBoard(Vector2 prevDragPosition, Vector2 dragDelta);
             void OnDragFromUnitView(UnitView unitView, Vector2 prevDragPosition, Vector2 dragDelta);
@@ -112,9 +113,17 @@ namespace Tofunaut.GridStrategy.Game.UI
                 // if we have no potential selected unit yet, try to find one
                 if (Physics.Raycast(ray, out RaycastHit unitViewHit))
                 {
-                    // this could be null
                     _potentialSelectedUnitView = unitViewHit.collider.GetComponentInParent<UnitView>();
-                    _potentialSelectedUnitTime = Time.time;
+
+                    if (_potentialSelectedUnitView) // remember, GameObjects can be cast as bools (false if destroyed or null)
+                    {
+                        _potentialSelectedUnitTime = Time.time;
+
+                        foreach (IListener listener in _listeners)
+                        {
+                            listener.OnPointerDownOverUnitView(_potentialSelectedUnitView);
+                        }
+                    }
                 }
 
                 if (_potentialSelectedUnitView == null)
@@ -132,7 +141,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 {
                     foreach (IListener listener in _listeners)
                     {
-                        listener.OnPointerDownOverBoard(boardTileView);
+                        listener.OnPointerDownOverBoardTileView(boardTileView);
                     }
                 }
             }
