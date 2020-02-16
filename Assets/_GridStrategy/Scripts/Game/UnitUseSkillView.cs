@@ -46,6 +46,12 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void TargetTowardTile(BoardTile boardTile)
         {
+            // return if it is not the unit's owner's turn
+            if(unit.Owner.playerIndex != _game.CurrentPlayer.playerIndex)
+            {
+                return;
+            }
+
             // set CurrentlyTargeting to null and try to set it
             CurrentlyTargeting = null;
             int closestDistance = int.MaxValue;

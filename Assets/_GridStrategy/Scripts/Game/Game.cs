@@ -134,6 +134,7 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
+            Debug.Log("ExecuteNextPlayerAction: " + _playerActions[_actionIndex].ToString());
             _playerActions[_actionIndex].Execute(this, onComplete);
         }
 

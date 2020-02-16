@@ -57,8 +57,16 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void PathTo(BoardTile boardTile)
         {
+            // return when no unit has been set
             if(unit == null)
             {
+                return;
+            }
+
+            // return it is not the selected unit's owner's turn
+            if(unit.Owner.playerIndex != _game.CurrentPlayer.playerIndex)
+            {
+                CurrentPath = null;
                 return;
             }
 
@@ -127,8 +135,6 @@ namespace Tofunaut.GridStrategy.Game
                 Positions = new Vector3[0];
                 return;
             }
-
-
 
             List<Vector3> positionsAsList = new List<Vector3>();
             IntVector2[] simplifiedPath = Board.SimplifyPath(CurrentPath);

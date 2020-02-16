@@ -101,7 +101,12 @@ namespace Tofunaut.GridStrategy.Game
         {
             if (_pathSelectionView.IsBuilt)
             {
-                _listener.OnPathSelected(_selectedUnit, _pathSelectionView.CurrentPath);
+                // only notifiy the listener when there is a path selected and that path has a length greater than 1
+                // paths will always contain the starting point, so a length 1 path is a no-op
+                if(_pathSelectionView.CurrentPath != null && _pathSelectionView.CurrentPath.Length > 1)
+                {
+                    _listener.OnPathSelected(_selectedUnit, _pathSelectionView.CurrentPath);
+                }
                 _pathSelectionView.Destroy();
             }
             if (_useSkillView.IsBuilt)

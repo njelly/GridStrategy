@@ -48,6 +48,11 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         public abstract void Execute(Game game, Action OnComplete);
+
+        public override string ToString()
+        {
+            return JsonUtility.ToJson(this);
+        }
     }
 
     // --------------------------------------------------------------------------------------------
