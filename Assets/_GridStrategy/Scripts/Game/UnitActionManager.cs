@@ -106,13 +106,16 @@ namespace Tofunaut.GridStrategy.Game
             }
             if (_useSkillView.IsBuilt)
             {
-                _listener.OnSkillTargetSelected(_selectedUnit, _useSkillView.CurrentFacing, _prevBoardTile);
+                // if we are targeting a tile, then notify the listener
+                if(_useSkillView.CurrentlyTargeting != null)
+                {
+                    _listener.OnSkillTargetSelected(_selectedUnit, _useSkillView.CurrentFacing, _useSkillView.CurrentlyTargeting);
+                }
+
                 _useSkillView.Destroy();
             }
 
             _selectedUnit = null;
-
-
         }
 
         // --------------------------------------------------------------------------------------------
