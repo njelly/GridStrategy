@@ -151,7 +151,6 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void HighlightBoardTilesForUnitMove(Unit unit)
         {
-            ClearAllBoardTileHighlights();
             HighlightBoardTilesForUnitMoveRecursive(unit, new Dictionary<BoardTile, int>(), unit.BoardTile, 0);
         }
 
@@ -393,8 +392,6 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void HighlightBoardTilesForUseSkill(Skill skill)
         {
-            ClearAllBoardTileHighlights();
-
             List<BoardTile> targetableTiles = skill.GetTargetableTiles();
             foreach(BoardTile boardTile in targetableTiles)
             {
@@ -421,8 +418,6 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void HighlightBoardTile(IntVector2 coord)
         {
-            ClearAllBoardTileHighlights();
-
             if(BoardTileView.TryGetView(this.GetTile(coord), out BoardTileView view))
             {
                 view.SetHighlight(BoardTileView.EHighlight.Neutral);

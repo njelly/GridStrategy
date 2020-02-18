@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Tofunaut.GridStrategy.Game
 {
     // --------------------------------------------------------------------------------------------
-    public class UnitUseSkillView : SharpSprite
+    public class UnitUseSkillView : SharpGameObject
     {
         private static Vector3 Offset => new Vector3(2f, 2f, 0f);
 
@@ -18,10 +18,9 @@ namespace Tofunaut.GridStrategy.Game
         private List<BoardTile> _targetableTiles;
 
         // --------------------------------------------------------------------------------------------
-        public UnitUseSkillView(Game game) : base("FacingArrow", AppManager.AssetManager.Get<Sprite>(AssetPaths.Sprites.FacingArrow))
+        public UnitUseSkillView(Game game) : base("UnitUseSkillView")
         {
             _game = game;
-            LocalScale = Vector3.one * 4;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -32,8 +31,10 @@ namespace Tofunaut.GridStrategy.Game
             _game.board.HighlightBoardTilesForUseSkill(unit.Skill);
 
             _targetableTiles = unit.Skill.GetTargetableTiles();
-            CurrentlyTargeting = null;
         }
+
+        // --------------------------------------------------------------------------------------------
+        protected override void Build() { }
 
         // --------------------------------------------------------------------------------------------
         public override void Destroy()
@@ -77,7 +78,7 @@ namespace Tofunaut.GridStrategy.Game
                 return;
             }
 
-            Unit.EFacing facing = Unit.VectorToFacing(CurrentlyTargeting.LocalPosition - unit.LocalPosition);
+            Unit.EFacing facing = Unit.VectorToFacing(CurrentlyTargeting.LocalPosition - unit.BoardTile.LocalPosition);
             LocalRotation = Unit.FacingToRotation(facing);
             LocalPosition = unit.BoardTile.LocalPosition + (LocalRotation * (Vector3.right * Offset.x)) + new Vector3(0f, Offset.y, 0f);
         }
