@@ -96,6 +96,9 @@ namespace Tofunaut.GridStrategy.Game
 
             _owner.PlayerTurnStarted -= Player_PlayerTurnStarted;
             _owner.PlayerTurnEnded -= Player_PlayerTurnEnded;
+
+            BoardTile.SetOccupant(null);
+            BoardTile = null;
         }
 
         #endregion SharpGameObject
@@ -430,15 +433,21 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        public static EFacing VectorToFacing(Vector3 v) => VectorToFacing(new Vector2(v.x, v.z));
-        public static EFacing VectorToFacing(Vector2 v)
+        public static EFacing VectorToFacing(Vector2 v) => VectorToFacing(new Vector3(v.x, 0f, v.y));
+        public static EFacing VectorToFacing(Vector3 v)
         {
-            float angle = Mathf.Atan2(-v.y, -v.x);
-            angle += Mathf.PI;
-            angle /= Mathf.PI / 2f;
-            int halfQuarter = Convert.ToInt32(angle);
-            halfQuarter %= 4;
-            return (EFacing)(halfQuarter + 1);
+            float highestValue = float.MinValue;
+            EFacing mostAligned = 0;
+            foreach(EFacing facingEnum in Enum.GetValues(typeof(EFacing)))
+            {
+                float dot = Vector3.Dot(FacingToRotation(facingEnum) * Vector2.right, v);
+                if (dot > highestValue)
+                {
+                    highestValue = dot;
+                    mostAligned = facingEnum;
+                }
+            }
+            return mostAligned;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -481,6 +490,18 @@ namespace Tofunaut.GridStrategy.Game
                     Debug.LogError($"Facing not implemented: {facing}, can't rotate");
                     return v;
             }
+        }
+
+        // --------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Unit tests for Unit.cs
+        /// </summary>
+        public static void RunTests()
+        {
+            Debug.Assert(VectorToFacing(FacingToRotation(EFacing.North) * Vector3.right) == EFacing.North);
+            Debug.Assert(VectorToFacing(FacingToRotation(EFacing.South) * Vector3.right) == EFacing.South);
+            Debug.Assert(VectorToFacing(FacingToRotation(EFacing.East) * Vector3.right) == EFacing.East);
+            Debug.Assert(VectorToFacing(FacingToRotation(EFacing.West) * Vector3.right) == EFacing.West);
         }
 
         // --------------------------------------------------------------------------------------------
