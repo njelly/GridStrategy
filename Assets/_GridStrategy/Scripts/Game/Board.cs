@@ -244,11 +244,20 @@ namespace Tofunaut.GridStrategy.Game
         /// <summary>
         /// Finds the best path for a unit to a target coordinate using A*
         /// </summary>
-        public IntVector2[] BestPathForUnit(Unit unit, IntVector2 startCoord, IntVector2 targetCoord, int movementExhausted)
+        public bool TryGetBestPathForUnit(Unit unit, IntVector2 startCoord, IntVector2 targetCoord, int movementExhausted, out IntVector2[] bestPath)
         {
+            bestPath = new IntVector2[0];
+            if (movementExhausted >= unit.MoveRange)
+            {
+                // return empty array if we've already exahusted the list
+                return false;
+            }
+
+            Debug.Log($"best path for unit {unit.id} from {startCoord} to {targetCoord} with {movementExhausted} already exhausted");
+
             // A* implementation for best path
-            List<IntVector2AsAStarNode> open = new List<IntVector2AsAStarNode>();
-            List<IntVector2AsAStarNode> closed = new List<IntVector2AsAStarNode>();
+            HashSet<IntVector2AsAStarNode> open = new HashSet<IntVector2AsAStarNode>();
+            HashSet<IntVector2AsAStarNode> closed = new HashSet<IntVector2AsAStarNode>();
             open.Add(new IntVector2AsAStarNode
             {
                 coord = startCoord,
@@ -260,24 +269,27 @@ namespace Tofunaut.GridStrategy.Game
 
             int moveRange = unit.MoveRange - movementExhausted;
 
-            IntVector2[] bestPath = new IntVector2[0];
+            bool succeeded = false;
             while(open.Count > 0)
             {
+
+                List<IntVector2AsAStarNode> openAsList = new List<IntVector2AsAStarNode>(open);
                 // sort the open list ascending by f value
-                open.Sort((IntVector2AsAStarNode a, IntVector2AsAStarNode b) =>
+                openAsList.Sort((IntVector2AsAStarNode a, IntVector2AsAStarNode b) =>
                 {
                     return a.f.CompareTo(b.f);
                 });
 
                 // set the current node to the node with the least f
-                IntVector2AsAStarNode currentNode = open[0];
+                IntVector2AsAStarNode currentNode = openAsList[0];
 
-                closed.Add(open[0]);
-                open.RemoveAt(0);
+                closed.Add(openAsList[0]);
+                open.Remove(currentNode);
 
-                if(currentNode.coord.Equals(targetCoord)) // remember to you .Equals() instead of == becuase these are not the same object
+                if(currentNode.coord.Equals(targetCoord)) // remember to use .Equals() instead of == becuase these are not the same object
                 {
                     bestPath = currentNode.ToPath();
+                    succeeded = true;
                     break;
                 }
 
@@ -378,15 +390,16 @@ namespace Tofunaut.GridStrategy.Game
                     closed.Remove(toRemove);
                 }
 
-                closed.Sort((IntVector2AsAStarNode a, IntVector2AsAStarNode b) =>
+                List<IntVector2AsAStarNode> closedAsList = new List<IntVector2AsAStarNode>(closed);
+                closedAsList.Sort((IntVector2AsAStarNode a, IntVector2AsAStarNode b) =>
                 {
                     return a.f.CompareTo(b.f);
                 });
 
-                bestPath = closed[0].ToPath();
+                bestPath = closedAsList[0].ToPath();
             }
 
-            return bestPath;
+            return succeeded;
         }
 
         // --------------------------------------------------------------------------------------------
@@ -458,6 +471,23 @@ namespace Tofunaut.GridStrategy.Game
 
             worldPos = Vector3.zero;
             return false;
+        }
+
+        // --------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Returns the cost of the path for a particular unit.
+        /// </summary>
+        public int CalculateCostForPath(Unit unit, IntVector2[] path)
+        {
+            int toReturn = 0;
+
+            // skip the first coord, since that's the one we're already on
+            for(int i = 1; i < path.Length; i++)
+            {
+                toReturn += GetTile(path[i]).GetMoveCostForUnit(unit);
+            }
+
+            return toReturn;
         }
 
 

@@ -97,7 +97,7 @@ namespace Tofunaut.GridStrategy.Game
             _owner.PlayerTurnStarted -= Player_PlayerTurnStarted;
             _owner.PlayerTurnEnded -= Player_PlayerTurnEnded;
 
-            BoardTile.SetOccupant(null);
+            BoardTile?.SetOccupant(null);
             BoardTile = null;
         }
 

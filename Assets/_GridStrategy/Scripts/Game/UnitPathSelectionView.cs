@@ -96,35 +96,27 @@ namespace Tofunaut.GridStrategy.Game
             }
             else
             {
-                // otherwise, find the best path from the last element of current path to the tile
-                IntVector2[] toAppend = _game.board.BestPathForUnit(unit, CurrentPath[CurrentPath.Length - 1], boardTile.Coord, CalculateCostForCurrentPath());
-                List<IntVector2> appendedPathAsList = new List<IntVector2>(CurrentPath);
-                for(int i = CurrentPath.Length; i < CurrentPath.Length + toAppend.Length; i++)
+                // the path does not contain this tile, so lets try to find the best path to it
+                for (int backtrackIndex = CurrentPath.Length - 1; backtrackIndex >= 0; backtrackIndex--)
                 {
-                    appendedPathAsList.Add(toAppend[i - CurrentPath.Length]);
+                    // backtrack along our CurrentPath until we find a coord that has a valid path to the target
+                    IntVector2[] upToBacktrackIndex = new List<IntVector2>(CurrentPath).GetRange(0, backtrackIndex + 1).ToArray();
+                    int cost = _game.board.CalculateCostForPath(unit, upToBacktrackIndex);
+                    if (_game.board.TryGetBestPathForUnit(unit, CurrentPath[backtrackIndex], boardTile.Coord, cost, out IntVector2[] backtrackAppend))
+                    {
+                        // we found a valid path, lets go with that
+                        List<IntVector2> appendedPathAsList = new List<IntVector2>(upToBacktrackIndex);
+                        for (int i = upToBacktrackIndex.Length; i < upToBacktrackIndex.Length + backtrackAppend.Length; i++)
+                        {
+                            appendedPathAsList.Add(backtrackAppend[i - upToBacktrackIndex.Length]);
+                        }
+                        CurrentPath = Board.RemoveDuplicates(appendedPathAsList.ToArray());
+                        break;
+                    }
                 }
-                CurrentPath = Board.RemoveDuplicates(appendedPathAsList.ToArray());
             }
 
             SetPostionsBasedOnCurrentPath();
-        }
-
-        // --------------------------------------------------------------------------------------------
-        private int CalculateCostForCurrentPath()
-        {
-            if(CurrentPath == null || CurrentPath.Length <= 1)
-            {
-                return 0;
-            }
-
-            int toReturn = 0;
-            for(int i = 1; i < CurrentPath.Length; i++)
-            {
-                BoardTile boardTile = _game.board.GetTile(CurrentPath[i]);
-                toReturn += boardTile.GetMoveCostForUnit(unit);
-            }
-
-            return toReturn;
         }
 
         // --------------------------------------------------------------------------------------------
