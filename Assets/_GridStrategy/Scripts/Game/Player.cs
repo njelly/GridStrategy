@@ -19,6 +19,7 @@ namespace Tofunaut.GridStrategy.Game
         public event EventHandler<PlayerEventArgs> PlayerTurnEnded;
         public event EventHandler<PlayerEventArgs> PlayerLost;
         public event EventHandler<PlayerEventArgs> PlayerPlayedCard;
+        public event EventHandler<PlayerEventArgs> PlayerSourceChanged;
 
         public IReadOnlyCollection<Unit> Units { get { return _units.AsReadOnly(); } }
         public Unit Hero => _hero;
@@ -35,6 +36,19 @@ namespace Tofunaut.GridStrategy.Game
         /// The maximum energy the player can have this turn.
         /// </summary>
         public int EnergyCap => _energyCap;
+
+        public int Source
+        {
+            get { return _source; }
+            set
+            {
+                if(value != _source)
+                {
+                    _source = value;
+                    PlayerSourceChanged?.Invoke(this, new PlayerEventArgs(this));
+                }
+            }
+        }
 
         public readonly int playerIndex;
         public readonly string name;
@@ -56,6 +70,7 @@ namespace Tofunaut.GridStrategy.Game
 
         private int _energy;
         private int _energyCap;
+        private int _source;
 
         private readonly Game _game;
         private readonly PlayerData _playerData;
@@ -68,6 +83,8 @@ namespace Tofunaut.GridStrategy.Game
 
             _game = game;
             _playerData = playerData;
+
+            Source = playerData.initialSource;
 
             // create the player's deck
             _deck = new Deck(game, playerData.deckData, this, deckSeed);
@@ -93,7 +110,10 @@ namespace Tofunaut.GridStrategy.Game
             _energyCap++;
             _energyCap = Mathf.Min(_energyCap, AppManager.Config.MaxPlayerEnergy);
 
-            _energy = _energyCap;
+            // refill energy by taking it from the player's Source
+            int amountFromSource = Mathf.Min(_energyCap - _energy, Source);
+            _energy += amountFromSource;
+            Source -= amountFromSource;
 
             // draw a card if there are any cards left
             if(_deck.NumCardsLeft > 0)

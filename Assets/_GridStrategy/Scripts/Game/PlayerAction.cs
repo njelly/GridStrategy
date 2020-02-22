@@ -82,9 +82,9 @@ namespace Tofunaut.GridStrategy.Game
                 Debug.LogError("the path is empty");
             }
 
-            if (toMove.HasMoved)
+            if (!toMove.CanMove)
             {
-                Debug.LogError($"{toMove.id} has already moved!");
+                Debug.LogError($"{toMove.id} cannot move!");
                 return false;
             }
 
@@ -134,8 +134,9 @@ namespace Tofunaut.GridStrategy.Game
         public override bool IsValid(Game game)
         {
             Unit unit = Unit.GetUnit(unitId);
-            if(unit.HasUsedSkill)
+            if(!unit.CanUseSkill)
             {
+                Debug.LogError($"{unit.id} cannot use it's skill!");
                 return false;
             }
 

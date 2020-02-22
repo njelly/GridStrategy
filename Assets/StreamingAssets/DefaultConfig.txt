@@ -156,7 +156,8 @@
             "id": "first_boss",
             "hero": "default_hero",
             "deck": "first_boss",
-            "headspritepath": "default_enemy_head"
+            "headspritepath": "default_enemy_head",
+            "initialsource": 40
         }
     ],
     "i18n": [

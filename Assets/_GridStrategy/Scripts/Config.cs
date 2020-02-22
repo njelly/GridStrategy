@@ -198,6 +198,7 @@ namespace Tofunaut.GridStrategy
                 deckData = GetDeckData(opponentData.deckId),
                 heroData = GetUnitData(opponentData.heroId),
                 headSpritePath = opponentData.headSpritePath,
+                initialSource = opponentData.initialSource,
             };
         }
 
@@ -562,6 +563,9 @@ namespace Tofunaut.GridStrategy
                 {
                     Debug.LogError($"opponent data index {i} is missing an id");
                     hasError = true;
+
+                    // break so we don't add it to the dictionary
+                    break;
                 }
 
                 // hero
@@ -596,6 +600,25 @@ namespace Tofunaut.GridStrategy
                     Debug.LogError($"opponent data index {i} is missing a headSpritePath");
                     hasError = true;
                 }
+
+                // initial source
+                if(rawOpponentData.TryGetValue("initialsource", out object initialSourceObj))
+                {
+                    if (int.TryParse(initialSourceObj.ToString(), out int initialSource))
+                    {
+                        opponentData.initialSource = initialSource;
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not parse {initialSourceObj.ToString()} as int for initialsource");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"opponent data index {i} is missing a initialsource");
+                    hasError = true;
+                }
+
 
                 _idToOpponentData.Add(opponentData.id, opponentData);
             }
@@ -903,6 +926,7 @@ namespace Tofunaut.GridStrategy
         public string heroId;
         public string deckId;
         public string headSpritePath;
+        public int initialSource;
     }
 
     // --------------------------------------------------------------------------------------------
@@ -916,6 +940,7 @@ namespace Tofunaut.GridStrategy
         public DeckData deckData;
         public UnitData heroData;
         public string headSpritePath;
+        public int initialSource;
 
         // --------------------------------------------------------------------------------------------
         public void LoadAssets(AssetManager assetManager)

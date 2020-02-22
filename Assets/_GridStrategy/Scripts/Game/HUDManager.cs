@@ -62,6 +62,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 player.Hero.OnTookDamage += OnUnitTookDamage;
                 player.PlayerTurnStarted += OnPlayerTurnStarted;
                 player.PlayerPlayedCard += OnPlayerPlayedCard;
+                player.PlayerSourceChanged += OnPlayerSourceChanged;
             }
 
             _game.GameBegan += OnGameBegan;
@@ -85,6 +86,7 @@ namespace Tofunaut.GridStrategy.Game.UI
                 player.Hero.OnTookDamage -= OnUnitTookDamage;
                 player.PlayerTurnStarted -= OnPlayerTurnStarted;
                 player.PlayerPlayedCard -= OnPlayerPlayedCard;
+                player.PlayerSourceChanged -= OnPlayerSourceChanged;
             }
 
             _localPlayerHand.Hide();
@@ -157,6 +159,12 @@ namespace Tofunaut.GridStrategy.Game.UI
         private void OnPlayerPlayedCard(object sender, Player.PlayerEventArgs e)
         {
             _playerToPlayerPanels[e.player].SetEnergy(e.player.Energy, e.player.EnergyCap);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void OnPlayerSourceChanged(object sender, Player.PlayerEventArgs e)
+        {
+            _playerToPlayerPanels[e.player].SetSource(e.player.Source);
         }
 
         // --------------------------------------------------------------------------------------------

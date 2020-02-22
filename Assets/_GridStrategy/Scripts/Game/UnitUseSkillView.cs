@@ -79,7 +79,6 @@ namespace Tofunaut.GridStrategy.Game
             }
 
             Unit.EFacing facing = Unit.VectorToFacing(CurrentlyTargeting.LocalPosition - unit.BoardTile.LocalPosition);
-            Debug.Log($"facing: {facing}, vector: {CurrentlyTargeting.LocalPosition - unit.BoardTile.LocalPosition}");
             LocalRotation = Unit.FacingToRotation(facing);
             LocalPosition = unit.BoardTile.LocalPosition + (LocalRotation * (Vector3.right * Offset.x)) + new Vector3(0f, Offset.y, 0f);
         }

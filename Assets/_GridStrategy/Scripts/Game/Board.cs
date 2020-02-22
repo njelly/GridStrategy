@@ -253,8 +253,6 @@ namespace Tofunaut.GridStrategy.Game
                 return false;
             }
 
-            Debug.Log($"best path for unit {unit.id} from {startCoord} to {targetCoord} with {movementExhausted} already exhausted");
-
             // A* implementation for best path
             HashSet<IntVector2AsAStarNode> open = new HashSet<IntVector2AsAStarNode>();
             HashSet<IntVector2AsAStarNode> closed = new HashSet<IntVector2AsAStarNode>();

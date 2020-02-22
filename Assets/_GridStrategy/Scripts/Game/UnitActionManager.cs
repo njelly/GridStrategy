@@ -129,12 +129,12 @@ namespace Tofunaut.GridStrategy.Game
             _useSkillView.unit = _selectedUnit;
             _prevBoardTile = unitView.Unit.BoardTile;
 
-            if (!_selectedUnit.HasMoved && !_pathSelectionView.IsBuilt)
+            if (_selectedUnit.CanMove && !_pathSelectionView.IsBuilt)
             {
                 // only show the UnitPathSelectionView if the unit can move
                 _pathSelectionView.Render(AppManager.Transform);
             }
-            if (!_selectedUnit.HasUsedSkill && !_useSkillView.IsBuilt)
+            if (_selectedUnit.CanUseSkill && !_useSkillView.IsBuilt)
             {
                 // only show the UnitUseSkillView if the unit can use its skill
                 _useSkillView.Render(AppManager.Transform);

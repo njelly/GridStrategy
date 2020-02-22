@@ -19,6 +19,7 @@ namespace Tofunaut.GridStrategy.Game.UI
     {
         protected static Vector2 Size => new Vector2(500, 200);
         protected const float HealthBarAnimTime = 1f;
+        protected const float SourceAnimTime = 3f;
 
         protected readonly Player _player;
 
@@ -28,6 +29,8 @@ namespace Tofunaut.GridStrategy.Game.UI
         protected SharpUIProgressBar _heroHealthBar;
         protected UIEnergyMeter _energyMeter;
         protected TofuAnimation _healthBarAnim;
+        protected SharpUITextMeshPro _sourceLabel;
+        protected TofuAnimation _sourceAnimation;
 
         // --------------------------------------------------------------------------------------------
         // always render on top so this blocks input
@@ -63,6 +66,14 @@ namespace Tofunaut.GridStrategy.Game.UI
             _headSprite.SetFillSize();
             _headBackground.AddChild(_headSprite);
 
+            _sourceLabel = new SharpUITextMeshPro("SourceLabel", _player.Source.ToString());
+            _sourceLabel.SetFixedSize(50, 50);
+            _sourceLabel.Font = AppManager.AssetManager.Get<TMPro.TMP_FontAsset>(AssetPaths.Fonts.GravityBoldItalic);
+            _sourceLabel.AutoSizeFont();
+            _sourceLabel.alignment = EAlignment.BottomLeft;
+            _sourceLabel.TextAlignment = TMPro.TextAlignmentOptions.Center;
+            _background.AddChild(_sourceLabel);
+
             _energyMeter = new UIEnergyMeter($"{_player.name}_energy_meter");
             _energyMeter.SetEnergy(_player.Energy, _player.EnergyCap);
             _energyMeter.alignment = EAlignment.TopLeft;
@@ -97,6 +108,48 @@ namespace Tofunaut.GridStrategy.Game.UI
                     _healthBarAnim = null;
                 })
                 .Play();
+        }
+
+        // --------------------------------------------------------------------------------------------
+        public void SetSource(int amount)
+        {
+            _sourceLabel.Text = amount.ToString();
+
+            // TODO: bug with this code... :(
+            //// try to get the original source value based on the label text
+            //int.TryParse(_sourceLabel.Text, out int prevAmount);
+            //
+            //_sourceAnimation?.Stop();
+            //
+            //if (prevAmount == amount)
+            //{
+            //    _sourceLabel.Text = amount.ToString();
+            //    return;
+            //}
+            //
+            //int numTicks = Mathf.Abs(amount - prevAmount);
+            //int direction = (int)Mathf.Sign(amount - prevAmount);
+            //float tickTime = SourceAnimTime / numTicks;
+            //
+            //_sourceAnimation = new TofuAnimation();
+            //for(int i = prevAmount; i == amount; i += direction)
+            //{
+            //    _sourceAnimation.Value01(tickTime, EEaseType.EaseOutExpo, (float newValue) =>
+            //    {
+            //        _sourceLabel.LocalScale = Vector3.LerpUnclamped(Vector3.one, Vector3.one * 1.1f, newValue);
+            //    })
+            //    .Value01(tickTime, EEaseType.Linear, (float newValue) =>
+            //    {
+            //        _sourceLabel.Text = ((int)Mathf.LerpUnclamped(i, i + direction, newValue)).ToString();
+            //    })
+            //    .Then();
+            //}
+            //_sourceAnimation.Execute(() =>
+            //{
+            //    _sourceLabel.LocalScale = Vector3.one;
+            //    _sourceLabel.Text = amount.ToString();
+            //})
+            //.Play();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -216,6 +269,8 @@ namespace Tofunaut.GridStrategy.Game.UI
             _energyMeter.childAlignment = EAlignment.TopRight;
             _energyMeter.order = EHorizontalOrder.RightToLeft;
             _energyMeter.margin = new RectOffset(0, (int)Size.y + 10, 70, 0);
+
+            _sourceLabel.alignment = EAlignment.BottomRight;
 
             return toReturn;
         }

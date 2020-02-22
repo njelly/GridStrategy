@@ -42,16 +42,27 @@ namespace Tofunaut.GridStrategy.Game
         public int MoveRange { get; protected set; }
         public EFacing Facing { get { return _facing; } }
         public bool IsMoving => _moveAnim != null;
-        public bool HasMoved { get; private set; }
         public bool HasUsedSkill { get; private set; }
+        public bool HasMoved { get; private set; }
         public Player Owner => _owner;
         public bool IsDead => Health <= 0;
+
+        /// <summary>
+        /// True when this unit has existed for at least one full turn and hasn't yet used it's skill.
+        /// </summary>
+        public bool CanUseSkill => _numTurnsActive > 0 && !HasUsedSkill;
+
+        /// <summary>
+        /// True when this unit has existed for at least one full turn, hasn't used it's skill, and hasn't moved yet.
+        /// </summary>
+        public bool CanMove => _numTurnsActive > 0 && !HasUsedSkill && !HasMoved;
 
         public readonly int id;
 
         private UnitView _view;
         private UnitData _data;
         private Player _owner;
+        private int _numTurnsActive;
 
         private EFacing _facing;
         private TofuAnimation _facingAnim;
@@ -106,9 +117,9 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void Move(IntVector2[] path, bool animate, Action onComplete)
         {
-            if (HasMoved)
+            if (!CanMove)
             {
-                Debug.LogError($"Unit {id} has already moved this turn");
+                Debug.LogError($"Unit {id} cannot move");
                 return;
             }
 
@@ -193,14 +204,13 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public void UseSkill(EFacing faceTowards, IntVector2 targetCoord, Action onComplete)
         {
-            if (HasUsedSkill)
+            if (!CanUseSkill)
             {
-                Debug.LogError($"Unit {id} has already used its skill this turn");
+                Debug.LogError($"Unit {id} cannot use its skill");
                 return;
             }
 
             HasUsedSkill = true;
-            HasMoved = true; // don't allow movement after using skill
 
             if(faceTowards != Facing)
             {
@@ -385,11 +395,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void Player_PlayerTurnStarted(object sender, Player.PlayerEventArgs e)
         {
-            if (e.player != Owner)
-            {
-                return;
-            }
-
+            _numTurnsActive++;
             HasMoved = false;
             HasUsedSkill = false;
         }

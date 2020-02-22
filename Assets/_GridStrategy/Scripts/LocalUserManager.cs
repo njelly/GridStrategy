@@ -30,6 +30,7 @@ namespace Tofunaut.GridStrategy
                 deckData = decks[0],
                 heroData = AppManager.Config.GetUnitData(heroLibrary[0]),
                 headSpritePath = AssetPaths.Sprites.DefaultHeroHead,
+                initialSource = 60, // TODO: how should this value be determined?
             };
         }
 

@@ -67,9 +67,9 @@ Material:
     - _OutlineWidth: 0
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
-    - _ScaleRatioA: 1
-    - _ScaleRatioB: 1
-    - _ScaleRatioC: 1
+    - _ScaleRatioA: 0.8333333
+    - _ScaleRatioB: 0.6770833
+    - _ScaleRatioC: 0.6770833
     - _ScaleX: 1
     - _ScaleY: 1
     - _ShaderFlags: 0
@@ -113,9 +113,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: Gravity-BoldItalic SDF
   m_EditorClassIdentifier: 
-  hashCode: 0
+  hashCode: 1389382437
   material: {fileID: -8787003792438235491}
-  materialHashCode: 0
+  materialHashCode: 516358926
   m_Version: 1.1.0
   m_SourceFontFileGUID: 17dd6152b3ee81240911cf91d5d300d2
   m_SourceFontFile_EditorRef: {fileID: 0}
@@ -2658,6 +2658,7 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
