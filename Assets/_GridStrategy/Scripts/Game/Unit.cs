@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using TofuCore;
 using Tofunaut.Animation;
 using Tofunaut.Core;
@@ -35,6 +36,7 @@ namespace Tofunaut.GridStrategy.Game
         private static int _idCounter;
         private static readonly List<Unit> _idToUnit = new List<Unit>();
 
+        public ReadOnlyCollection<Modifier> Modifiers => _modifiers.AsReadOnly();
         public BoardTile BoardTile { get; private set; }
         public Skill Skill { get; private set; }
         public int Health { get; protected set; }
@@ -69,9 +71,11 @@ namespace Tofunaut.GridStrategy.Game
         private TofuAnimation _moveAnim;
         private Action _onMoveComplete;
         private readonly Game _game;
+        private readonly List<Modifier> _modifiers;
+        private ModifierTotals _modifierTotals;
 
         // --------------------------------------------------------------------------------------------
-        public Unit(UnitData data, Game game, Player owner) : base(data.id) 
+        public Unit(UnitData data, Game game, Player owner) : base(data.id)
         {
             id = _idCounter++;
             _idToUnit.Add(this);
@@ -79,6 +83,9 @@ namespace Tofunaut.GridStrategy.Game
             _data = data;
             _game = game;
             _owner = owner;
+
+            _modifiers = new List<Modifier>();
+            _modifierTotals = ModifierTotals.Identity;
 
             Health = _data.health;
             MoveRange = _data.moveRange;
@@ -133,7 +140,7 @@ namespace Tofunaut.GridStrategy.Game
 
             if (animate)
             {
-                if(_moveAnim != null)
+                if (_moveAnim != null)
                 {
                     Debug.LogError("move anim in progress!");
                     return;
@@ -149,7 +156,7 @@ namespace Tofunaut.GridStrategy.Game
                     Vector3 toPos = _game.board.GetTile(path[i]).Transform.position;
                     float time = (toPos - fromPos).magnitude / _data.travelSpeed;
 
-                    if(i != 1)
+                    if (i != 1)
                     {
                         // we don't need to call Then() on the first loop
                         _moveAnim.Then();
@@ -165,14 +172,14 @@ namespace Tofunaut.GridStrategy.Game
 
                         Ray ray = new Ray(Transform.position + Vector3.up, Vector3.down);
                         RaycastHit[] hits = Physics.RaycastAll(ray, 2f);
-                        for(int j = 0; j < hits.Length; j++)
+                        for (int j = 0; j < hits.Length; j++)
                         {
                             BoardTileView boardTileView = hits[j].collider.GetComponentInParent<BoardTileView>();
-                            if(boardTileView == null)
+                            if (boardTileView == null)
                             {
                                 continue;
                             }
-                            if(boardTileView.BoardTile != BoardTile)
+                            if (boardTileView.BoardTile != BoardTile)
                             {
                                 OccupyBoardTile(boardTileView.BoardTile, false);
                             }
@@ -212,7 +219,7 @@ namespace Tofunaut.GridStrategy.Game
 
             HasUsedSkill = true;
 
-            if(faceTowards != Facing)
+            if (faceTowards != Facing)
             {
                 SetFacing(faceTowards, false);
             }
@@ -277,7 +284,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         private void UseSkillOnUnit(Unit targetUnit, Action onComplete)
         {
-            if(Skill.DamageDealt > 0)
+            if (Skill.DamageDealt > 0)
             {
                 targetUnit.TakeDamage(this, Skill.DamageDealt);
                 onComplete?.Invoke();
@@ -304,16 +311,40 @@ namespace Tofunaut.GridStrategy.Game
 
             OnTookDamage?.Invoke(this, new DamageEventArgs(sourceUnit, this, previousHealth, Health, Health <= 0));
 
-            if(Health <= 0)
+            if (Health <= 0)
             {
                 Destroy();
             }
         }
 
         // --------------------------------------------------------------------------------------------
+        private void ApplyModifier(ModifierData modifierData)
+        {
+            Modifier modifier = new Modifier(modifierData, _game, this);
+            modifier.OnModifierExpired += Modifier_OnModifierExpired;
+            _modifiers.Add(modifier);
+
+            _modifierTotals = Modifier.CalculateTotals(_modifiers);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void RemoveModifier(Modifier modifier)
+        {
+            _modifiers.Remove(modifier);
+            modifier.OnModifierExpired -= Modifier_OnModifierExpired;
+            _modifierTotals = Modifier.CalculateTotals(_modifiers);
+        }
+
+        // --------------------------------------------------------------------------------------------
+        private void Modifier_OnModifierExpired(object sender, Modifier.ModifierEventArgs e)
+        {
+            RemoveModifier(e.modifier);
+        }
+
+        // --------------------------------------------------------------------------------------------
         public void StopOnTile()
         {
-            if(_moveAnim != null)
+            if (_moveAnim != null)
             {
                 _moveAnim.Stop();
                 _onMoveComplete?.Invoke();
@@ -326,9 +357,9 @@ namespace Tofunaut.GridStrategy.Game
 
         // --------------------------------------------------------------------------------------------
         public void OccupyBoardTile(BoardTile newTile, bool asChild)
-        {           
+        {
             // do this check so that OccupyBoardTile can be called arbitrarily without re-occupying the same boardtile
-            if(BoardTile != newTile)
+            if (BoardTile != newTile)
             {
                 // leave the current tile, if it exists 
                 BoardTile?.SetOccupant(null);
@@ -354,7 +385,7 @@ namespace Tofunaut.GridStrategy.Game
 
             Quaternion rot = FacingToRotation(facing);
 
-            if(animate)
+            if (animate)
             {
                 Quaternion startRot = LocalRotation;
                 _facingAnim = new TofuAnimation()
@@ -373,7 +404,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public bool IsAllyOf(Unit other)
         {
-            if(other == null)
+            if (other == null)
             {
                 return false;
             }
@@ -414,12 +445,12 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public static bool CanSpawnOnTile(UnitData unitData, BoardTile boardTile, Unit spawnFrom)
         {
-            if(boardTile.Occupant != null)
+            if (boardTile.Occupant != null)
             {
                 return false;
             }
 
-            if((boardTile.Coord - spawnFrom.BoardTile.Coord).ManhattanDistance > 1)
+            if ((boardTile.Coord - spawnFrom.BoardTile.Coord).ManhattanDistance > 1)
             {
                 return false;
             }
@@ -430,7 +461,7 @@ namespace Tofunaut.GridStrategy.Game
         // --------------------------------------------------------------------------------------------
         public static Unit GetUnit(int id)
         {
-            if(id >= _idToUnit.Count)
+            if (id >= _idToUnit.Count)
             {
                 Debug.LogError($"no unit for id {id}");
             }
@@ -444,7 +475,7 @@ namespace Tofunaut.GridStrategy.Game
         {
             float highestValue = float.MinValue;
             EFacing mostAligned = 0;
-            foreach(EFacing facingEnum in Enum.GetValues(typeof(EFacing)))
+            foreach (EFacing facingEnum in Enum.GetValues(typeof(EFacing)))
             {
                 float dot = Vector3.Dot(FacingToRotation(facingEnum) * Vector2.right, v);
                 if (dot > highestValue)

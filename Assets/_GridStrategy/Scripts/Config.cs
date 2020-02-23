@@ -63,7 +63,7 @@ namespace Tofunaut.GridStrategy
             // get global data
             if (sheetData.TryGetValue("Global", out object[] globalDatas))
             {
-                if(globalDatas.Length <= 0)
+                if (globalDatas.Length <= 0)
                 {
                     Debug.LogError("global datas array is empty");
                 }
@@ -170,9 +170,9 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public string Localize(string id)
         {
-            if(_i18n.TryGetValue(id, out Dictionary<string, string> langDict))
+            if (_i18n.TryGetValue(id, out Dictionary<string, string> langDict))
             {
-                if(langDict.TryGetValue(id, out string toReturn))
+                if (langDict.TryGetValue(id, out string toReturn))
                 {
                     return toReturn;
                 }
@@ -211,9 +211,9 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         public bool TryParseGlobals(Dictionary<string, object> globalData)
         {
-            if(globalData.TryGetValue("maxplayerenergy", out object maxPlayerEnergyObj))
+            if (globalData.TryGetValue("maxplayerenergy", out object maxPlayerEnergyObj))
             {
-                if(int.TryParse(maxPlayerEnergyObj.ToString(), out int maxPlayerEnergy))
+                if (int.TryParse(maxPlayerEnergyObj.ToString(), out int maxPlayerEnergy))
                 {
                     this.MaxPlayerEnergy = maxPlayerEnergy;
                 }
@@ -602,7 +602,7 @@ namespace Tofunaut.GridStrategy
                 }
 
                 // initial source
-                if(rawOpponentData.TryGetValue("initialsource", out object initialSourceObj))
+                if (rawOpponentData.TryGetValue("initialsource", out object initialSourceObj))
                 {
                     if (int.TryParse(initialSourceObj.ToString(), out int initialSource))
                     {
@@ -631,11 +631,11 @@ namespace Tofunaut.GridStrategy
             _idToSkillData = new Dictionary<string, SkillData>();
             bool hasError = false;
 
-            for(int i = 0; i < rawSkillDatas.Length; i++)
+            for (int i = 0; i < rawSkillDatas.Length; i++)
             {
                 Dictionary<string, object> rawSkillData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(rawSkillDatas[i].ToString());
                 SkillData skillData = new SkillData();
-                
+
                 // id
                 if (rawSkillData.TryGetValue("id", out object idObj))
                 {
@@ -791,19 +791,19 @@ namespace Tofunaut.GridStrategy
         {
             bool hasError = false;
             _i18n = new Dictionary<string, Dictionary<string, string>>();
-            if(sheetData.TryGetValue(I18NKey, out object[] i18nObjArray))
+            if (sheetData.TryGetValue(I18NKey, out object[] i18nObjArray))
             {
-                foreach(object i18nObj in i18nObjArray)
+                foreach (object i18nObj in i18nObjArray)
                 {
                     try
                     {
                         Dictionary<string, string> i18nData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(i18nObj.ToString());
 
-                        if(i18nData.TryGetValue(LanguageKeys.IdKey, out string id))
+                        if (i18nData.TryGetValue(LanguageKeys.IdKey, out string id))
                         {
                             _i18n.Add(id, new Dictionary<string, string>());
 
-                            if(i18nData.TryGetValue(LanguageKeys.English, out string enValue))
+                            if (i18nData.TryGetValue(LanguageKeys.English, out string enValue))
                             {
                                 _i18n[id].Add(LanguageKeys.English, enValue);
                             }
@@ -819,7 +819,7 @@ namespace Tofunaut.GridStrategy
                             hasError = true;
                         }
                     }
-                    catch(Newtonsoft.Json.JsonException e)
+                    catch (Newtonsoft.Json.JsonException e)
                     {
                         Debug.LogError($"failed to parse i18n object: {e.Message}");
                         hasError = true;
@@ -927,6 +927,17 @@ namespace Tofunaut.GridStrategy
         public string deckId;
         public string headSpritePath;
         public int initialSource;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Data for a modifier that can be applied
+    /// </summary>
+    [Serializable]
+    public struct ModifierData
+    {
+        public string id;
+        public int numTurnsActive;
     }
 
     // --------------------------------------------------------------------------------------------

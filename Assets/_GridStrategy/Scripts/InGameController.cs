@@ -37,7 +37,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void Awake()
         {
-            if(_instance != null)
+            if (_instance != null)
             {
                 Debug.LogError("Only one instance of InGameController can exist at at a time");
                 Destroy(this);
@@ -78,7 +78,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void OnDestroy()
         {
-            if(_instance == this)
+            if (_instance == this)
             {
                 _instance = null;
             }
@@ -141,7 +141,7 @@ namespace Tofunaut.GridStrategy
         // --------------------------------------------------------------------------------------------
         private void PostGame_Enter()
         {
-            if(_gameOverView == null)
+            if (_gameOverView == null)
             {
                 _gameOverView = new UIGameOverView(this, _game);
             }
