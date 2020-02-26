@@ -36,7 +36,7 @@ namespace Tofunaut.GridStrategy.Game
         private static int _idCounter;
         private static readonly List<Unit> _idToUnit = new List<Unit>();
 
-        public ReadOnlyCollection<Modifier> Modifiers => _modifiers.AsReadOnly();
+        public ReadOnlyCollection<UnitModifier> Modifiers => _modifiers.AsReadOnly();
         public BoardTile BoardTile { get; private set; }
         public Skill Skill { get; private set; }
         public int Health { get; protected set; }
@@ -71,8 +71,8 @@ namespace Tofunaut.GridStrategy.Game
         private TofuAnimation _moveAnim;
         private Action _onMoveComplete;
         private readonly Game _game;
-        private readonly List<Modifier> _modifiers;
-        private ModifierTotals _modifierTotals;
+        private readonly List<UnitModifier> _modifiers;
+        private UnitModifierTotals _modifierTotals;
 
         // --------------------------------------------------------------------------------------------
         public Unit(UnitData data, Game game, Player owner) : base(data.id)
@@ -84,8 +84,8 @@ namespace Tofunaut.GridStrategy.Game
             _game = game;
             _owner = owner;
 
-            _modifiers = new List<Modifier>();
-            _modifierTotals = ModifierTotals.Identity;
+            _modifiers = new List<UnitModifier>();
+            _modifierTotals = UnitModifierTotals.Identity;
 
             Health = _data.health;
             MoveRange = _data.moveRange;
@@ -318,25 +318,25 @@ namespace Tofunaut.GridStrategy.Game
         }
 
         // --------------------------------------------------------------------------------------------
-        private void ApplyModifier(ModifierData modifierData)
+        private void ApplyModifier(UnitModifierData modifierData)
         {
-            Modifier modifier = new Modifier(modifierData, _game, this);
+            UnitModifier modifier = new UnitModifier(modifierData, _game, this);
             modifier.OnModifierExpired += Modifier_OnModifierExpired;
             _modifiers.Add(modifier);
 
-            _modifierTotals = Modifier.CalculateTotals(_modifiers);
+            _modifierTotals = UnitModifier.CalculateTotals(_modifiers);
         }
 
         // --------------------------------------------------------------------------------------------
-        private void RemoveModifier(Modifier modifier)
+        private void RemoveModifier(UnitModifier modifier)
         {
             _modifiers.Remove(modifier);
             modifier.OnModifierExpired -= Modifier_OnModifierExpired;
-            _modifierTotals = Modifier.CalculateTotals(_modifiers);
+            _modifierTotals = UnitModifier.CalculateTotals(_modifiers);
         }
 
         // --------------------------------------------------------------------------------------------
-        private void Modifier_OnModifierExpired(object sender, Modifier.ModifierEventArgs e)
+        private void Modifier_OnModifierExpired(object sender, UnitModifier.ModifierEventArgs e)
         {
             RemoveModifier(e.modifier);
         }

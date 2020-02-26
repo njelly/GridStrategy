@@ -934,10 +934,12 @@ namespace Tofunaut.GridStrategy
     /// Data for a modifier that can be applied
     /// </summary>
     [Serializable]
-    public struct ModifierData
+    public struct UnitModifierData
     {
         public string id;
         public int numTurnsActive;
+        public float skillDamageAdditive;
+        public float skillDamageMultiplier;
     }
 
     // --------------------------------------------------------------------------------------------
