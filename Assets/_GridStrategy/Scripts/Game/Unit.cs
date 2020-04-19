@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using TofuCore;
+using Tofunaut.Core;
 using Tofunaut.Animation;
 using Tofunaut.Core;
 using Tofunaut.SharpUnity;

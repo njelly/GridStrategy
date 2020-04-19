@@ -8,10 +8,10 @@
 
 using System;
 using System.Collections.Generic;
-using TofuCore;
+using Tofunaut.Core;
 using Tofunaut.GridStrategy.Game.UI;
 using Tofunaut.SharpUnity;
-using Tofunaut.TofuCore;
+using Tofunaut.Tofunaut.Core;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game
@@ -83,7 +83,7 @@ namespace Tofunaut.GridStrategy.Game
             _unitActionManager = new UnitActionManager(this, this);
             UIWorldInteractionPanel.AddListener(_unitActionManager);
 
-            gameCamera = GameCamera.Create(this, -67.5f, _players[_currentPlayerIndex].Hero.GameObject.transform.position);
+            gameCamera = GameCamera.Create(this, -90, board.CenterPos + Vector3.down * BoardTileView.Size/2f);
             gameCamera.Render(AppManager.Transform);
 
             _playerActions = new List<PlayerAction>();

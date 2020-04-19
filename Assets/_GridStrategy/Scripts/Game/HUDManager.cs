@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using TofuCore;
+using Tofunaut.Core;
 using Tofunaut.GridStrategy.UI;
 using Tofunaut.SharpUnity;
 using Tofunaut.SharpUnity.UI;

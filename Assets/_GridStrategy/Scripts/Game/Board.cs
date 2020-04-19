@@ -6,10 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-using System;
 using System.Collections.Generic;
 using System.Text;
-using TofuCore;
+using Tofunaut.Core;
 using Tofunaut.SharpUnity;
 using UnityEngine;
 

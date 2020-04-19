@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TofuCore;
+using Tofunaut.Core;
 using Tofunaut.GridStrategy.Game;
 using Tofunaut.UnityUtils;
 using UnityEngine;

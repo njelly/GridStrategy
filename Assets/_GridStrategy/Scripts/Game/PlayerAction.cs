@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using TofuCore;
+using Tofunaut.Core;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game

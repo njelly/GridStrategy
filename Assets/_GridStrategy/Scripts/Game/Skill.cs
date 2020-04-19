@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using TofuCore;
+using Tofunaut.Core;
 using UnityEngine;
 
 namespace Tofunaut.GridStrategy.Game

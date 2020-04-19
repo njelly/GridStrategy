@@ -68,8 +68,8 @@ namespace Tofunaut.GridStrategy.Game
         {
             GameCamera toReturn = new GameCamera(game);
             toReturn._orbitAngle = initOribitAngle;
-            toReturn._distanceFromLookTarget = 34f;
-            toReturn._horizonAngle = 45f;
+            toReturn._distanceFromLookTarget = 46f;
+            toReturn._horizonAngle = 35f;
 
             toReturn.LookingAt = initLookAt;
 

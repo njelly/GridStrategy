@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
-using TofuCore;
+using Tofunaut.Core;
 using Tofunaut.SharpUnity;
 using UnityEngine;
 
